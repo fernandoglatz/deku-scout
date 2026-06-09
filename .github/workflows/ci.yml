@@ -10,6 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # Smoke test: ensure imports work and basic module checks pass
@@ -28,11 +29,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Compile Python modules
-        run: python -m py_compile app/__init__.py app/config.py app/parsing.py app/db.py app/exchange.py app/scraper.py app/web.py wsgi.py
-
-      - name: Smoke test (import app)
-        run: python -c "from app import create_app; app = create_app(); print('✓ App factory works')"
+      - name: Run tests
+        run: pytest -v
 
   # Build for linux/amd64 (faster, primary platform)
   build-amd64:
@@ -58,7 +56,7 @@ jobs:
             type=raw,value=ci-amd64
 
       - name: Build Docker image (amd64)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -93,7 +91,7 @@ jobs:
             type=raw,value=ci-arm64
 
       - name: Build Docker image (arm64)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
