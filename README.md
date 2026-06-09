@@ -1,0 +1,97 @@
+# DekuScout
+
+A self-hosted web app that tracks your [DekuDeals](https://www.dekudeals.com) wishlist and compares prices across multiple regional storefronts, showing you where to buy each game at the lowest converted price.
+
+## Features
+
+- Scrapes your DekuDeals public wishlist and displays all games in a single dashboard
+- Compares prices across any combination of supported regions (40+ countries)
+- Converts regional prices to your reference currency using live exchange rates
+- Highlights the best-buy region and how much you save vs. the reference price
+- Shows sale badges, sale end dates, and release dates
+- Caches game data locally (SQLite) with configurable TTL — no repeated scraping
+- Displays and caches game cover art locally
+- Price history chart per game (fetched from DekuDeals item pages)
+- Fully configurable through the UI — no config file editing required
+
+## Screenshots
+
+![Main dashboard](docs/main.png)
+
+![Settings](docs/settings.png)
+
+## Quick Start
+
+### Docker Compose (recommended)
+
+Copy `.env.example` to `.env` and fill in your values:
+
+```
+WISHLIST_URL=https://www.dekudeals.com/wishlist/<your-code>
+TZ=America/Sao_Paulo
+```
+
+Then run:
+
+```bash
+docker compose up -d
+```
+
+Open [http://localhost:5000](http://localhost:5000) in your browser. On first load, enter your wishlist code or URL in the setup screen.
+
+### Running Locally
+
+```bash
+pip install -r requirements.txt
+python -m app
+```
+
+The app listens on `http://0.0.0.0:5000`.
+
+## Configuration
+
+All runtime settings are stored in the local SQLite database and can be changed from the web UI:
+
+| Setting | Description |
+|---|---|
+| Wishlist URL | Your DekuDeals public wishlist URL or code |
+| Selected currencies | Which regional storefronts to show |
+| Reference currency | The currency used for price comparisons and "best buy" calculations |
+
+Environment variables (used at startup / for Docker):
+
+| Variable | Default | Description |
+|---|---|---|
+| `WISHLIST_URL` | — | Pre-seeds the wishlist URL on first run |
+| `DATA_DIR` | `./data` | Directory for the SQLite database and icon cache |
+
+## Architecture
+
+```
+app/
+├── __init__.py     # Flask app factory
+├── config.py       # Constants, country/currency map
+├── scraper.py      # DekuDeals HTML scraping, icon download
+├── parsing.py      # Date/price string parsing helpers
+├── db.py           # SQLite persistence (cookies, game cache, config)
+├── exchange.py     # Live exchange rate fetching (open.er-api.com)
+├── web.py          # Flask routes and REST endpoints
+└── templates/
+    └── index.html  # Single-page UI
+```
+
+Data is persisted in a single SQLite file (`DATA_DIR/session.db`). Game data is cached for 30 minutes; price history is cached for 6 hours. Exchange rates are fetched at most once per hour.
+
+## Running Tests
+
+```bash
+pytest
+```
+
+## Docker Image
+
+Pre-built images are published to `ghcr.io/fernandoglatz/dekuscout`. The image exposes port `5000` and expects a writable volume at `/data`.
+
+```bash
+docker pull ghcr.io/fernandoglatz/dekuscout:latest
+```

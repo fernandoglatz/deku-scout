@@ -1,0 +1,292 @@
+<div id="setupModal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle" class="modal-title" data-i18n="modal.title">Configure Your Wishlist</h2>
+      <button class="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="setupForm" novalidate>
+        <div class="input-section active">
+          <label for="wishlistUrl" data-i18n="modal.urlLabel">Wishlist URL</label>
+          <input type="url" id="wishlistUrl" placeholder="https://www.dekudeals.com/wishlist/..." data-i18n-placeholder="modal.urlPlaceholder" autocomplete="off" spellcheck="false">
+          <p class="helper-text" data-i18n="modal.urlHelper">Paste the full wishlist URL from DekuDeals</p>
+        </div>
+
+        <div class="currency-section">
+          <label class="section-label" data-i18n="modal.currenciesLabel">Currencies to compare</label>
+          <div class="currency-search-wrap">
+            <input type="search" id="currencySearch" placeholder="Filter countries…" data-i18n-placeholder="modal.filterPlaceholder" autocomplete="off">
+          </div>
+          <div class="currency-grid" id="currencyGrid"></div>
+          <div class="reference-wrap">
+            <label for="referenceCurrency" data-i18n="modal.referenceLabel">Reference currency (best-buy base)</label>
+            <select id="referenceCurrency"></select>
+          </div>
+        </div>
+
+        <div id="formError" class="form-error" style="display:none;" role="alert"></div>
+
+        <button type="submit" id="submitBtn" class="btn submit-btn" data-i18n="modal.saveBtn">Save Settings</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.65);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.4);
+    width: 90%; max-width: 520px;
+    max-height: 90vh; display: flex; flex-direction: column;
+  }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0; }
+  .modal-close {
+    background: none; border: none;
+    font-size: 1.4rem; line-height: 1;
+    color: var(--text-muted); cursor: pointer;
+    padding: 0; width: 1.8rem; height: 1.8rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; transition: color .15s, background .15s;
+  }
+  .modal-close:hover { color: var(--text); background: var(--border); }
+  .modal-body { padding: 1.5rem; overflow-y: auto; }
+  .input-section { margin-bottom: 1.25rem; }
+  .input-section label, .section-label {
+    display: block; margin-bottom: .4rem;
+    font-size: .85rem; font-weight: 600; color: var(--text-sub);
+  }
+  .input-section input {
+    width: 100%; padding: .6rem .8rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text);
+    font-size: .9rem; outline: none; transition: border-color .15s;
+  }
+  .input-section input:focus { border-color: var(--accent); }
+  .helper-text { margin-top: .35rem; font-size: .75rem; color: var(--text-muted); }
+  .currency-section { margin-bottom: 1.25rem; }
+  .currency-search-wrap { margin-bottom: .5rem; }
+  .currency-search-wrap input {
+    width: 100%; padding: .45rem .7rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: .82rem; outline: none;
+  }
+  .currency-search-wrap input:focus { border-color: var(--accent); }
+  .currency-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: .3rem; max-height: 220px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: .5rem; background: var(--bg);
+  }
+  .currency-item {
+    display: flex; align-items: center; gap: .45rem;
+    padding: .3rem .4rem; border-radius: 4px; cursor: pointer;
+    font-size: .8rem; color: var(--text); user-select: none;
+    transition: background .1s;
+  }
+  .currency-item:hover { background: var(--row-hover); }
+  .currency-item input[type="checkbox"] { margin: 0; cursor: pointer; accent-color: var(--accent); }
+  .currency-item .ci-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .currency-item .ci-code { color: var(--text-muted); font-size: .72rem; font-family: monospace; }
+  .reference-wrap { margin-top: .75rem; }
+  .reference-wrap label {
+    display: block; margin-bottom: .35rem;
+    font-size: .82rem; font-weight: 600; color: var(--text-sub);
+  }
+  .reference-wrap select {
+    width: 100%; padding: .5rem .7rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: .85rem; outline: none;
+  }
+  .reference-wrap select:focus { border-color: var(--accent); }
+  .form-error {
+    padding: .65rem .85rem; margin-bottom: 1rem;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.3);
+    border-radius: 6px; color: #ef4444;
+    font-size: .82rem;
+  }
+  .submit-btn { width: 100%; padding: .65rem; font-size: .9rem; }
+</style>
+
+<script>
+(function () {
+  var COUNTRIES = {{ countries | tojson }};
+
+  var modal      = document.getElementById('setupModal');
+  var openBtn    = document.getElementById('openModalBtn');
+  var bannerBtn  = document.getElementById('bannerUpdateBtn');
+  var closeBtn   = modal ? modal.querySelector('.modal-close') : null;
+  var form       = document.getElementById('setupForm');
+  var submitBtn  = document.getElementById('submitBtn');
+  var formError  = document.getElementById('formError');
+  var urlField   = document.getElementById('wishlistUrl');
+  var grid       = document.getElementById('currencyGrid');
+  var refSelect  = document.getElementById('referenceCurrency');
+  var searchInput = document.getElementById('currencySearch');
+
+  if (!modal) return;
+
+  var selectedCurrencies = ['br', 'us'];
+  var referenceCurrency  = 'br';
+
+  function buildGrid() {
+    grid.innerHTML = '';
+    var sorted = Object.keys(COUNTRIES).sort(function (a, b) {
+      return COUNTRIES[a].name.localeCompare(COUNTRIES[b].name);
+    });
+    sorted.forEach(function (code) {
+      var c = COUNTRIES[code];
+      var item = document.createElement('label');
+      item.className = 'currency-item';
+      item.dataset.code = code;
+      item.innerHTML =
+        '<input type="checkbox" value="' + code + '">' +
+        '<span class="ci-name">' + c.name + '</span>' +
+        '<span class="ci-code">' + c.iso + '</span>';
+      grid.appendChild(item);
+    });
+    syncCheckboxes();
+  }
+
+  function syncCheckboxes() {
+    grid.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+      cb.checked = selectedCurrencies.indexOf(cb.value) !== -1;
+    });
+    updateRefSelect();
+  }
+
+  function updateRefSelect() {
+    var prev = refSelect.value;
+    refSelect.innerHTML = '';
+    selectedCurrencies.forEach(function (code) {
+      var opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = COUNTRIES[code].name + ' (' + COUNTRIES[code].iso + ')';
+      refSelect.appendChild(opt);
+    });
+    if (selectedCurrencies.indexOf(prev) !== -1) {
+      refSelect.value = prev;
+    } else if (selectedCurrencies.indexOf(referenceCurrency) !== -1) {
+      refSelect.value = referenceCurrency;
+    }
+  }
+
+  grid.addEventListener('change', function (e) {
+    if (e.target.type !== 'checkbox') return;
+    var code = e.target.value;
+    if (e.target.checked) {
+      if (selectedCurrencies.indexOf(code) === -1) selectedCurrencies.push(code);
+    } else {
+      selectedCurrencies = selectedCurrencies.filter(function (c) { return c !== code; });
+    }
+    updateRefSelect();
+  });
+
+  searchInput.addEventListener('input', function () {
+    var q = searchInput.value.trim().toLowerCase();
+    grid.querySelectorAll('.currency-item').forEach(function (item) {
+      var code = item.dataset.code;
+      var name = COUNTRIES[code].name.toLowerCase();
+      var iso  = COUNTRIES[code].iso.toLowerCase();
+      item.style.display = (!q || name.includes(q) || iso.includes(q) || code.includes(q)) ? '' : 'none';
+    });
+  });
+
+  function openModal() {
+    modal.style.display = 'flex';
+    fetch('/api/config')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.wishlist_url) urlField.value = data.wishlist_url;
+        if (data.selected_currencies) selectedCurrencies = data.selected_currencies.slice();
+        if (data.reference_currency) referenceCurrency = data.reference_currency;
+        syncCheckboxes();
+      })
+      .catch(function () {});
+    setTimeout(function () { if (urlField) urlField.focus(); }, 50);
+  }
+
+  function closeModal() {
+    modal.style.display = 'none';
+    formError.style.display = 'none';
+    form.reset();
+    searchInput.value = '';
+    grid.querySelectorAll('.currency-item').forEach(function (i) { i.style.display = ''; });
+  }
+
+  if (openBtn)   openBtn.addEventListener('click', openModal);
+  if (bannerBtn) bannerBtn.addEventListener('click', openModal);
+  if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+  });
+
+  buildGrid();
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    formError.style.display = 'none';
+
+    if (selectedCurrencies.length === 0) {
+      formError.textContent = window.I18n ? I18n.t('modal.errorNoCurrency') : 'Please select at least one currency.';
+      formError.style.display = 'block';
+      return;
+    }
+
+    var ref = refSelect.value;
+    if (!ref || selectedCurrencies.indexOf(ref) === -1) {
+      formError.textContent = window.I18n ? I18n.t('modal.errorNoReference') : 'Please select a reference currency.';
+      formError.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = window.I18n ? I18n.t('modal.savingBtn') : 'Saving…';
+
+    var urlVal = urlField.value.trim();
+    var payload = {
+      selected_currencies: selectedCurrencies.slice(),
+      reference_currency: ref,
+    };
+    if (urlVal) payload.input = urlVal;
+
+    fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+      .then(function (res) {
+        if (res.ok && res.data.success) {
+          window.location.reload();
+        } else {
+          formError.textContent = res.data.error || (window.I18n ? I18n.t('modal.errorSave') : 'Failed to save. Please try again.');
+          formError.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = window.I18n ? I18n.t('modal.saveBtn') : 'Save Settings';
+        }
+      })
+      .catch(function () {
+        formError.textContent = window.I18n ? I18n.t('modal.errorNetwork') : 'Network error. Please try again.';
+        formError.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = window.I18n ? I18n.t('modal.saveBtn') : 'Save Settings';
+      });
+  });
+}());
+</script>

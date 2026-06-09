@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <title>DekuScout</title>
+  <style>
+    :root {
+      --bg:          #111827;
+      --surface:     #1f2937;
+      --border:      #374151;
+      --text:        #f3f4f6;
+      --text-muted:  #9ca3af;
+      --text-sub:    #e5e7eb;
+      --accent:      #60a5fa;
+      --row-hover:   #1e2a3a;
+      --sale-row:    rgba(16,185,129,.05);
+      --orig-color:  #6b7280;
+      --spinner-trk: #374151;
+      --green:       #6ee7b7;
+      --yellow:      #fbbf24;
+      --badge-bg:    #065f46;
+      --badge-text:  #6ee7b7;
+    }
+    [data-theme="light"] {
+      --bg:          #f3f4f6;
+      --surface:     #ffffff;
+      --border:      #d1d5db;
+      --text:        #111827;
+      --text-muted:  #6b7280;
+      --text-sub:    #374151;
+      --accent:      #2563eb;
+      --row-hover:   #e0e7ff;
+      --sale-row:    rgba(16,185,129,.08);
+      --orig-color:  #9ca3af;
+      --spinner-trk: #d1d5db;
+      --green:       #047857;
+      --yellow:      #b45309;
+      --badge-bg:    #d1fae5;
+      --badge-text:  #065f46;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px; transition: background .2s, color .2s;
+    }
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0.9rem 2rem; display: flex; align-items: center; gap: 1.5rem;
+      position: sticky; top: 0; z-index: 20;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .meta { flex: 1; display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.8rem; flex-wrap: wrap; }
+    .meta b { color: var(--text-sub); }
+    .btn {
+      background: #2563eb; color: #fff; border: none;
+      padding: 0.45rem 1.1rem; border-radius: 6px;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap; transition: background .15s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn:disabled { background: var(--border); cursor: not-allowed; color: var(--text-muted); }
+    .theme-btn {
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+      padding: 0.45rem 0.7rem; border-radius: 6px; font-size: 1rem; cursor: pointer; line-height: 1;
+      transition: background .15s, border-color .15s;
+    }
+    .theme-btn:hover { border-color: var(--accent); }
+    .lang-select {
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+      padding: 0.45rem 1.7rem 0.45rem 0.65rem; border-radius: 6px;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; letter-spacing: .04em;
+      transition: border-color .15s; outline: none;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 8px 5px;
+    }
+    .lang-select:hover, .lang-select:focus { border-color: var(--accent); }
+    #loading {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); z-index: 100;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 1rem; color: #e5e7eb; font-size: 1rem;
+    }
+    #loading.show { display: flex; }
+    .spinner {
+      width: 2.5rem; height: 2.5rem;
+      border: 3px solid var(--spinner-trk); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    main { padding: 1.5rem 2rem; }
+    .stats { display: flex; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .75rem 1.25rem; min-width: 110px;
+    }
+    .stat .val { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+    .stat .lbl { font-size: .72rem; color: var(--text-muted); margin-top: .3rem; }
+    .toolbar { display: flex; gap: .75rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+    .search-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      padding: .45rem .8rem; font-size: .85rem; width: 260px; outline: none;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .filter-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text-muted);
+      padding: .45rem .9rem; font-size: .8rem; cursor: pointer; transition: all .15s;
+    }
+    .filter-btn:hover, .filter-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--surface); padding: .7rem .9rem;
+      text-align: left; font-size: .7rem; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em;
+      white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    thead th:hover { color: var(--text-sub); }
+    thead th.asc::after  { content: ' ↑'; color: var(--accent); }
+    thead th.desc::after { content: ' ↓'; color: var(--accent); }
+    thead th:first-child { width: 3.5rem; text-align: center; cursor: default; }
+    thead th:first-child::after { content: '' !important; }
+    .th-icon { width: 3rem; cursor: default !important; }
+    .th-icon::after { content: '' !important; }
+    tbody tr { border-top: 1px solid var(--surface); transition: background .1s; }
+    tbody tr:hover { background: var(--row-hover) !important; }
+    tbody tr.on-sale { background: var(--sale-row); }
+    tbody tr.unavailable { opacity: .4; }
+    td { padding: .6rem .9rem; vertical-align: middle; }
+    td:first-child { text-align: center; color: var(--text-muted); font-size: .75rem; }
+    .td-icon { padding: .4rem .6rem; text-align: center; }
+    .game-icon {
+      width: 42px; height: 42px; object-fit: cover;
+      border-radius: 6px; display: block; margin: 0 auto; background: var(--border);
+    }
+    .game-icon-placeholder {
+      width: 42px; height: 42px; border-radius: 6px;
+      background: var(--border); display: inline-flex;
+      align-items: center; justify-content: center; font-size: 1.2rem; margin: 0 auto;
+    }
+    .name a { color: var(--text); font-weight: 500; text-decoration: none; }
+    .name a:hover { color: var(--accent); text-decoration: underline; }
+    .orig { color: var(--orig-color); text-decoration: line-through; font-variant-numeric: tabular-nums; }
+    .cur  { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .disc { color: var(--green); font-size: .78rem; font-weight: 600; }
+    .bb-winner { color: var(--green); }
+    .bb-ref    { color: var(--yellow); }
+    .bb-eq     { color: var(--text-muted); }
+    .bb-conv   { color: var(--orig-color); font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .bb-save   { font-size: .72rem; font-weight: 700; }
+    .sale-end  { color: var(--yellow); font-size: .78rem; white-space: nowrap; }
+    .c-green   { color: var(--green); }
+    .c-yellow  { color: var(--yellow); }
+    .rel-date  { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
+    .ph-trigger { cursor: help; }
+    #ph-popup {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: .85rem 1rem 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,.45); width: 380px; pointer-events: auto;
+    }
+    #ph-title { font-size: .78rem; font-weight: 600; color: var(--accent); margin-bottom: .5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #ph-loading { text-align: center; color: var(--text-muted); font-size: .78rem; padding: 2rem 0; }
+    #ph-error   { color: #f87171; font-size: .75rem; padding: .4rem 0; }
+    #ph-chart-wrap { position: relative; height: 160px; }
+    @media (max-width: 640px) {
+      header, main { padding-left: 1rem; padding-right: 1rem; }
+      .meta { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="loading"><div class="spinner"></div><span data-i18n="loading.fetching">Fetching prices from DekuDeals…</span></div>
+<header>
+  <h1>&#127918; DekuScout</h1>
+  <div class="meta">
+    <span><span data-i18n="meta.updated">Updated:</span> <b>{{ last_updated }}</b></span>
+    {% if exchange_rates %}
+    <span>
+      {% for locale, rate in exchange_rates.items() %}
+        <b>{{ locale.upper() }}/{{ reference_locale.upper() }}:</b> {{ "%.4f"|format(rate) }}{% if not loop.last %} &nbsp;{% endif %}
+      {% endfor %}
+    </span>
+    {% endif %}
+    <span><b class="c-green">{{ on_sale }}</b> <span data-i18n="meta.onSale">on sale</span></span>
+    <span><b class="c-yellow">{{ unavailable }}</b> <span data-i18n="meta.unavailable">unavailable</span></span>
+  </div>
+  <button class="theme-btn" id="themeToggle" title="Toggle light/dark theme">&#9790;</button>
+  <select class="lang-select" id="langSelect" title="Language / Idioma">
+    <option value="en">🇺🇸 English</option>
+    <option value="pt">🇧🇷 Português</option>
+    <option value="es">🇪🇸 Español</option>
+    <option value="ja">🇯🇵 日本語</option>
+  </select>
+  {% if not wishlist_configured %}
+  <button class="btn" id="openModalBtn" type="button" data-i18n="btn.setupWishlist">Setup Wishlist</button>
+  {% else %}
+  <button class="theme-btn" id="openModalBtn" type="button" title="Change settings">&#9881;</button>
+  {% endif %}
+  <form id="rf" action="/refresh" method="post" style="margin:0">
+    <button class="btn" type="submit">&#8635; <span data-i18n="btn.refresh">Refresh</span></button>
+  </form>
+</header>
+<main>
+  {% include 'components/config_banner.html' %}
+  {% if games %}
+  <div class="stats">
+    <div class="stat"><div class="val">{{ total }}</div><div class="lbl" data-i18n="stats.total">Total games</div></div>
+    <div class="stat"><div class="val c-green">{{ on_sale }}</div><div class="lbl" data-i18n="stats.onSale">On sale now</div></div>
+    <div class="stat"><div class="val c-yellow">{{ unavailable }}</div><div class="lbl" data-i18n="stats.unavailable">Unavailable</div></div>
+  </div>
+  <div class="toolbar">
+    <input class="search-box" id="search" type="search" placeholder="Search games…" data-i18n-placeholder="search.placeholder" autocomplete="off">
+    <button class="filter-btn active" data-filter="all" data-i18n="filter.all">All</button>
+    <button class="filter-btn" data-filter="sale" data-i18n="filter.onSale">On Sale</button>
+    <button class="filter-btn" data-filter="available" data-i18n="filter.available">Available</button>
+    {% if selected_locales|length > 1 %}
+      {% for locale in selected_locales %}
+        {% if locale != reference_locale %}
+        <button class="filter-btn" data-filter="bb-{{ locale }}"><span data-i18n="filter.bestBuy">Best Buy</span> {{ locale.upper() }}</button>
+        {% endif %}
+      {% endfor %}
+      <button class="filter-btn" data-filter="bb-{{ reference_locale }}"><span data-i18n="filter.bestBuy">Best Buy</span> {{ reference_locale.upper() }}</button>
+    {% endif %}
+  </div>
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th class="th-icon"></th>
+          <th data-type="str" data-i18n="th.game">Game</th>
+          {% for locale in selected_locales %}
+          <th data-type="price" data-locale="{{ locale }}" data-col="cur"{% if locale == reference_locale %} data-ref-cur="1"{% endif %}>
+            {{ countries[locale].symbol }} {{ locale.upper() }}
+          </th>
+          {% endfor %}
+          {% if selected_locales|length > 1 %}
+          <th data-type="price" data-i18n="th.bestBuy">Best Buy</th>
+          {% endif %}
+          <th data-type="date" data-i18n="th.releaseDate">Release Date</th>
+          <th data-type="date" data-i18n="th.saleEnds">Sale Ends</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for g in games %}
+        {% set is_on_sale = g.has_discount %}
+        {% set is_unavail = g.all_unavailable %}
+        <tr class="{{ 'on-sale' if is_on_sale else ('unavailable' if is_unavail else '') }}"
+            data-sale="{{ '1' if is_on_sale else '0' }}"
+            data-unavail="{{ '1' if is_unavail else '0' }}"
+            data-bestbuy="{{ g.best_buy }}">
+          <td>{{ loop.index }}</td>
+          <td class="td-icon">
+            <img class="game-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
+                 onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'game-icon-placeholder',textContent:'🎮'}))"
+                 alt="" loading="lazy">
+          </td>
+          <td class="name"><a href="https://www.dekudeals.com/items/{{ g.slug }}" target="_blank" rel="noopener">{{ g.name }}</a></td>
+          {% for locale in selected_locales %}
+          {% set p = g.prices.get(locale, {}) %}
+          <td class="cur" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}" data-sort="{{ p.get('current', '') if p else '' }}">
+            <span class="orig">{{ p.get('original', '') if p else '' }}</span><br>
+            {%- set cur = p.get('current', '') if p else '' -%}
+            {%- if not cur or cur == 'Unavailable' -%}
+            <span data-i18n="cell.unavailable">Unavailable</span>
+            {%- else -%}
+            {{ cur }}
+            {%- endif -%}
+            {%- if p and p.get('discount') %} <span class="disc">({{ p.discount }})</span>{% endif %}
+          </td>
+          {% endfor %}
+          {% if selected_locales|length > 1 %}
+          <td data-sort="{{ g.best_buy_label or '' }}">
+            {% if g.best_buy == 'eq' %}
+              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+              <span class="bb-eq bb-save" data-i18n="bb.samePrice">≈ same price</span>
+            {% elif g.best_buy == reference_locale %}
+              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+              <span class="bb-ref bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ reference_locale.upper() }}</span>
+            {% elif g.best_buy %}
+              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+              <span class="bb-winner bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ g.best_buy.upper() }}</span>
+            {% endif %}
+          </td>
+          {% endif %}
+          <td class="rel-date" data-date="{{ g.release_date }}"></td>
+          <td class="sale-end" data-date="{{ g.sale_end }}"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif wishlist_configured and not wishlist_error %}
+  <p style="color:var(--text-muted);text-align:center;padding:3rem 0;" data-i18n="loading.wishlistData">Loading wishlist data...</p>
+  {% endif %}
+</main>
+<script>
+window.I18n = (function () {
+  var cache = {};
+  var current = 'en';
+  var strings = {};
+  var SUPPORTED = ['en', 'pt', 'es', 'ja'];
+  var LOCALE_MAP = { en: 'en-US', pt: 'pt-BR', es: 'es-ES', ja: 'ja-JP' };
+
+  function resolve(lang) {
+    var prefix = (lang || '').toLowerCase().split('-')[0];
+    return SUPPORTED.indexOf(prefix) !== -1 ? prefix : 'en';
+  }
+
+  function t(key, vars) {
+    var s = strings[key] !== undefined ? strings[key] : key;
+    if (vars) {
+      Object.keys(vars).forEach(function (k) {
+        s = s.split('{' + k + '}').join(String(vars[k]));
+      });
+    }
+    return s;
+  }
+
+  function applyDOM() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var val = strings[el.dataset.i18n];
+      if (val !== undefined) el.textContent = val;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      var val = strings[el.dataset.i18nPlaceholder];
+      if (val !== undefined) el.placeholder = val;
+    });
+  }
+
+  function load(lang, cb) {
+    current = lang;
+    document.documentElement.lang = LOCALE_MAP[lang] || lang;
+    if (cache[lang]) {
+      strings = cache[lang];
+      applyDOM();
+      if (cb) cb();
+      return;
+    }
+    fetch('/static/locales/' + lang + '.json')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        cache[lang] = data;
+        strings = data;
+        applyDOM();
+        if (cb) cb();
+      })
+      .catch(function () { if (cb) cb(); });
+  }
+
+  function init(selectEl, cb) {
+    var saved = localStorage.getItem('lang');
+    if (saved === 'pt-BR') { saved = 'pt'; localStorage.setItem('lang', 'pt'); }
+    var lang = (saved && SUPPORTED.indexOf(saved) !== -1) ? saved : resolve(navigator.language);
+    current = lang;
+    if (selectEl) selectEl.value = lang;
+    if (selectEl) {
+      selectEl.addEventListener('change', function () {
+        var next = selectEl.value;
+        localStorage.setItem('lang', next);
+        load(next, cb);
+      });
+    }
+    load(lang, cb);
+  }
+
+  return {
+    t: t,
+    init: init,
+    current: function () { return current; },
+    localeString: function () { return LOCALE_MAP[current] || 'en-US'; }
+  };
+}());
+</script>
+<script>
+(function () {
+  document.getElementById('rf').addEventListener('submit', function () {
+    document.getElementById('loading').classList.add('show');
+    this.querySelector('button').disabled = true;
+  });
+
+  var html = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+  var saved = localStorage.getItem('theme') || 'dark';
+  html.dataset.theme = saved;
+  themeBtn.textContent = saved === 'dark' ? '☀️' : '☾';
+  themeBtn.addEventListener('click', function () {
+    var next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    localStorage.setItem('theme', next);
+    themeBtn.textContent = next === 'dark' ? '☀️' : '☾';
+  });
+
+  function formatReleaseDate(val, locale) {
+    if (!val) return '';
+    if (/^\d{4}$/.test(val)) return val;
+    var d = new Date(val + (val.includes('T') ? '' : 'T00:00:00Z'));
+    if (isNaN(d)) return val;
+    return new Intl.DateTimeFormat(locale,
+      { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+
+  function formatSaleEnd(isoStr, locale) {
+    if (!isoStr) return '';
+    var d = new Date(isoStr);
+    if (isNaN(d)) return '';
+    var diffMs = d - Date.now();
+    if (diffMs <= 0) return I18n.t('sale.expired');
+    var diffH = diffMs / 3600000;
+    if (diffH < 48) {
+      var h = Math.floor(diffH), m = Math.floor((diffH - h) * 60);
+      if (h === 0) return I18n.t('sale.inMinutes', { m: m });
+      return I18n.t('sale.inHours', { h: h });
+    }
+    return new Intl.DateTimeFormat(locale,
+      { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+
+  function applyDates() {
+    var locale = I18n.localeString();
+    document.querySelectorAll('td.sale-end[data-date]').forEach(function (td) {
+      td.textContent = formatSaleEnd(td.dataset.date, locale);
+    });
+    document.querySelectorAll('td.rel-date[data-date]').forEach(function (td) {
+      td.textContent = formatReleaseDate(td.dataset.date, locale);
+    });
+  }
+
+  I18n.init(document.getElementById('langSelect'), applyDates);
+
+  var tbl = document.getElementById('tbl');
+  if (!tbl) return;
+  var allThs = [...tbl.querySelectorAll('thead th')];
+  var sortIdx = -1, sortDir = 1;
+
+  function parsePrice(s) {
+    var clean = s.replace(/[^\d,.]/g, '');
+    if (!clean) return 0;
+    var dots = (clean.match(/\./g) || []).length;
+    var commas = (clean.match(/,/g) || []).length;
+    if (dots > 1) { clean = clean.replace(/\./g, ''); if (commas === 1) clean = clean.replace(',', '.'); }
+    else if (commas > 1) { clean = clean.replace(/,/g, ''); }
+    else if (dots === 1 && commas === 1) {
+      if (clean.lastIndexOf(',') > clean.lastIndexOf('.')) { clean = clean.replace('.','').replace(',','.'); }
+      else { clean = clean.replace(',',''); }
+    } else if (commas === 1) {
+      var parts = clean.split(',');
+      if (parts[1].length <= 2) { clean = clean.replace(',', '.'); } else { clean = clean.replace(',', ''); }
+    }
+    return parseFloat(clean) || 0;
+  }
+  function parseDate(s) { var d = new Date(s); return isNaN(d) ? 0 : d.getTime(); }
+
+  function doSort(colIdx, dir) {
+    sortIdx = colIdx; sortDir = dir;
+    allThs.forEach(function (h) { h.classList.remove('asc', 'desc'); });
+    if (allThs[colIdx]) allThs[colIdx].classList.add(dir === 1 ? 'asc' : 'desc');
+    var tbody = tbl.querySelector('tbody');
+    var rows = [...tbody.querySelectorAll('tr')];
+    var type = allThs[colIdx] ? allThs[colIdx].dataset.type : 'str';
+    rows.sort(function (a, b) {
+      var au = a.dataset.unavail === '1', bu = b.dataset.unavail === '1';
+      if (au !== bu) return au ? 1 : -1;
+      var av = a.cells[colIdx] ? (a.cells[colIdx].dataset.sort || a.cells[colIdx].textContent.trim()) : '';
+      var bv = b.cells[colIdx] ? (b.cells[colIdx].dataset.sort || b.cells[colIdx].textContent.trim()) : '';
+      var cmp = 0;
+      if (type === 'price') { cmp = (parsePrice(av) - parsePrice(bv)) * dir; }
+      else if (type === 'date') {
+        var ad = a.cells[colIdx] ? (a.cells[colIdx].dataset.date || av) : av;
+        var bd = b.cells[colIdx] ? (b.cells[colIdx].dataset.date || bv) : bv;
+        cmp = (parseDate(ad) - parseDate(bd)) * dir;
+      } else { cmp = av.localeCompare(bv) * dir; }
+      if (cmp !== 0) return cmp;
+      return (a.cells[2] ? a.cells[2].textContent : '').localeCompare(b.cells[2] ? b.cells[2].textContent : '');
+    });
+    rows.forEach(function (r) { tbody.appendChild(r); });
+  }
+
+  allThs.forEach(function (th, i) {
+    if (!th.dataset.type || th.dataset.type === 'none' || i < 2) return;
+    th.addEventListener('click', function () { doSort(i, sortIdx === i ? -sortDir : 1); });
+  });
+
+  // Default sort: reference locale's current column
+  var refTh = tbl.querySelector('thead th[data-ref-cur="1"]');
+  var defaultCol = refTh ? allThs.indexOf(refTh) : 3;
+  doSort(defaultCol, 1);
+
+  var searchEl = document.getElementById('search');
+  var filterBtns = [...document.querySelectorAll('.filter-btn')];
+  var activeFilters = new Set();
+
+  function applyFilters() {
+    var q = searchEl.value.trim().toLowerCase();
+    tbl.querySelector('tbody').querySelectorAll('tr').forEach(function (tr) {
+      var matchSearch = !q || tr.cells[2].textContent.toLowerCase().includes(q);
+      var matchFilter = true;
+      if (activeFilters.size > 0) {
+        activeFilters.forEach(function (f) {
+          if (f === 'sale'      && tr.dataset.sale !== '1')    matchFilter = false;
+          if (f === 'available' && tr.dataset.unavail === '1') matchFilter = false;
+          if (f.startsWith('bb-') && tr.dataset.bestbuy !== f.slice(3)) matchFilter = false;
+        });
+      }
+      tr.style.display = matchSearch && matchFilter ? '' : 'none';
+    });
+  }
+
+  var allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+  activeFilters.add('sale');
+  allBtn.classList.remove('active');
+  var saleBtn = document.querySelector('.filter-btn[data-filter="sale"]');
+  if (saleBtn) saleBtn.classList.add('active');
+  applyFilters();
+
+  searchEl.addEventListener('input', applyFilters);
+  filterBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var filter = btn.dataset.filter;
+      if (filter === 'all') {
+        activeFilters.clear();
+        filterBtns.forEach(function (b) { b.classList.remove('active'); });
+        allBtn.classList.add('active');
+      } else {
+        allBtn.classList.remove('active');
+        if (activeFilters.has(filter)) {
+          activeFilters.delete(filter);
+          btn.classList.remove('active');
+        } else {
+          if (filter.startsWith('bb-')) {
+            activeFilters.forEach(function (f) {
+              if (f.startsWith('bb-')) {
+                activeFilters.delete(f);
+                var ob = document.querySelector('.filter-btn[data-filter="' + f + '"]');
+                if (ob) ob.classList.remove('active');
+              }
+            });
+          }
+          activeFilters.add(filter);
+          btn.classList.add('active');
+        }
+        if (activeFilters.size === 0) allBtn.classList.add('active');
+      }
+      applyFilters();
+    });
+  });
+
+}());
+</script>
+
+<div id="ph-popup" style="display:none;position:fixed;z-index:500;">
+  <div id="ph-title"></div>
+  <div id="ph-loading" data-i18n="ph.loading">Loading...</div>
+  <div id="ph-error" style="display:none;"></div>
+  <div id="ph-chart-wrap"><canvas id="ph-canvas"></canvas></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  var popup   = document.getElementById('ph-popup');
+  var titleEl = document.getElementById('ph-title');
+  var loadEl  = document.getElementById('ph-loading');
+  var errEl   = document.getElementById('ph-error');
+  var ctxEl   = document.getElementById('ph-canvas');
+
+  var COLORS = ['#60a5fa', '#34d399', '#fb923c', '#a78bfa', '#f87171', '#fbbf24'];
+  var phCache = {}, activeChart = null;
+  var showTimer = null, hideTimer = null, currentKey = null;
+
+  function fmtPrice(val, currency) {
+    if (val == null) return null;
+    if (currency === 'br') return 'R$ ' + val.toFixed(2).replace('.', ',');
+    if (currency === 'jp') return '¥' + Math.round(val).toLocaleString();
+    return '$' + val.toFixed(2);
+  }
+
+  function themeColors() {
+    var dark = document.documentElement.dataset.theme !== 'light';
+    return { grid: dark ? '#374151' : '#e5e7eb', tick: dark ? '#9ca3af' : '#6b7280' };
+  }
+
+  function renderChart(el, data, currency) {
+    var key = el.dataset.phSlug + ':' + currency;
+    if (currentKey !== key) return;
+    loadEl.style.display = 'none'; ctxEl.parentElement.style.display = 'none';
+    if (!data.headers || !data.headers.length || !data.data || !data.data.length) {
+      loadEl.textContent = I18n.t('ph.noHistory'); loadEl.style.display = 'block';
+      positionPopup(el); return;
+    }
+    ctxEl.parentElement.style.display = 'block';
+    var tc = themeColors(), rows = data.data;
+    var MAX = 150;
+    if (rows.length > MAX) {
+      var step = Math.ceil(rows.length / MAX);
+      rows = rows.filter(function (_, i) { return i % step === 0 || i === rows.length - 1; });
+    }
+    var labels = rows.map(function (r) { return r[0]; });
+    var allDS = data.headers.map(function (h, i) {
+      return { label: h, data: rows.map(function (r) { return r[i + 2]; }),
+        borderColor: COLORS[i % COLORS.length], backgroundColor: COLORS[i % COLORS.length] + '22',
+        borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 3, stepped: true, spanGaps: true };
+    });
+    var eshop = allDS.filter(function (d) { return d.label.toLowerCase().indexOf('nintendo eshop') !== -1; });
+    var datasets = eshop.length > 0 ? eshop : allDS;
+    if (activeChart) { activeChart.destroy(); activeChart = null; }
+    activeChart = new Chart(ctxEl, {
+      type: 'line', data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: tc.tick, font: { size: 10 }, boxWidth: 12, padding: 6 } },
+          tooltip: { callbacks: { label: function (ctx) {
+            return ctx.raw == null ? '' : ctx.dataset.label + ': ' + fmtPrice(ctx.raw, currency);
+          }}},
+        },
+        scales: {
+          x: { grid: { color: tc.grid }, ticks: { color: tc.tick, font: { size: 9 }, maxTicksLimit: 8, maxRotation: 0,
+            callback: function (v) { var l = this.getLabelForValue(v); return l ? l.slice(0, 7) : v; } } },
+          y: { grid: { color: tc.grid }, ticks: { color: tc.tick, font: { size: 9 },
+            callback: function (v) { return fmtPrice(v, currency); } } },
+        },
+      },
+    });
+    positionPopup(el);
+  }
+
+  function positionPopup(el) {
+    var rect = el.getBoundingClientRect();
+    var pw = popup.offsetWidth || 380, ph = popup.offsetHeight;
+    var left = Math.max(8, Math.min(window.innerWidth - pw - 8, rect.left + rect.width / 2 - pw / 2));
+    var top = rect.top - ph - 8;
+    if (top < 8) top = rect.bottom + 8;
+    popup.style.left = left + 'px'; popup.style.top = top + 'px';
+  }
+
+  function showPopup(el) {
+    var slug = el.dataset.phSlug, currency = el.dataset.phCurrency || 'br';
+    if (!slug) return;
+    var key = slug + ':' + currency; currentKey = key;
+    var nameEl = el.closest('tr').querySelector('.name a');
+    titleEl.textContent = (nameEl ? nameEl.textContent : '') + ' — ' + I18n.t('ph.priceHistory') + ' (' + currency.toUpperCase() + ')';
+    loadEl.textContent = I18n.t('ph.loading'); loadEl.style.display = 'block';
+    errEl.style.display = 'none'; ctxEl.parentElement.style.display = 'none';
+    popup.style.display = 'block'; positionPopup(el);
+    if (phCache[key]) { renderChart(el, phCache[key], currency); return; }
+    fetch('/price-history/' + slug + '?currency=' + currency)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        phCache[key] = data; renderChart(el, data, currency);
+      })
+      .catch(function () {
+        if (currentKey !== key) return;
+        loadEl.textContent = I18n.t('ph.failed'); loadEl.style.display = 'block';
+        positionPopup(el);
+      });
+  }
+
+  function hidePopup() { popup.style.display = 'none'; currentKey = null; }
+
+  document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
+    el.classList.add('ph-trigger');
+    el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
+    el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
+  });
+  popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+  popup.addEventListener('mouseleave', function () { hideTimer = setTimeout(hidePopup, 180); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePopup(); });
+}());
+</script>
+{% include 'components/setup_modal.html' %}
+</body>
+</html>

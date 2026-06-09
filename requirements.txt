@@ -1,0 +1,7 @@
+beautifulsoup4>=4.12
+Flask>=3.0
+gunicorn>=22.0
+requests>=2.32
+
+# dev / test
+pytest>=8.0

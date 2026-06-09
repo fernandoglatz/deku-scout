@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  dekuscout:
+    image: ghcr.io/fernandoglatz/dekuscout:latest
+    hostname: dekuscout
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - WISHLIST_URL=${WISHLIST_URL}
+      - DATA_DIR=/data
+    volumes:
+      - data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+
+volumes:
+  data:

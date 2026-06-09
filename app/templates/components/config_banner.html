@@ -1,0 +1,65 @@
+{% if not wishlist_configured %}
+<div class="config-banner banner-info">
+  <div class="banner-content">
+    <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    <span>
+      <span data-i18n="banner.noWishlist">No wishlist configured. Click</span>
+      <strong data-i18n="banner.setupWishlist">Setup Wishlist</strong>
+      <span data-i18n="banner.toStart">to get started.</span>
+    </span>
+  </div>
+</div>
+{% elif wishlist_error %}
+<div class="config-banner banner-error">
+  <div class="banner-content">
+    <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <div class="banner-text">
+      <strong data-i18n="banner.notFound">Wishlist not found.</strong>
+      {{ wishlist_error_message or "Please update your configuration." }}
+      <button type="button" class="banner-action" id="bannerUpdateBtn" data-i18n="banner.updateBtn">Update Configuration</button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+  .config-banner {
+    margin-bottom: 1.5rem;
+    border-radius: 8px; border: 1px solid;
+    padding: .9rem 1.1rem;
+  }
+  .banner-info {
+    background: rgba(59,130,246,.07);
+    border-color: rgba(59,130,246,.25);
+    color: var(--accent);
+  }
+  .banner-error {
+    background: rgba(239,68,68,.07);
+    border-color: rgba(239,68,68,.25);
+    color: #ef4444;
+  }
+  .banner-content {
+    display: flex; align-items: flex-start; gap: .65rem;
+    font-size: .875rem;
+  }
+  .banner-icon {
+    width: 1.15rem; height: 1.15rem;
+    flex-shrink: 0; margin-top: .1rem;
+  }
+  .banner-text { display: flex; flex-direction: column; gap: .4rem; }
+  .banner-action {
+    display: inline-block; align-self: flex-start;
+    padding: .3rem .75rem;
+    background: transparent; border: 1px solid currentColor;
+    border-radius: 4px; color: inherit;
+    font-size: .78rem; font-weight: 600; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .banner-action:hover {
+    background: currentColor; color: var(--bg);
+  }
+</style>
