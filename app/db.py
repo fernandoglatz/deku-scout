@@ -198,6 +198,7 @@ def save_price_history_cache(slug: str, currency: str, data: dict, db_path: str)
 
 def init_config_table() -> None:
     """Create the config table if it doesn't exist."""
+    os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
     with sqlite3.connect(DB_FILE) as conn:
         conn.execute(
             """
