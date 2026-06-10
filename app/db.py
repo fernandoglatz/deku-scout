@@ -34,30 +34,14 @@ def load_cookies(db_path: str, locale: str = "br") -> list[tuple]:
 
 def clear_games_cache(db_path: str) -> None:
     with sqlite3.connect(db_path) as conn:
-        conn.execute("DROP TABLE IF EXISTS games_cache")
+        conn.execute("DELETE FROM games_cache")
         conn.commit()
 
 
 def save_games_cache(games: list[dict], db_path: str) -> float:
     ts = time.time()
     with sqlite3.connect(db_path) as conn:
-        conn.execute("DROP TABLE IF EXISTS games_cache")
-        conn.execute(
-            """
-            CREATE TABLE games_cache (
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
-                name         TEXT    NOT NULL,
-                slug         TEXT    NOT NULL DEFAULT '',
-                prices       TEXT    NOT NULL DEFAULT '{}',
-                release_date TEXT    NOT NULL DEFAULT '',
-                sale_end     TEXT    NOT NULL DEFAULT '',
-                image_url    TEXT    NOT NULL DEFAULT '',
-                icon_ext     TEXT    NOT NULL DEFAULT '',
-                fetched_at   REAL    NOT NULL,
-                sale_ends    TEXT    NOT NULL DEFAULT '{}'
-            )
-            """
-        )
+        conn.execute("DELETE FROM games_cache")
         conn.executemany(
             "INSERT INTO games_cache"
             " (name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends)"
