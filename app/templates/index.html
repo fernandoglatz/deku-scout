@@ -416,6 +416,47 @@
       </tbody>
     </table>
   </div>
+  <div id="cardList">
+    {% for g in games %}
+    {% set is_on_sale = g.has_discount %}
+    {% set is_unavail = g.all_unavailable %}
+    <div class="game-card {{ 'on-sale' if is_on_sale else ('unavailable' if is_unavail else '') }}"
+         data-sale="{{ '1' if is_on_sale else '0' }}"
+         data-unavail="{{ '1' if is_unavail else '0' }}"
+         data-bestbuy="{{ g.best_buy }}"
+         data-name="{{ g.name | lower }}">
+      <img class="card-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'card-icon-ph',textContent:'🎮'}))"
+           alt="" loading="lazy">
+      <div class="card-body">
+        <div class="card-name">
+          <a href="https://www.dekudeals.com/items/{{ g.slug }}" target="_blank" rel="noopener">{{ g.name }}</a>
+        </div>
+        <div class="card-prices">
+          {% for locale in selected_locales %}
+          {% set p = g.prices.get(locale, {}) %}
+          {%- set cur = p.get('current', '') if p else '' -%}
+          <div class="card-price-cell" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}">
+            <span class="card-price-label">{{ countries[locale].symbol }} {{ locale.upper() }}</span>
+            {%- if p and p.get('original') -%}
+            <span class="card-price-orig">{{ p.original }}</span>
+            {%- endif -%}
+            {%- if not cur or cur == 'Unavailable' -%}
+            <span class="card-price-unavail" data-i18n="cell.unavailable">Unavailable</span>
+            {%- else -%}
+            <span class="card-price-cur">{{ cur }}</span>
+            {%- endif -%}
+            {%- if p and p.get('discount') -%}
+            <span class="disc">{{ p.discount }}</span>
+            {%- endif -%}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="card-sale-end" data-date="{{ g.sale_end }}"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
   {% elif wishlist_configured and not wishlist_error %}
   <p style="color:var(--text-muted);text-align:center;padding:3rem 0;" data-i18n="loading.wishlistData">Loading wishlist data...</p>
   {% endif %}
