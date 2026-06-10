@@ -180,6 +180,13 @@
     #ph-loading { text-align: center; color: var(--text-muted); font-size: .78rem; padding: 2rem 0; }
     #ph-error   { color: #f87171; font-size: .75rem; padding: .4rem 0; }
     #ph-chart-wrap { position: relative; height: 160px; }
+    #ph-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 498;
+      background: rgba(0,0,0,.5);
+    }
+    #ph-backdrop.show { display: block; }
     @media (max-width: 640px) {
       header, main { padding-left: 1rem; padding-right: 1rem; }
       .meta { display: none; }
@@ -225,6 +232,25 @@
         align-items: center;
       }
       #mobileMenuActions .btn { flex: 1; justify-content: center; }
+
+      #ph-popup {
+        position: fixed !important;
+        bottom: 0 !important; left: 0 !important; right: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 12px 12px 0 0;
+        z-index: 500;
+        padding: 0 1rem 1.25rem;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+      .bs-handle {
+        width: 36px; height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        margin: 0.65rem auto 0.75rem;
+      }
     }
   </style>
 </head>
@@ -702,7 +728,9 @@ window.I18n = (function () {
 }());
 </script>
 
+<div id="ph-backdrop"></div>
 <div id="ph-popup" style="display:none;position:fixed;z-index:500;">
+  <div class="bs-handle"></div>
   <div id="ph-title"></div>
   <div id="ph-loading" data-i18n="ph.loading">Loading...</div>
   <div id="ph-error" style="display:none;"></div>
@@ -780,6 +808,7 @@ window.I18n = (function () {
   }
 
   function positionPopup(el) {
+    if (isTouchDevice) return;
     var rect = el.getBoundingClientRect();
     var pw = popup.offsetWidth || 380, ph = popup.offsetHeight;
     var left = Math.max(8, Math.min(window.innerWidth - pw - 8, rect.left + rect.width / 2 - pw / 2));
@@ -813,14 +842,43 @@ window.I18n = (function () {
 
   function hidePopup() { popup.style.display = 'none'; currentKey = null; }
 
+  var backdrop = document.getElementById('ph-backdrop');
+  var isTouchDevice = ('ontouchstart' in window);
+
+  function showBottomSheet(el) {
+    showPopup(el);
+    backdrop.classList.add('show');
+  }
+
+  function hideBottomSheet() {
+    hidePopup();
+    backdrop.classList.remove('show');
+  }
+
   document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
     el.classList.add('ph-trigger');
-    el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
-    el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
+    if (isTouchDevice) {
+      el.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
+          hideBottomSheet();
+        } else {
+          showBottomSheet(el);
+        }
+      }, { passive: false });
+    } else {
+      el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
+      el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
+    }
   });
-  popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
-  popup.addEventListener('mouseleave', function () { hideTimer = setTimeout(hidePopup, 180); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePopup(); });
+
+  if (!isTouchDevice) {
+    popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+    popup.addEventListener('mouseleave', function () { hideTimer = setTimeout(hidePopup, 180); });
+  }
+
+  backdrop.addEventListener('click', hideBottomSheet);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideBottomSheet(); });
 }());
 </script>
 {% include 'components/setup_modal.html' %}
