@@ -68,6 +68,15 @@
       transition: background .15s, border-color .15s;
     }
     .theme-btn:hover { border-color: var(--accent); }
+    .user-badge {
+      background: var(--surface); color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.7rem; border-radius: 6px;
+      font-size: 0.75rem; white-space: nowrap;
+      max-width: 200px; overflow: hidden; text-overflow: ellipsis;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      cursor: default;
+    }
     .lang-select {
       background: var(--surface); color: var(--text); border: 1px solid var(--border);
       padding: 0.45rem 1.7rem 0.45rem 0.65rem; border-radius: 6px;
@@ -198,6 +207,9 @@
     <option value="es">🇪🇸 Español</option>
     <option value="ja">🇯🇵 日本語</option>
   </select>
+  {% if user_email %}
+  <span class="user-badge" title="{{ user_email }}">&#128100; {{ user_email }}</span>
+  {% endif %}
   {% if not wishlist_configured %}
   <button class="btn" id="openModalBtn" type="button" data-i18n="btn.setupWishlist">Setup Wishlist</button>
   {% else %}
