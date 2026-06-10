@@ -6,6 +6,3 @@ CREATE TABLE cookies (
     locale TEXT NOT NULL DEFAULT 'br',
     PRIMARY KEY (name, domain, path, locale)
 );
-
--- @rollback
-DROP TABLE cookies;

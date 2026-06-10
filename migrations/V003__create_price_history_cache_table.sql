@@ -7,6 +7,3 @@ CREATE TABLE price_history_cache (
     fetched_at REAL NOT NULL,
     PRIMARY KEY (slug, currency)
 );
-
--- @rollback
-DROP TABLE price_history_cache;

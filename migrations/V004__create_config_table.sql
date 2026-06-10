@@ -6,6 +6,3 @@ CREATE TABLE config (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- @rollback
-DROP TABLE config;

@@ -12,6 +12,3 @@ CREATE TABLE games_cache (
     fetched_at   REAL    NOT NULL,
     sale_ends    TEXT    NOT NULL DEFAULT '{}'
 );
-
--- @rollback
-DROP TABLE games_cache;
