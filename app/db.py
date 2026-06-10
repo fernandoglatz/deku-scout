@@ -4,32 +4,15 @@ import sqlite3
 import time
 from typing import Optional
 
-import requests
+from requests.cookies import RequestsCookieJar
 
 from app.config import CACHE_TTL, DB_FILE, HISTORY_CACHE_TTL
 from app.parsing import parse_release_date, parse_sale_end
 import re
 
 
-def save_cookies(jar: requests.cookies.RequestsCookieJar, db_path: str, locale: str = "br") -> None:
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+def save_cookies(jar: RequestsCookieJar, db_path: str, locale: str = "br") -> None:
     with sqlite3.connect(db_path) as conn:
-        # Migrate old schema if locale column is missing
-        cols = {r[1] for r in conn.execute("PRAGMA table_info(cookies)")}
-        if cols and ("domain" not in cols or "locale" not in cols):
-            conn.execute("DROP TABLE cookies")
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS cookies (
-                name   TEXT NOT NULL,
-                value  TEXT NOT NULL,
-                domain TEXT NOT NULL DEFAULT '',
-                path   TEXT NOT NULL DEFAULT '/',
-                locale TEXT NOT NULL DEFAULT 'br',
-                PRIMARY KEY (name, domain, path, locale)
-            )
-            """
-        )
         rows = [(c.name, c.value, c.domain or "", c.path or "/", locale) for c in jar]
         conn.executemany(
             "INSERT OR REPLACE INTO cookies (name, value, domain, path, locale) VALUES (?, ?, ?, ?, ?)",
