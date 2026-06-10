@@ -59,8 +59,10 @@ def test_multiple_config_values(temp_db):
     assert get_config("key3") == "value3"
 
 
-def test_get_config_endpoint(client, temp_db, monkeypatch):
+def test_get_config_endpoint(client, monkeypatch):
     """Test GET /api/config endpoint."""
+    import app.config as config_module
+
     # Test when no WISHLIST_URL is configured
     response = client.get("/api/config")
     assert response.status_code == 200
@@ -70,8 +72,8 @@ def test_get_config_endpoint(client, temp_db, monkeypatch):
     assert data["wishlist_url"] is None
     assert data["configured"] is False
 
-    # Set a WISHLIST_URL and test again
-    set_config("WISHLIST_URL", "https://example.com/wishlist")
+    # Set a WISHLIST_URL and test again (write to client's DB)
+    set_config("WISHLIST_URL", "https://example.com/wishlist", config_module.DB_FILE)
     response = client.get("/api/config")
     assert response.status_code == 200
     data = response.get_json()
@@ -273,8 +275,10 @@ def test_post_config_endpoint_invalid_input(client, temp_db):
     assert "Please enter a valid wishlist code or full URL" in data["error"]
 
 
-def test_post_config_endpoint_valid_code_success(client, temp_db, monkeypatch):
+def test_post_config_endpoint_valid_code_success(client, monkeypatch):
     """Test POST /api/config with valid code and successful validation."""
+    import app.config as config_module
+
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -289,13 +293,15 @@ def test_post_config_endpoint_valid_code_success(client, temp_db, monkeypatch):
     assert data["success"] is True
     assert data["wishlist_url"] == "https://www.dekudeals.com/wishlist/x8kxhn96yf"
 
-    # Verify it was saved to the database
-    saved_url = get_config("WISHLIST_URL")
+    # Verify it was saved to the client's database
+    saved_url = get_config("WISHLIST_URL", config_module.DB_FILE)
     assert saved_url == "https://www.dekudeals.com/wishlist/x8kxhn96yf"
 
 
-def test_post_config_endpoint_valid_url_success(client, temp_db, monkeypatch):
+def test_post_config_endpoint_valid_url_success(client, monkeypatch):
     """Test POST /api/config with valid URL and successful validation."""
+    import app.config as config_module
+
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -311,8 +317,8 @@ def test_post_config_endpoint_valid_url_success(client, temp_db, monkeypatch):
     assert data["success"] is True
     assert data["wishlist_url"] == test_url
 
-    # Verify it was saved to the database
-    saved_url = get_config("WISHLIST_URL")
+    # Verify it was saved to the client's database
+    saved_url = get_config("WISHLIST_URL", config_module.DB_FILE)
     assert saved_url == test_url
 
 
@@ -375,8 +381,10 @@ def test_post_config_endpoint_connection_error(client, temp_db, monkeypatch):
     assert saved_url is None
 
 
-def test_post_config_endpoint_updates_existing_config(client, temp_db, monkeypatch):
+def test_post_config_endpoint_updates_existing_config(client, monkeypatch):
     """Test that POST /api/config updates an existing config value."""
+    import app.config as config_module
+
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -385,8 +393,8 @@ def test_post_config_endpoint_updates_existing_config(client, temp_db, monkeypat
     import requests
     monkeypatch.setattr(requests, "get", mock_get)
 
-    # Set initial config
-    set_config("WISHLIST_URL", "https://www.dekudeals.com/wishlist/old")
+    # Set initial config in client's database
+    set_config("WISHLIST_URL", "https://www.dekudeals.com/wishlist/old", config_module.DB_FILE)
 
     # Update with new config
     response = client.post("/api/config", json={"input": "x8kxhn96yf"})
@@ -395,8 +403,8 @@ def test_post_config_endpoint_updates_existing_config(client, temp_db, monkeypat
     assert data["success"] is True
     assert data["wishlist_url"] == "https://www.dekudeals.com/wishlist/x8kxhn96yf"
 
-    # Verify it was updated in the database
-    saved_url = get_config("WISHLIST_URL")
+    # Verify it was updated in the client's database
+    saved_url = get_config("WISHLIST_URL", config_module.DB_FILE)
     assert saved_url == "https://www.dekudeals.com/wishlist/x8kxhn96yf"
 
 
@@ -497,10 +505,11 @@ def test_merge_prices_missing_in_one_locale():
 
 # ── currency config endpoint tests ───────────────────────────────────────────
 
-def test_get_config_returns_currencies(client, temp_db):
+def test_get_config_returns_currencies(client):
+    import app.config as config_module
     from app.db import set_config
-    set_config("SELECTED_CURRENCIES", '["br","us"]')
-    set_config("REFERENCE_CURRENCY", "br")
+    set_config("SELECTED_CURRENCIES", '["br","us"]', config_module.DB_FILE)
+    set_config("REFERENCE_CURRENCY", "br", config_module.DB_FILE)
     response = client.get("/api/config")
     assert response.status_code == 200
     data = response.get_json()
@@ -508,8 +517,9 @@ def test_get_config_returns_currencies(client, temp_db):
     assert data["reference_currency"] == "br"
 
 
-def test_post_config_saves_currencies(client, temp_db, monkeypatch):
+def test_post_config_saves_currencies(client, monkeypatch):
     import json as _json
+    import app.config as config_module
     from app.db import get_config
     response = client.post("/api/config", json={
         "selected_currencies": ["br", "us", "jp"],
@@ -518,8 +528,8 @@ def test_post_config_saves_currencies(client, temp_db, monkeypatch):
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] is True
-    assert _json.loads(get_config("SELECTED_CURRENCIES")) == ["br", "us", "jp"]
-    assert get_config("REFERENCE_CURRENCY") == "br"
+    assert _json.loads(get_config("SELECTED_CURRENCIES", config_module.DB_FILE)) == ["br", "us", "jp"]
+    assert get_config("REFERENCE_CURRENCY", config_module.DB_FILE) == "br"
 
 
 def test_post_config_rejects_invalid_locale(client, temp_db):

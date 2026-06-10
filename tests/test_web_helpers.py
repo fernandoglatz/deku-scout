@@ -114,7 +114,7 @@ def test_format_price_eur():
 
 def test_get_selected_locales_default(monkeypatch):
     from app.web import _get_selected_locales
-    monkeypatch.setattr("app.web.get_config", lambda _key: None)
+    monkeypatch.setattr("app.web.get_config", lambda _key, _db=None: None)
     assert _get_selected_locales() == ["br", "us"]
 
 
@@ -122,7 +122,7 @@ def test_get_selected_locales_configured(monkeypatch):
     from app.web import _get_selected_locales
     import json
     monkeypatch.setattr("app.web.get_config",
-                        lambda key: json.dumps(["br", "us", "jp"]) if key == "SELECTED_CURRENCIES" else None)
+                        lambda key, _db=None: json.dumps(["br", "us", "jp"]) if key == "SELECTED_CURRENCIES" else None)
     assert _get_selected_locales() == ["br", "us", "jp"]
 
 
@@ -130,19 +130,19 @@ def test_get_selected_locales_configured(monkeypatch):
 
 def test_get_reference_locale_default(monkeypatch):
     from app.web import _get_reference_locale
-    monkeypatch.setattr("app.web.get_config", lambda _key: None)
+    monkeypatch.setattr("app.web.get_config", lambda _key, _db=None: None)
     assert _get_reference_locale(["br", "us"]) == "br"
 
 
 def test_get_reference_locale_configured(monkeypatch):
     from app.web import _get_reference_locale
-    monkeypatch.setattr("app.web.get_config", lambda key: "us" if key == "REFERENCE_CURRENCY" else None)
+    monkeypatch.setattr("app.web.get_config", lambda key, _db=None: "us" if key == "REFERENCE_CURRENCY" else None)
     assert _get_reference_locale(["br", "us"]) == "us"
 
 
 def test_get_reference_locale_invalid_falls_back(monkeypatch):
     from app.web import _get_reference_locale
-    monkeypatch.setattr("app.web.get_config", lambda key: "jp" if key == "REFERENCE_CURRENCY" else None)
+    monkeypatch.setattr("app.web.get_config", lambda key, _db=None: "jp" if key == "REFERENCE_CURRENCY" else None)
     # "jp" is not in selected → fall back to first
     assert _get_reference_locale(["br", "us"]) == "br"
 

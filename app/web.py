@@ -14,7 +14,8 @@ from flask import Blueprint, jsonify, redirect, render_template, request, send_f
 
 log = logging.getLogger(__name__)
 
-from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR
+from app.config import COUNTRIES, HEADERS, ICONS_DIR
+from app.user import get_db_path, get_user_email
 from app.db import (
     clear_games_cache,
     get_cached_price_history,
@@ -107,12 +108,12 @@ def _validate_wishlist_url(url: str) -> Optional[str]:
 
 
 def _get_selected_locales() -> list[str]:
-    raw = get_config("SELECTED_CURRENCIES")
+    raw = get_config("SELECTED_CURRENCIES", get_db_path())
     return json.loads(raw) if raw else ["br", "us"]
 
 
 def _get_reference_locale(selected_locales: list[str]) -> str:
-    ref = get_config("REFERENCE_CURRENCY")
+    ref = get_config("REFERENCE_CURRENCY", get_db_path())
     return ref if ref and ref in selected_locales else selected_locales[0]
 
 
@@ -205,7 +206,9 @@ def _compute_best_buy(games: list[dict], selected_locales: list[str], reference_
 
 @web_bp.route("/")
 def index():
-    wishlist_url = get_config("WISHLIST_URL")
+    db_path = get_db_path()
+    user_email = get_user_email()
+    wishlist_url = get_config("WISHLIST_URL", db_path)
     wishlist_configured = wishlist_url is not None
     selected_locales = _get_selected_locales()
     reference_locale = _get_reference_locale(selected_locales)
@@ -226,14 +229,15 @@ def index():
             reference_locale=reference_locale,
             countries=COUNTRIES,
             exchange_rates=exchange_rates,
+            user_email=user_email,
         )
 
-    games, fetched_at = load_games_cache(DB_FILE)
+    games, fetched_at = load_games_cache(db_path)
     if games is None:
         log.info("index: cache miss — fetching live data (locales=%s)", selected_locales)
         try:
             games, fetched_at = fetch_all_games(
-                DB_FILE,
+                db_path,
                 wishlist_url=wishlist_url,
                 locales=selected_locales,
                 reference_locale=reference_locale,
@@ -260,6 +264,7 @@ def index():
                     reference_locale=reference_locale,
                     countries=COUNTRIES,
                     exchange_rates={},
+                    user_email=user_email,
                 )
             return (
                 "<h1>Error</h1><p>Failed to fetch wishlist data. "
@@ -305,12 +310,14 @@ def index():
         reference_locale=reference_locale,
         countries=COUNTRIES,
         exchange_rates=exchange_rates,
+        user_email=user_email,
     )
 
 
 @web_bp.route("/api/config", methods=["GET"])
 def get_config_api():
-    url = get_config("WISHLIST_URL")
+    db_path = get_db_path()
+    url = get_config("WISHLIST_URL", db_path)
     selected_locales = _get_selected_locales()
     reference_locale = _get_reference_locale(selected_locales)
     return jsonify({
@@ -323,6 +330,7 @@ def get_config_api():
 
 @web_bp.route("/api/config", methods=["POST"])
 def set_config_api():
+    db_path = get_db_path()
     data = request.get_json()
     has_currencies = data and ("selected_currencies" in data or "reference_currency" in data)
     has_input = data and "input" in data
@@ -338,16 +346,16 @@ def set_config_api():
             invalid = [c for c in selected if c not in COUNTRIES]
             if invalid:
                 return jsonify({"success": False, "error": f"Invalid locale codes: {invalid}"}), 400
-            set_config("SELECTED_CURRENCIES", json.dumps(selected))
-            clear_games_cache(DB_FILE)
+            set_config("SELECTED_CURRENCIES", json.dumps(selected), db_path)
+            clear_games_cache(db_path)
 
         reference = data.get("reference_currency")
         if reference is not None:
-            current_raw = get_config("SELECTED_CURRENCIES")
+            current_raw = get_config("SELECTED_CURRENCIES", db_path)
             current_selected = json.loads(current_raw) if current_raw else []
             if reference not in current_selected:
                 return jsonify({"success": False, "error": "Reference currency must be one of the selected currencies"}), 400
-            set_config("REFERENCE_CURRENCY", reference)
+            set_config("REFERENCE_CURRENCY", reference, db_path)
 
     if not has_input:
         return jsonify({"success": True}), 200
@@ -360,17 +368,18 @@ def set_config_api():
     if validation_error:
         return jsonify({"success": False, "error": validation_error}), 400
 
-    set_config("WISHLIST_URL", url)
+    set_config("WISHLIST_URL", url, db_path)
     return jsonify({"success": True, "wishlist_url": url}), 200
 
 
 @web_bp.route("/refresh", methods=["POST"])
 def refresh():
-    wishlist_url = get_config("WISHLIST_URL")
+    db_path = get_db_path()
+    wishlist_url = get_config("WISHLIST_URL", db_path)
     selected_locales = _get_selected_locales()
     reference_locale = _get_reference_locale(selected_locales)
     fetch_all_games(
-        DB_FILE,
+        db_path,
         wishlist_url=wishlist_url,
         locales=selected_locales,
         reference_locale=reference_locale,
@@ -393,7 +402,7 @@ def serve_icon(slug: str):
 
     if not icon_found:
         try:
-            with sqlite3.connect(DB_FILE) as conn:
+            with sqlite3.connect(get_db_path()) as conn:
                 row = conn.execute(
                     "SELECT image_url FROM games_cache WHERE slug = ?", (slug,)
                 ).fetchone()
@@ -422,15 +431,16 @@ def serve_icon(slug: str):
 
 @web_bp.route("/price-history/<path:slug>")
 def price_history_api(slug: str):
+    db_path = get_db_path()
     currency = request.args.get("currency", "br").lower()
     locale = currency
-    cached = get_cached_price_history(slug, currency, DB_FILE)
+    cached = get_cached_price_history(slug, currency, db_path)
     if cached is not None:
         return jsonify(cached)
     try:
         from app.scraper import build_session, set_locale
 
-        sess = build_session(DB_FILE, locale)
+        sess = build_session(db_path, locale)
         set_locale(sess, locale)
         resp = sess.get(
             f"https://www.dekudeals.com/items/{slug}",
@@ -443,7 +453,7 @@ def price_history_api(slug: str):
         if not script_tag or not script_tag.string:
             return jsonify({"headers": [], "data": []})
         data = json.loads(script_tag.string)
-        save_price_history_cache(slug, currency, data, DB_FILE)
+        save_price_history_cache(slug, currency, data, db_path)
         return jsonify(data)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500

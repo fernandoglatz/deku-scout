@@ -97,7 +97,6 @@ def test_before_request_creates_user_db_on_first_request(client, monkeypatch, tm
     assert os.path.exists(expected_db)
 
 
-@pytest.mark.xfail(reason="app/web.py still reads DB_FILE directly; will pass after Task 4", strict=True)
 def test_before_request_user_db_is_isolated_from_default(client, monkeypatch, tmp_path):
     import app.config as config_module
     monkeypatch.setattr(config_module, "DATA_DIR", str(tmp_path))
