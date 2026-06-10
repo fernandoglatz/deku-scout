@@ -494,8 +494,10 @@ window.I18n = (function () {
     mobileMenuReady = true;
 
     // Clone lang select
-    var langClone = document.getElementById('langSelect').cloneNode(true);
+    var langOrig = document.getElementById('langSelect');
+    var langClone = langOrig.cloneNode(true);
     langClone.id = 'langSelectMobile';
+    langClone.value = langOrig.value;
     langClone.addEventListener('change', function () {
       document.getElementById('langSelect').value = langClone.value;
       document.getElementById('langSelect').dispatchEvent(new Event('change'));
