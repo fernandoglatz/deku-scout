@@ -68,6 +68,7 @@
       transition: background .15s, border-color .15s;
     }
     .theme-btn:hover { border-color: var(--accent); }
+    #mobileMenuBtn { display: none; }
     .user-badge {
       background: var(--surface); color: var(--text-muted);
       border: 1px solid var(--border);
@@ -182,6 +183,47 @@
       header, main { padding-left: 1rem; padding-right: 1rem; }
       .meta { display: none; }
       .search-box { width: 100%; }
+
+      /* hide all header controls on mobile */
+      header .theme-btn,
+      header .lang-select,
+      header .user-badge,
+      header #openModalBtn,
+      header #rf { display: none; }
+
+      /* show hamburger */
+      #mobileMenuBtn { display: flex; }
+
+      /* mobile dropdown panel */
+      #mobileMenu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0; right: 0;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 1rem;
+        z-index: 19;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+      #mobileMenu.open { display: flex; }
+
+      #mobileMenu .lang-select,
+      #mobileMenu .user-badge,
+      #mobileMenu .theme-btn,
+      #mobileMenu #openModalBtn,
+      #mobileMenu #rf { display: flex !important; }
+
+      #mobileMenu .lang-select { width: 100%; }
+      #mobileMenu .user-badge  { max-width: 100%; width: 100%; }
+
+      #mobileMenuActions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      #mobileMenuActions .btn { flex: 1; justify-content: center; }
     }
   </style>
 </head>
@@ -219,6 +261,10 @@
   <form id="rf" action="/refresh" method="post" style="margin:0">
     <button class="btn" type="submit">&#8635; <span data-i18n="btn.refresh">Refresh</span></button>
   </form>
+  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false">&#9776;</button>
+  <div id="mobileMenu" role="navigation" aria-label="Mobile menu">
+    <!-- clones are inserted by JS -->
+  </div>
 </header>
 <main>
   {% include 'components/config_banner.html' %}
@@ -409,6 +455,86 @@ window.I18n = (function () {
     html.dataset.theme = next;
     localStorage.setItem('theme', next);
     themeBtn.textContent = next === 'dark' ? '☀️' : '☾';
+  });
+
+  // Mobile menu — populate with clones of header controls on first open
+  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  var mobileMenu    = document.getElementById('mobileMenu');
+  var mobileMenuReady = false;
+
+  function buildMobileMenu() {
+    if (mobileMenuReady) return;
+    mobileMenuReady = true;
+
+    // Clone lang select
+    var langClone = document.getElementById('langSelect').cloneNode(true);
+    langClone.id = 'langSelectMobile';
+    langClone.addEventListener('change', function () {
+      document.getElementById('langSelect').value = langClone.value;
+      document.getElementById('langSelect').dispatchEvent(new Event('change'));
+    });
+    mobileMenu.appendChild(langClone);
+
+    // Clone user badge (display only)
+    var badge = document.querySelector('header .user-badge');
+    if (badge) mobileMenu.appendChild(badge.cloneNode(true));
+
+    // Actions row: theme + settings + refresh
+    var actionsRow = document.createElement('div');
+    actionsRow.id = 'mobileMenuActions';
+
+    var themeClone = document.getElementById('themeToggle').cloneNode(true);
+    themeClone.id = 'themeToggleMobile';
+    themeClone.addEventListener('click', function () {
+      document.getElementById('themeToggle').click();
+      themeClone.textContent = document.getElementById('themeToggle').textContent;
+    });
+    actionsRow.appendChild(themeClone);
+
+    var settingsBtn = document.getElementById('openModalBtn');
+    if (settingsBtn) {
+      var settingsClone = settingsBtn.cloneNode(true);
+      settingsClone.addEventListener('click', function () {
+        closeMobileMenu();
+        settingsBtn.click();
+      });
+      actionsRow.appendChild(settingsClone);
+    }
+
+    var rfClone = document.getElementById('rf').cloneNode(true);
+    rfClone.id = 'rfMobile';
+    rfClone.addEventListener('submit', function () {
+      document.getElementById('loading').classList.add('show');
+      rfClone.querySelector('button').disabled = true;
+    });
+    actionsRow.appendChild(rfClone);
+
+    mobileMenu.appendChild(actionsRow);
+  }
+
+  function closeMobileMenu() {
+    mobileMenu.classList.remove('open');
+    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  mobileMenuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var isOpen = mobileMenu.classList.contains('open');
+    if (!isOpen) {
+      buildMobileMenu();
+      mobileMenu.classList.add('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      closeMobileMenu();
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (mobileMenu.classList.contains('open') &&
+        !mobileMenu.contains(e.target) &&
+        e.target !== mobileMenuBtn) {
+      closeMobileMenu();
+    }
   });
 
   function formatReleaseDate(val, locale) {
