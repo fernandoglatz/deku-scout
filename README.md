@@ -65,6 +65,33 @@ Environment variables (used at startup / for Docker):
 | `WISHLIST_URL` | — | Pre-seeds the wishlist URL on first run |
 | `DATA_DIR` | `./data` | Directory for the SQLite database and icon cache |
 
+## User Management
+
+DekuScout supports multi-user deployments via an auth proxy that injects an `X-Forwarded-User` header containing the user's email address. When this header is present, each user gets a fully isolated SQLite database (config, wishlist, games cache, price history). Icons are shared globally across users.
+
+When the header is absent, the app falls back to a single shared `session.db` — preserving local / single-user behavior unchanged.
+
+### Auth Proxy Setup
+
+Configure your reverse proxy (e.g. Authelia, Authentik, oauth2-proxy) to inject the header on every request:
+
+```
+X-Forwarded-User: user@example.com
+```
+
+DekuScout reads this header on each request, computes a SHA-256 hash of the email address, and stores that user's data under:
+
+```
+data/
+  session.db               ← default (no header / local dev)
+  users/
+    <sha256(email)>/
+      session.db           ← per-user isolated database
+  icons/                   ← shared globally
+```
+
+The user's email is displayed as a badge in the header of the UI. No extra configuration is required — user databases are created and migrated automatically on first access.
+
 ## Architecture
 
 ```
