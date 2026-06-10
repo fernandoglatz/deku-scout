@@ -187,6 +187,37 @@
       background: rgba(0,0,0,.5);
     }
     #ph-backdrop.show { display: block; }
+    #cardList { display: none; }
+    .game-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: .65rem .85rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+    }
+    .game-card.on-sale { background: var(--sale-row); border-color: rgba(16,185,129,.2); }
+    .game-card.unavailable { opacity: .4; }
+    .card-icon {
+      width: 44px; height: 44px; object-fit: cover;
+      border-radius: 6px; flex-shrink: 0; background: var(--border);
+    }
+    .card-icon-ph {
+      width: 44px; height: 44px; border-radius: 6px;
+      background: var(--border); flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card-name { margin-bottom: .3rem; }
+    .card-name a { color: var(--text); font-weight: 600; font-size: .88rem; text-decoration: none; }
+    .card-name a:hover { color: var(--accent); }
+    .card-prices { display: flex; flex-direction: column; gap: .2rem; }
+    .card-price-cell {
+      display: flex; align-items: baseline; gap: .3rem;
+      flex-wrap: wrap; font-size: .8rem; cursor: help;
+    }
+    .card-price-label { color: var(--text-muted); font-size: .72rem; font-weight: 600; min-width: 2.5rem; }
+    .card-price-orig { color: var(--orig-color); text-decoration: line-through; font-size: .75rem; font-variant-numeric: tabular-nums; }
+    .card-price-cur { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .card-price-unavail { color: var(--text-muted); font-size: .78rem; }
+    .card-sale-end { color: var(--yellow); font-size: .75rem; margin-top: .3rem; }
     @media (max-width: 640px) {
       header, main { padding-left: 1rem; padding-right: 1rem; }
       .meta { display: none; }
@@ -251,6 +282,8 @@
         border-radius: 2px;
         margin: 0.65rem auto 0.75rem;
       }
+      .table-wrap { display: none; }
+      #cardList { display: flex; flex-direction: column; gap: .5rem; }
     }
   </style>
 </head>
