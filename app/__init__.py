@@ -1,4 +1,5 @@
 import logging
+import threading
 
 from flask import Flask, g
 
@@ -17,6 +18,7 @@ def create_app():
     app = Flask(__name__, template_folder="templates", static_folder="static", static_url_path="/static")
 
     initialized_dbs: set[str] = set()
+    _init_lock = threading.Lock()
 
     run_migrations(config.DB_FILE)
     initialized_dbs.add(config.DB_FILE)
@@ -27,8 +29,10 @@ def create_app():
         db_path = resolve_db_path(email) if email else config.DB_FILE
         g.db_path = db_path
         if db_path not in initialized_dbs:
-            run_migrations(db_path)
-            initialized_dbs.add(db_path)
+            with _init_lock:
+                if db_path not in initialized_dbs:
+                    run_migrations(db_path)
+                    initialized_dbs.add(db_path)
 
     from app.web import web_bp
     app.register_blueprint(web_bp)
