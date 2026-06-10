@@ -843,7 +843,7 @@ window.I18n = (function () {
   function hidePopup() { popup.style.display = 'none'; currentKey = null; }
 
   var backdrop = document.getElementById('ph-backdrop');
-  var isTouchDevice = ('ontouchstart' in window);
+  var isTouchDevice = window.matchMedia ? window.matchMedia('(pointer: coarse)').matches : ('ontouchstart' in window);
 
   function showBottomSheet(el) {
     showPopup(el);
@@ -858,14 +858,14 @@ window.I18n = (function () {
   document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
     el.classList.add('ph-trigger');
     if (isTouchDevice) {
-      el.addEventListener('touchstart', function (e) {
+      el.addEventListener('touchend', function (e) {
         e.preventDefault();
         if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
           hideBottomSheet();
         } else {
           showBottomSheet(el);
         }
-      }, { passive: false });
+      });
     } else {
       el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
       el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
