@@ -7,8 +7,13 @@ from app import create_app
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch, tmp_path):
     """Flask test client fixture."""
+    import app.config as config_module
+
+    db_path = str(tmp_path / "test_client.db")
+    monkeypatch.setattr(config_module, "DB_FILE", db_path)
+
     app = create_app()
     app.config['TESTING'] = True
     with app.test_client() as client:
