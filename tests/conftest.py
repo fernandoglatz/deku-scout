@@ -19,10 +19,12 @@ def client():
 def temp_db(monkeypatch):
     """Temporary database that patches app.db.DB_FILE."""
     import app.db as db_module
+    from app.migrations import run_migrations
 
     fd, path = tempfile.mkstemp(suffix=".db")
     os.close(fd)
     monkeypatch.setattr(db_module, "DB_FILE", path)
+    run_migrations(path)
 
     yield path
 
@@ -35,9 +37,11 @@ def temp_db_web(monkeypatch, tmp_path):
     """Temporary database that patches both app.db.DB_FILE and app.web.DB_FILE."""
     import app.db as db_module
     import app.web as web_module
+    from app.migrations import run_migrations
 
     db_path = str(tmp_path / "test_web.db")
     monkeypatch.setattr(db_module, "DB_FILE", db_path)
     monkeypatch.setattr(web_module, "DB_FILE", db_path)
+    run_migrations(db_path)
 
     yield db_path
