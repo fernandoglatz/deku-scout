@@ -143,7 +143,6 @@ def save_price_history_cache(slug: str, currency: str, data: dict, db_path: str)
         conn.commit()
 
 
-
 def get_config(key: str) -> Optional[str]:
     """Retrieve a config value from the database."""
     with sqlite3.connect(DB_FILE) as conn:

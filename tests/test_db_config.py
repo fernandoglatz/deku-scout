@@ -6,7 +6,6 @@ from app.db import get_config, set_config
 
 def test_migrations_create_config_table(temp_db):
     """Config table exists after migrations run (via temp_db fixture)."""
-    import sqlite3
     with sqlite3.connect(temp_db) as conn:
         cursor = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='config'"
