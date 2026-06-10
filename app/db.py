@@ -143,17 +143,17 @@ def save_price_history_cache(slug: str, currency: str, data: dict, db_path: str)
         conn.commit()
 
 
-def get_config(key: str) -> Optional[str]:
+def get_config(key: str, db_path: Optional[str] = None) -> Optional[str]:
     """Retrieve a config value from the database."""
-    with sqlite3.connect(DB_FILE) as conn:
+    with sqlite3.connect(db_path or DB_FILE) as conn:
         cursor = conn.execute("SELECT value FROM config WHERE key = ?", (key,))
         row = cursor.fetchone()
     return row[0] if row else None
 
 
-def set_config(key: str, value: str) -> None:
+def set_config(key: str, value: str, db_path: Optional[str] = None) -> None:
     """Save or update a config value."""
-    with sqlite3.connect(DB_FILE) as conn:
+    with sqlite3.connect(db_path or DB_FILE) as conn:
         conn.execute(
             """
             INSERT INTO config (key, value, updated_at)
