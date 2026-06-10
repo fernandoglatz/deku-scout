@@ -680,6 +680,9 @@ window.I18n = (function () {
     document.querySelectorAll('td.rel-date[data-date]').forEach(function (td) {
       td.textContent = formatReleaseDate(td.dataset.date, locale);
     });
+    document.querySelectorAll('.card-sale-end[data-date]').forEach(function (el) {
+      el.textContent = formatSaleEnd(el.dataset.date, locale);
+    });
   }
 
   I18n.init(document.getElementById('langSelect'), applyDates);
@@ -748,17 +751,23 @@ window.I18n = (function () {
 
   function applyFilters() {
     var q = searchEl.value.trim().toLowerCase();
+    function matchesFilters(el) {
+      if (activeFilters.size === 0) return true;
+      var ok = true;
+      activeFilters.forEach(function (f) {
+        if (f === 'sale'      && el.dataset.sale !== '1')    ok = false;
+        if (f === 'available' && el.dataset.unavail === '1') ok = false;
+        if (f.startsWith('bb-') && el.dataset.bestbuy !== f.slice(3)) ok = false;
+      });
+      return ok;
+    }
     tbl.querySelector('tbody').querySelectorAll('tr').forEach(function (tr) {
       var matchSearch = !q || tr.cells[2].textContent.toLowerCase().includes(q);
-      var matchFilter = true;
-      if (activeFilters.size > 0) {
-        activeFilters.forEach(function (f) {
-          if (f === 'sale'      && tr.dataset.sale !== '1')    matchFilter = false;
-          if (f === 'available' && tr.dataset.unavail === '1') matchFilter = false;
-          if (f.startsWith('bb-') && tr.dataset.bestbuy !== f.slice(3)) matchFilter = false;
-        });
-      }
-      tr.style.display = matchSearch && matchFilter ? '' : 'none';
+      tr.style.display = matchSearch && matchesFilters(tr) ? '' : 'none';
+    });
+    document.querySelectorAll('#cardList .game-card').forEach(function (card) {
+      var matchSearch = !q || card.dataset.name.includes(q);
+      card.style.display = matchSearch && matchesFilters(card) ? '' : 'none';
     });
   }
 
