@@ -15,7 +15,6 @@ from flask import Blueprint, jsonify, redirect, render_template, request, send_f
 log = logging.getLogger(__name__)
 
 from app.config import COUNTRIES, HEADERS, ICONS_DIR
-from app.user import get_db_path, get_user_email
 from app.db import (
     clear_games_cache,
     get_cached_price_history,
@@ -26,6 +25,7 @@ from app.db import (
 )
 from app.exchange import fetch_rate
 from app.scraper import _content_type_to_ext, _icon_path, download_icons, fetch_all_games
+from app.user import get_db_path, get_user_email
 
 web_bp = Blueprint("web", __name__)
 
@@ -389,6 +389,7 @@ def refresh():
 
 @web_bp.route("/icons/<path:slug>")
 def serve_icon(slug: str):
+    db_path = get_db_path()
     safe_slug = slug.replace("/", "_")[:80]
     # Strip image extension from slug so URLs like /icons/game.jpg work correctly
     _IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
@@ -402,7 +403,7 @@ def serve_icon(slug: str):
 
     if not icon_found:
         try:
-            with sqlite3.connect(get_db_path()) as conn:
+            with sqlite3.connect(db_path) as conn:
                 row = conn.execute(
                     "SELECT image_url FROM games_cache WHERE slug = ?", (slug,)
                 ).fetchone()
