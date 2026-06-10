@@ -19,7 +19,6 @@ from app.db import (
     clear_games_cache,
     get_cached_price_history,
     get_config,
-    init_config_table,
     load_games_cache,
     save_price_history_cache,
     set_config,

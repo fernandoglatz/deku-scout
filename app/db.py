@@ -1,5 +1,4 @@
 import json
-import os
 import sqlite3
 import time
 from typing import Optional
@@ -68,18 +67,10 @@ def save_games_cache(games: list[dict], db_path: str) -> float:
 def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float]]:
     try:
         with sqlite3.connect(db_path) as conn:
-            try:
-                rows = conn.execute(
-                    "SELECT name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends"
-                    " FROM games_cache ORDER BY id"
-                ).fetchall()
-                has_sale_ends = True
-            except sqlite3.OperationalError:
-                rows = conn.execute(
-                    "SELECT name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at"
-                    " FROM games_cache ORDER BY id"
-                ).fetchall()
-                has_sale_ends = False
+            rows = conn.execute(
+                "SELECT name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends"
+                " FROM games_cache ORDER BY id"
+            ).fetchall()
         if not rows:
             return None, None
         fetched_at = rows[0][7]
@@ -117,7 +108,7 @@ def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float
                     "sale_end": _normalize_sale_end(r[4]),
                     "image_url": r[5],
                     "icon_ext": r[6],
-                    "sale_ends": _normalize_sale_ends(r[8]) if has_sale_ends else {},
+                    "sale_ends": _normalize_sale_ends(r[8]),
                 }
                 for r in rows
             ],
@@ -151,22 +142,6 @@ def save_price_history_cache(slug: str, currency: str, data: dict, db_path: str)
         )
         conn.commit()
 
-
-def init_config_table() -> None:
-    """Create the config table if it doesn't exist."""
-    os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
-    with sqlite3.connect(DB_FILE) as conn:
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS config (
-                key TEXT PRIMARY KEY,
-                value TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """
-        )
-        conn.commit()
 
 
 def get_config(key: str) -> Optional[str]:

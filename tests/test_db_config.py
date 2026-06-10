@@ -1,30 +1,21 @@
 import sqlite3
 import pytest
 
-import app.db as db_module
-from app.db import init_config_table, get_config, set_config
+from app.db import get_config, set_config
 
 
-def test_init_config_table(temp_db):
-    """Test that config table is created successfully."""
-    # Initialize the table
-    init_config_table()
-
-    # Verify table exists
+def test_migrations_create_config_table(temp_db):
+    """Config table exists after migrations run (via temp_db fixture)."""
+    import sqlite3
     with sqlite3.connect(temp_db) as conn:
         cursor = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='config'"
         )
-        table_exists = cursor.fetchone() is not None
-
-    assert table_exists, "Config table was not created"
+        assert cursor.fetchone() is not None
 
 
 def test_set_and_get_config(temp_db):
     """Test setting and retrieving config values."""
-    # Initialize table
-    init_config_table()
-
     # Set a config value
     set_config("test_key", "test_value")
 
@@ -36,9 +27,6 @@ def test_set_and_get_config(temp_db):
 
 def test_get_nonexistent_config(temp_db):
     """Test getting a config value that doesn't exist."""
-    # Initialize table
-    init_config_table()
-
     # Get a non-existent config value
     result = get_config("nonexistent_key")
 
@@ -47,9 +35,6 @@ def test_get_nonexistent_config(temp_db):
 
 def test_update_config(temp_db):
     """Test updating an existing config value."""
-    # Initialize table
-    init_config_table()
-
     # Set initial value
     set_config("update_key", "initial_value")
     result1 = get_config("update_key")
@@ -64,9 +49,6 @@ def test_update_config(temp_db):
 
 def test_multiple_config_values(temp_db):
     """Test storing and retrieving multiple config values."""
-    # Initialize table
-    init_config_table()
-
     # Set multiple values
     set_config("key1", "value1")
     set_config("key2", "value2")
@@ -80,9 +62,6 @@ def test_multiple_config_values(temp_db):
 
 def test_get_config_endpoint(client, temp_db, monkeypatch):
     """Test GET /api/config endpoint."""
-    # Initialize the config table
-    init_config_table()
-
     # Test when no WISHLIST_URL is configured
     response = client.get("/api/config")
     assert response.status_code == 200
@@ -279,8 +258,6 @@ def test_validate_wishlist_url_generic_error(monkeypatch):
 # Tests for POST /api/config endpoint
 def test_post_config_endpoint_missing_input(client, temp_db):
     """Test POST /api/config with missing input field."""
-    init_config_table()
-
     response = client.post("/api/config", json={})
     assert response.status_code == 400
     data = response.get_json()
@@ -290,8 +267,6 @@ def test_post_config_endpoint_missing_input(client, temp_db):
 
 def test_post_config_endpoint_invalid_input(client, temp_db):
     """Test POST /api/config with invalid input format."""
-    init_config_table()
-
     response = client.post("/api/config", json={"input": "!!!invalid!!!"})
     assert response.status_code == 400
     data = response.get_json()
@@ -301,8 +276,6 @@ def test_post_config_endpoint_invalid_input(client, temp_db):
 
 def test_post_config_endpoint_valid_code_success(client, temp_db, monkeypatch):
     """Test POST /api/config with valid code and successful validation."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -324,8 +297,6 @@ def test_post_config_endpoint_valid_code_success(client, temp_db, monkeypatch):
 
 def test_post_config_endpoint_valid_url_success(client, temp_db, monkeypatch):
     """Test POST /api/config with valid URL and successful validation."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -348,8 +319,6 @@ def test_post_config_endpoint_valid_url_success(client, temp_db, monkeypatch):
 
 def test_post_config_endpoint_url_not_found(client, temp_db, monkeypatch):
     """Test POST /api/config when the URL returns 404."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 404
@@ -371,8 +340,6 @@ def test_post_config_endpoint_url_not_found(client, temp_db, monkeypatch):
 
 def test_post_config_endpoint_timeout(client, temp_db, monkeypatch):
     """Test POST /api/config when the request times out."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         raise requests.Timeout()
 
@@ -392,8 +359,6 @@ def test_post_config_endpoint_timeout(client, temp_db, monkeypatch):
 
 def test_post_config_endpoint_connection_error(client, temp_db, monkeypatch):
     """Test POST /api/config when there's a connection error."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         raise requests.ConnectionError()
 
@@ -413,8 +378,6 @@ def test_post_config_endpoint_connection_error(client, temp_db, monkeypatch):
 
 def test_post_config_endpoint_updates_existing_config(client, temp_db, monkeypatch):
     """Test that POST /api/config updates an existing config value."""
-    init_config_table()
-
     def mock_get(*args, **kwargs):
         class MockResponse:
             status_code = 200
@@ -536,8 +499,7 @@ def test_merge_prices_missing_in_one_locale():
 # ── currency config endpoint tests ───────────────────────────────────────────
 
 def test_get_config_returns_currencies(client, temp_db):
-    from app.db import init_config_table, set_config
-    init_config_table()
+    from app.db import set_config
     set_config("SELECTED_CURRENCIES", '["br","us"]')
     set_config("REFERENCE_CURRENCY", "br")
     response = client.get("/api/config")
@@ -549,8 +511,7 @@ def test_get_config_returns_currencies(client, temp_db):
 
 def test_post_config_saves_currencies(client, temp_db, monkeypatch):
     import json as _json
-    from app.db import init_config_table, get_config
-    init_config_table()
+    from app.db import get_config
     response = client.post("/api/config", json={
         "selected_currencies": ["br", "us", "jp"],
         "reference_currency": "br",
@@ -563,8 +524,6 @@ def test_post_config_saves_currencies(client, temp_db, monkeypatch):
 
 
 def test_post_config_rejects_invalid_locale(client, temp_db):
-    from app.db import init_config_table
-    init_config_table()
     response = client.post("/api/config", json={
         "selected_currencies": ["br", "xx"],
         "reference_currency": "br",
@@ -575,8 +534,6 @@ def test_post_config_rejects_invalid_locale(client, temp_db):
 
 
 def test_post_config_rejects_reference_not_in_selected(client, temp_db):
-    from app.db import init_config_table
-    init_config_table()
     # First save valid currencies
     client.post("/api/config", json={"selected_currencies": ["br", "us"], "reference_currency": "br"})
     # Then try to set reference to something not selected
