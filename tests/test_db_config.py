@@ -322,7 +322,7 @@ def test_post_config_endpoint_valid_url_success(client, monkeypatch):
     assert saved_url == test_url
 
 
-def test_post_config_endpoint_url_not_found(client, temp_db, monkeypatch):
+def test_post_config_endpoint_url_not_found(client, monkeypatch):
     """Test POST /api/config when the URL returns 404."""
     def mock_get(*args, **kwargs):
         class MockResponse:
@@ -343,7 +343,7 @@ def test_post_config_endpoint_url_not_found(client, temp_db, monkeypatch):
     assert saved_url is None
 
 
-def test_post_config_endpoint_timeout(client, temp_db, monkeypatch):
+def test_post_config_endpoint_timeout(client, monkeypatch):
     """Test POST /api/config when the request times out."""
     def mock_get(*args, **kwargs):
         raise requests.Timeout()
@@ -362,7 +362,7 @@ def test_post_config_endpoint_timeout(client, temp_db, monkeypatch):
     assert saved_url is None
 
 
-def test_post_config_endpoint_connection_error(client, temp_db, monkeypatch):
+def test_post_config_endpoint_connection_error(client, monkeypatch):
     """Test POST /api/config when there's a connection error."""
     def mock_get(*args, **kwargs):
         raise requests.ConnectionError()
