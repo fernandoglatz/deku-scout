@@ -77,3 +77,39 @@ def test_get_db_path_returns_g_db_path_in_request():
     with app.test_request_context():
         g.db_path = "/tmp/custom.db"
         assert get_db_path() == "/tmp/custom.db"
+
+
+def test_before_request_sets_default_db_for_anonymous(client):
+    response = client.get("/api/config")
+    assert response.status_code == 200
+
+
+def test_before_request_creates_user_db_on_first_request(client, monkeypatch, tmp_path):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "DATA_DIR", str(tmp_path))
+    from app.user import resolve_db_path
+
+    email = "alice@example.com"
+    response = client.get("/api/config", headers={"X-Forwarded-User": email})
+    assert response.status_code == 200
+
+    expected_db = resolve_db_path(email)
+    assert os.path.exists(expected_db)
+
+
+def test_before_request_user_db_is_isolated_from_default(client, monkeypatch, tmp_path):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "DATA_DIR", str(tmp_path))
+    from app.user import resolve_db_path
+    from app.db import set_config, get_config
+
+    email = "bob@example.com"
+    client.post(
+        "/api/config",
+        json={"selected_currencies": ["jp"], "reference_currency": "jp"},
+        headers={"X-Forwarded-User": email},
+    )
+
+    user_db = resolve_db_path(email)
+    assert get_config("SELECTED_CURRENCIES", user_db) == '["jp"]'
+    assert get_config("SELECTED_CURRENCIES") is None
