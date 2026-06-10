@@ -145,17 +145,6 @@ def get_cached_price_history(slug: str, currency: str, db_path: str) -> Optional
 def save_price_history_cache(slug: str, currency: str, data: dict, db_path: str) -> None:
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS price_history_cache (
-                slug       TEXT NOT NULL,
-                currency   TEXT NOT NULL DEFAULT 'brl',
-                data       TEXT NOT NULL,
-                fetched_at REAL NOT NULL,
-                PRIMARY KEY (slug, currency)
-            )
-        """
-        )
-        conn.execute(
             "INSERT OR REPLACE INTO price_history_cache"
             " (slug, currency, data, fetched_at) VALUES (?,?,?,?)",
             (slug, currency, json.dumps(data), time.time()),
