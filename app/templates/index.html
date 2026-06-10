@@ -69,6 +69,7 @@
     }
     .theme-btn:hover { border-color: var(--accent); }
     #mobileMenuBtn { display: none; }
+    #mobileMenu    { display: none; }
     .user-badge {
       background: var(--surface); color: var(--text-muted);
       border: 1px solid var(--border);
@@ -261,7 +262,7 @@
   <form id="rf" action="/refresh" method="post" style="margin:0">
     <button class="btn" type="submit">&#8635; <span data-i18n="btn.refresh">Refresh</span></button>
   </form>
-  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false">&#9776;</button>
+  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <div id="mobileMenu" role="navigation" aria-label="Mobile menu">
     <!-- clones are inserted by JS -->
   </div>
@@ -522,6 +523,9 @@ window.I18n = (function () {
     var isOpen = mobileMenu.classList.contains('open');
     if (!isOpen) {
       buildMobileMenu();
+      // Sync theme button text in case it changed since last open
+      var themeClone = document.getElementById('themeToggleMobile');
+      if (themeClone) themeClone.textContent = document.getElementById('themeToggle').textContent;
       mobileMenu.classList.add('open');
       mobileMenuBtn.setAttribute('aria-expanded', 'true');
     } else {
@@ -535,6 +539,10 @@ window.I18n = (function () {
         e.target !== mobileMenuBtn) {
       closeMobileMenu();
     }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMobileMenu();
   });
 
   function formatReleaseDate(val, locale) {
