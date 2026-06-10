@@ -9,6 +9,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ ./app/
+COPY migrations/ ./migrations/
 COPY wsgi.py .
 
 RUN useradd -m appuser && mkdir -p /data && chown appuser:appuser /data
