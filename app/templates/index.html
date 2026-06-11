@@ -660,13 +660,12 @@ window.I18n = (function () {
 
   allThs.forEach(function (th, i) {
     if (!th.dataset.type || th.dataset.type === 'none' || i < 2) return;
-    th.addEventListener('click', function () { doSort(i, sortIdx === i ? -sortDir : 1); });
+    th.addEventListener('click', function () { doSort(i, sortIdx === i ? -sortDir : 1); saveUiState(); });
   });
 
   // Default sort: reference locale's current column
   var refTh = tbl.querySelector('thead th[data-ref-cur="1"]');
   var defaultCol = refTh ? allThs.indexOf(refTh) : 3;
-  doSort(defaultCol, 1);
 
   var searchEl = document.getElementById('search');
   var filterBtns = [...document.querySelectorAll('.filter-btn')];
@@ -688,14 +687,50 @@ window.I18n = (function () {
     });
   }
 
-  var allBtn = document.querySelector('.filter-btn[data-filter="all"]');
-  activeFilters.add('sale');
-  allBtn.classList.remove('active');
-  var saleBtn = document.querySelector('.filter-btn[data-filter="sale"]');
-  if (saleBtn) saleBtn.classList.add('active');
-  applyFilters();
+  function saveUiState() {
+    try {
+      localStorage.setItem('dekuscout_ui', JSON.stringify({
+        si: sortIdx, sd: sortDir,
+        filters: [...activeFilters],
+        search: searchEl ? searchEl.value : ''
+      }));
+    } catch(e) {}
+  }
 
-  searchEl.addEventListener('input', applyFilters);
+  // Restore persisted state, or apply defaults
+  var _saved = null;
+  try { _saved = JSON.parse(localStorage.getItem('dekuscout_ui') || 'null'); } catch(e) {}
+
+  var allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+  var saleBtn = document.querySelector('.filter-btn[data-filter="sale"]');
+
+  if (_saved) {
+    if (typeof _saved.search === 'string') searchEl.value = _saved.search;
+    if (Array.isArray(_saved.filters)) {
+      if (_saved.filters.length === 0) {
+        allBtn.classList.add('active');
+      } else {
+        allBtn.classList.remove('active');
+        _saved.filters.forEach(function(f) {
+          activeFilters.add(f);
+          var b = document.querySelector('.filter-btn[data-filter="' + f + '"]');
+          if (b) b.classList.add('active');
+        });
+      }
+    }
+    applyFilters();
+    var si = typeof _saved.si === 'number' && _saved.si >= 0 ? _saved.si : defaultCol;
+    doSort(si, _saved.sd || 1);
+  } else {
+    // Default: sale filter, reference-price sort
+    activeFilters.add('sale');
+    allBtn.classList.remove('active');
+    if (saleBtn) saleBtn.classList.add('active');
+    applyFilters();
+    doSort(defaultCol, 1);
+  }
+
+  searchEl.addEventListener('input', function() { applyFilters(); saveUiState(); });
   filterBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var filter = btn.dataset.filter;
@@ -724,6 +759,7 @@ window.I18n = (function () {
         if (activeFilters.size === 0) allBtn.classList.add('active');
       }
       applyFilters();
+      saveUiState();
     });
   });
 

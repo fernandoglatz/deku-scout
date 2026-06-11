@@ -2,6 +2,12 @@
 
 A self-hosted web app that tracks your [DekuDeals](https://www.dekudeals.com) wishlist and compares prices across multiple regional storefronts, showing you where to buy each game at the lowest converted price.
 
+## Live Demo
+
+**[https://dekuscout.fernandoglatz.com](https://dekuscout.fernandoglatz.com)**
+
+Uses the wishlist at [dekudeals.com/wishlist/x8kxhn96yf](https://www.dekudeals.com/wishlist/x8kxhn96yf).
+
 ## Features
 
 - Scrapes your DekuDeals public wishlist and displays all games in a single dashboard
@@ -52,18 +58,18 @@ The app listens on `http://0.0.0.0:5000`.
 
 All runtime settings are stored in the local SQLite database and can be changed from the web UI:
 
-| Setting | Description |
-|---|---|
-| Wishlist URL | Your DekuDeals public wishlist URL or code |
-| Selected currencies | Which regional storefronts to show |
-| Reference currency | The currency used for price comparisons and "best buy" calculations |
+| Setting             | Description                                                         |
+| ------------------- | ------------------------------------------------------------------- |
+| Wishlist URL        | Your DekuDeals public wishlist URL or code                          |
+| Selected currencies | Which regional storefronts to show                                  |
+| Reference currency  | The currency used for price comparisons and "best buy" calculations |
 
 Environment variables (used at startup / for Docker):
 
-| Variable | Default | Description |
-|---|---|---|
-| `WISHLIST_URL` | — | Pre-seeds the wishlist URL on first run |
-| `DATA_DIR` | `./data` | Directory for the SQLite database and icon cache |
+| Variable       | Default  | Description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `WISHLIST_URL` | —        | Pre-seeds the wishlist URL on first run          |
+| `DATA_DIR`     | `./data` | Directory for the SQLite database and icon cache |
 
 ## User Management
 
