@@ -964,21 +964,21 @@ window.I18n = (function () {
       tipDismissed = true;
     }
     if (tipClose) tipClose.addEventListener('click', dismissTip);
-  }
 
-  var tipResizeTimer;
-  window.addEventListener('resize', function () {
-    clearTimeout(tipResizeTimer);
-    tipResizeTimer = setTimeout(function () {
-      if (tipDismissed) return;
-      var nowMobile = window.innerWidth <= 640;
-      if (nowMobile === tipIsMobile) return;
-      tipIsMobile = nowMobile;
-      var tipKey = tipIsMobile ? 'ph.tipTap' : 'ph.tipHover';
-      tipText.dataset.i18n = tipKey;
-      tipText.textContent = I18n.t(tipKey);
-    }, 150);
-  });
+    var tipResizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(tipResizeTimer);
+      tipResizeTimer = setTimeout(function () {
+        if (tipDismissed) return;
+        var nowMobile = window.innerWidth <= 640;
+        if (nowMobile === tipIsMobile) return;
+        tipIsMobile = nowMobile;
+        var newTipKey = tipIsMobile ? 'ph.tipTap' : 'ph.tipHover';
+        tipText.dataset.i18n = newTipKey;
+        tipText.textContent = I18n.t(newTipKey);
+      }, 150);
+    });
+  }
   // --- end tip banner ---
 
   document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
