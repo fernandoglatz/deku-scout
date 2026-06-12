@@ -64,7 +64,8 @@ def save_games_cache(games: list[dict], db_path: str) -> float:
     return ts
 
 
-def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float]]:
+def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float], bool]:
+    """Return (games, fetched_at, is_stale). games is None only when there is no cached data at all."""
     try:
         with sqlite3.connect(db_path) as conn:
             rows = conn.execute(
@@ -72,10 +73,9 @@ def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float
                 " FROM games_cache ORDER BY id"
             ).fetchall()
         if not rows:
-            return None, None
+            return None, None, False
         fetched_at = rows[0][7]
-        if time.time() - fetched_at > CACHE_TTL:
-            return None, fetched_at
+        is_stale = time.time() - fetched_at > CACHE_TTL
 
         def _normalize_sale_end(val: str) -> str:
             if not val:
@@ -113,9 +113,10 @@ def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float
                 for r in rows
             ],
             fetched_at,
+            is_stale,
         )
     except sqlite3.OperationalError:
-        return None, None
+        return None, None, False
 
 
 def get_cached_price_history(slug: str, currency: str, db_path: str) -> Optional[dict]:

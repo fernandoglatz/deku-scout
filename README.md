@@ -4,9 +4,13 @@ A self-hosted web app that tracks your [DekuDeals](https://www.dekudeals.com) wi
 
 ## Live Demo
 
-**[https://dekuscout.fernandoglatz.com](https://dekuscout.fernandoglatz.com)**
+**[https://dekuscout.fernandoglatz.com/demo](https://dekuscout.fernandoglatz.com/demo)**
 
 Uses the wishlist at [dekudeals.com/wishlist/x8kxhn96yf](https://www.dekudeals.com/wishlist/x8kxhn96yf).
+
+### Try it locally
+
+Visit `/demo` on any running instance to auto-configure the demo wishlist and go straight to the dashboard — no setup screen required. If a wishlist is already configured the `/demo` route simply redirects to `/` without overwriting it.
 
 ## Features
 

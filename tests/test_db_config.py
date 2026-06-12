@@ -451,7 +451,7 @@ def test_save_and_load_games_cache_new_schema(temp_db):
         }
     ]
     ts = save_games_cache(games, temp_db)
-    loaded, fetched_at = load_games_cache(temp_db)
+    loaded, fetched_at, is_stale = load_games_cache(temp_db)
     assert loaded is not None
     assert len(loaded) == 1
     g = loaded[0]
@@ -461,13 +461,15 @@ def test_save_and_load_games_cache_new_schema(temp_db):
     assert g["prices"]["us"]["discount"] == "-50%"
     assert g["release_date"] == "2024-01-15"
     assert abs(fetched_at - ts) < 1
+    assert is_stale is False
 
 
 def test_load_games_cache_returns_none_when_empty(temp_db):
     from app.db import load_games_cache
-    result, ts = load_games_cache(temp_db)
+    result, ts, is_stale = load_games_cache(temp_db)
     assert result is None
     assert ts is None
+    assert is_stale is False
 
 
 # ── scraper merge_prices tests ────────────────────────────────────────────────

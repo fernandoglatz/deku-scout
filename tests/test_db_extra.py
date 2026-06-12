@@ -136,12 +136,13 @@ def test_clear_games_cache_empties_table(temp_db):
     save_games_cache(games, temp_db)
     clear_games_cache(temp_db)
 
-    result, ts = load_games_cache(temp_db)
+    result, ts, is_stale = load_games_cache(temp_db)
     assert result is None
     assert ts is None
+    assert is_stale is False
 
 
-def test_load_games_cache_expired_returns_none(temp_db, monkeypatch):
+def test_load_games_cache_expired_returns_stale(temp_db, monkeypatch):
     from app.db import save_games_cache, load_games_cache
     import app.db as db_module
 
@@ -150,9 +151,10 @@ def test_load_games_cache_expired_returns_none(temp_db, monkeypatch):
               "sale_end": "", "image_url": "", "icon_ext": "", "sale_ends": {}}]
     ts = save_games_cache(games, temp_db)
 
-    result, fetched_at = load_games_cache(temp_db)
-    assert result is None
+    result, fetched_at, is_stale = load_games_cache(temp_db)
+    assert result is not None
     assert abs(fetched_at - ts) < 1
+    assert is_stale is True
 
 
 def test_save_games_cache_preserves_sale_ends(temp_db):
@@ -169,7 +171,7 @@ def test_save_games_cache_preserves_sale_ends(temp_db):
         "sale_ends": {"br": "2026-06-15T23:59:59Z"},
     }]
     save_games_cache(games, temp_db)
-    loaded, _ = load_games_cache(temp_db)
+    loaded, _, _stale = load_games_cache(temp_db)
 
     assert loaded[0]["sale_ends"]["br"] == "2026-06-15T23:59:59Z"
 
@@ -183,7 +185,7 @@ def test_save_games_cache_multiple_games(temp_db):
         for i in range(5)
     ]
     save_games_cache(games, temp_db)
-    loaded, _ = load_games_cache(temp_db)
+    loaded, _, _stale = load_games_cache(temp_db)
 
     assert len(loaded) == 5
     assert loaded[0]["name"] == "Game 0"
