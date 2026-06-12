@@ -950,19 +950,35 @@ window.I18n = (function () {
     try { localStorage.setItem(TIP_KEY, '1'); } catch (e) {}
   }
 
+  var tipIsMobile = window.innerWidth <= 640;
+
   if (tipEl) {
     var alreadySeen = false;
     try { alreadySeen = !!localStorage.getItem(TIP_KEY); } catch (e) {}
     if (!alreadySeen) {
-      tipText.textContent = isTouchDevice
-        ? I18n.t('ph.tipTap')
-        : I18n.t('ph.tipHover');
+      var tipKey = tipIsMobile ? 'ph.tipTap' : 'ph.tipHover';
+      tipText.dataset.i18n = tipKey;
+      tipText.textContent = I18n.t(tipKey);
       tipEl.style.display = 'flex';
     } else {
       tipDismissed = true;
     }
     if (tipClose) tipClose.addEventListener('click', dismissTip);
   }
+
+  var tipResizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(tipResizeTimer);
+    tipResizeTimer = setTimeout(function () {
+      if (tipDismissed) return;
+      var nowMobile = window.innerWidth <= 640;
+      if (nowMobile === tipIsMobile) return;
+      tipIsMobile = nowMobile;
+      var tipKey = tipIsMobile ? 'ph.tipTap' : 'ph.tipHover';
+      tipText.dataset.i18n = tipKey;
+      tipText.textContent = I18n.t(tipKey);
+    }, 150);
+  });
   // --- end tip banner ---
 
   document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
