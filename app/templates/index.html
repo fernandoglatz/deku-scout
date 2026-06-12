@@ -946,6 +946,8 @@ window.I18n = (function () {
         ? 'Tip: tap any price to see its full price history chart.'
         : 'Tip: hover any price to see its full price history chart.';
       tipEl.style.display = 'flex';
+    } else {
+      tipDismissed = true;
     }
     if (tipClose) tipClose.addEventListener('click', dismissTip);
   }
