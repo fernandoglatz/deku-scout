@@ -252,11 +252,37 @@
         margin: 0.65rem auto 0.75rem;
       }
     }
+    .ph-tip {
+      display: flex; align-items: center; gap: .75rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px; padding: .6rem 1rem;
+      font-size: .82rem; color: var(--text-sub);
+      margin-bottom: .75rem;
+      animation: phTipIn .25s ease;
+    }
+    .ph-tip b { color: var(--text); }
+    .ph-tip-close {
+      margin-left: auto; background: none; border: none;
+      color: var(--text-muted); cursor: pointer;
+      font-size: .95rem; line-height: 1; padding: .1rem .35rem;
+      border-radius: 3px; transition: color .15s;
+    }
+    .ph-tip-close:hover { color: var(--text); }
+    @keyframes phTipIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes phTipOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
   </style>
 </head>
 <body>
 <div id="loading"><div class="spinner"></div><span data-i18n="loading.fetching">Fetching prices from DekuDeals…</span></div>
 <header>
+  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <h1>&#127918; DekuScout</h1>
   <div class="meta">
     <span><span data-i18n="meta.updated">Updated:</span> <b>{{ last_updated }}</b></span>
@@ -288,7 +314,6 @@
   <form id="rf" action="/refresh" method="post" style="margin:0">
     <button class="btn" type="submit">&#8635; <span data-i18n="btn.refresh">Refresh</span></button>
   </form>
-  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <div id="mobileMenu" role="navigation" aria-label="Mobile menu">
     <!-- clones are inserted by JS -->
   </div>
@@ -314,6 +339,11 @@
       {% endfor %}
       <button class="filter-btn" data-filter="bb-{{ reference_locale }}"><span data-i18n="filter.bestBuy">Best Buy</span> {{ reference_locale.upper() }}</button>
     {% endif %}
+  </div>
+  <div class="ph-tip" id="ph-tip" style="display:none;" role="status" aria-live="polite">
+    <span>📈</span>
+    <span id="ph-tip-text"></span>
+    <button class="ph-tip-close" id="ph-tip-close" type="button" aria-label="Dismiss tip">✕</button>
   </div>
   <div class="table-wrap">
     <table id="tbl">
@@ -893,11 +923,40 @@ window.I18n = (function () {
     backdrop.classList.remove('show');
   }
 
+  // --- tip banner ---
+  var tipEl    = document.getElementById('ph-tip');
+  var tipText  = document.getElementById('ph-tip-text');
+  var tipClose = document.getElementById('ph-tip-close');
+  var TIP_KEY  = 'dekuscout_ph_tip_seen';
+
+  var tipDismissed = false;
+  function dismissTip() {
+    if (!tipEl || tipDismissed) return;
+    tipDismissed = true;
+    tipEl.style.animation = 'phTipOut .2s ease forwards';
+    setTimeout(function () { tipEl.style.display = 'none'; }, 200);
+    try { localStorage.setItem(TIP_KEY, '1'); } catch (e) {}
+  }
+
+  if (tipEl) {
+    var alreadySeen = false;
+    try { alreadySeen = !!localStorage.getItem(TIP_KEY); } catch (e) {}
+    if (!alreadySeen) {
+      tipText.textContent = isTouchDevice
+        ? 'Tip: tap any price to see its full price history chart.'
+        : 'Tip: hover any price to see its full price history chart.';
+      tipEl.style.display = 'flex';
+    }
+    if (tipClose) tipClose.addEventListener('click', dismissTip);
+  }
+  // --- end tip banner ---
+
   document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
     el.classList.add('ph-trigger');
     if (isTouchDevice) {
       el.addEventListener('touchend', function (e) {
         e.preventDefault();
+        dismissTip();
         if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
           hideBottomSheet();
         } else {
@@ -905,7 +964,7 @@ window.I18n = (function () {
         }
       });
     } else {
-      el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
+      el.addEventListener('mouseenter', function () { dismissTip(); clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
       el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
     }
   });
@@ -920,5 +979,24 @@ window.I18n = (function () {
 }());
 </script>
 {% include 'components/setup_modal.html' %}
+{% if loading_in_progress %}
+<script>
+(function () {
+  document.getElementById('loading').classList.add('show');
+
+  function poll() {
+    fetch('/api/status')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.ready) { window.location.reload(); }
+        else { setTimeout(poll, 2000); }
+      })
+      .catch(function () { setTimeout(poll, 3000); });
+  }
+
+  setTimeout(poll, 1000);
+}());
+</script>
+{% endif %}
 </body>
 </html>
