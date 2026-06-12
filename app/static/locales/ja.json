@@ -2,6 +2,7 @@
   "loading.fetching": "DekuDealsから価格を取得中…",
   "loading.wishlistData": "ウィッシュリストを読み込み中...",
   "meta.updated": "更新:",
+  "meta.never": "なし",
   "meta.onSale": "セール中",
   "meta.unavailable": "入手不可",
   "stats.total": "ゲーム総数",

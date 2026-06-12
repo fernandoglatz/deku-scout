@@ -2,6 +2,7 @@
   "loading.fetching": "Fetching prices from DekuDeals…",
   "loading.wishlistData": "Loading wishlist data...",
   "meta.updated": "Updated:",
+  "meta.never": "Never",
   "meta.onSale": "on sale",
   "meta.unavailable": "unavailable",
   "stats.total": "Total games",

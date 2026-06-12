@@ -29,6 +29,31 @@ from app.user import get_db_path, get_user_email
 
 web_bp = Blueprint("web", __name__)
 
+_refresh_lock = threading.Lock()
+_refreshing_dbs: set[str] = set()
+
+
+def _background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str) -> None:
+    try:
+        fetch_all_games(db_path, wishlist_url=wishlist_url, locales=locales, reference_locale=reference_locale)
+    except Exception as exc:
+        log.warning("background_refresh failed for %s: %s", db_path, exc)
+    finally:
+        with _refresh_lock:
+            _refreshing_dbs.discard(db_path)
+
+
+def _trigger_background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str) -> None:
+    with _refresh_lock:
+        if db_path in _refreshing_dbs:
+            return
+        _refreshing_dbs.add(db_path)
+    threading.Thread(
+        target=_background_refresh,
+        args=(db_path, wishlist_url, locales, reference_locale),
+        daemon=True,
+    ).start()
+
 
 def _parse_price(s: str) -> float:
     """Parse a price string from any locale format to float."""
@@ -232,53 +257,33 @@ def index():
             user_email=user_email,
         )
 
-    games, fetched_at = load_games_cache(db_path)
+    games, fetched_at, is_stale = load_games_cache(db_path)
     if games is None:
-        log.info("index: cache miss — fetching live data (locales=%s)", selected_locales)
-        try:
-            games, fetched_at = fetch_all_games(
-                db_path,
-                wishlist_url=wishlist_url,
-                locales=selected_locales,
-                reference_locale=reference_locale,
-            )
-        except requests.exceptions.ConnectionError:
-            return (
-                "<h1>Offline</h1><p>Could not connect to dekudeals.com. "
-                "Check your internet connection and <a href='/'>try again</a>.</p>",
-                503,
-            )
-        except requests.exceptions.HTTPError as e:
-            if e.response is not None and e.response.status_code == 404:
-                return render_template(
-                    "index.html",
-                    wishlist_configured=True,
-                    wishlist_error=True,
-                    wishlist_error_message="Wishlist not found. Please update your configuration.",
-                    games=None,
-                    on_sale=0,
-                    unavailable=0,
-                    last_updated="Never",
-                    total=0,
-                    selected_locales=selected_locales,
-                    reference_locale=reference_locale,
-                    countries=COUNTRIES,
-                    exchange_rates={},
-                    user_email=user_email,
-                )
-            return (
-                "<h1>Error</h1><p>Failed to fetch wishlist data. "
-                "<a href='/'>Try again</a>.</p>",
-                502,
-            )
-        except requests.exceptions.RequestException:
-            return (
-                "<h1>Error</h1><p>Failed to fetch wishlist data. "
-                "<a href='/'>Try again</a>.</p>",
-                502,
-            )
+        log.info("index: cache miss — starting background fetch (locales=%s)", selected_locales)
+        _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale)
+        return render_template(
+            "index.html",
+            wishlist_configured=True,
+            wishlist_error=False,
+            wishlist_error_message=None,
+            games=None,
+            loading_in_progress=True,
+            on_sale=0,
+            unavailable=0,
+            last_updated="Never",
+            total=0,
+            selected_locales=selected_locales,
+            reference_locale=reference_locale,
+            countries=COUNTRIES,
+            exchange_rates={},
+            user_email=user_email,
+        )
     else:
-        log.info("index: cache hit — %d games from cache", len(games))
+        if is_stale:
+            log.info("index: stale cache — serving %d games, refreshing in background", len(games))
+            _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale)
+        else:
+            log.info("index: cache hit — %d games from cache", len(games))
         threading.Thread(target=download_icons, args=(games,), daemon=True).start()
 
     last_updated = (
@@ -302,7 +307,9 @@ def index():
         wishlist_error=False,
         wishlist_error_message=None,
         games=games,
+        loading_in_progress=False,
         last_updated=last_updated,
+        fetched_at_ts=int(fetched_at) if fetched_at else 0,
         total=len(games),
         on_sale=on_sale,
         unavailable=unavailable,
@@ -312,6 +319,18 @@ def index():
         exchange_rates=exchange_rates,
         user_email=user_email,
     )
+
+
+@web_bp.route("/api/status")
+def api_status():
+    db_path = get_db_path()
+    games, fetched_at, is_stale = load_games_cache(db_path)
+    with _refresh_lock:
+        refreshing = db_path in _refreshing_dbs
+    return jsonify({
+        "ready": games is not None,
+        "refreshing": refreshing,
+    })
 
 
 @web_bp.route("/api/config", methods=["GET"])
@@ -370,6 +389,17 @@ def set_config_api():
 
     set_config("WISHLIST_URL", url, db_path)
     return jsonify({"success": True, "wishlist_url": url}), 200
+
+
+DEMO_WISHLIST_URL = "https://www.dekudeals.com/wishlist/x8kxhn96yf"
+
+
+@web_bp.route("/demo")
+def demo():
+    db_path = get_db_path()
+    if get_config("WISHLIST_URL", db_path) is None:
+        set_config("WISHLIST_URL", DEMO_WISHLIST_URL, db_path)
+    return redirect(url_for("web.index"))
 
 
 @web_bp.route("/refresh", methods=["POST"])

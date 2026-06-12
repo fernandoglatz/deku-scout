@@ -285,7 +285,7 @@
   <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <h1>&#127918; DekuScout</h1>
   <div class="meta">
-    <span><span data-i18n="meta.updated">Updated:</span> <b>{{ last_updated }}</b></span>
+    <span><span data-i18n="meta.updated">Updated:</span> <b id="meta-updated" data-ts="{{ fetched_at_ts | default(0) }}">{{ last_updated }}</b></span>
     {% if exchange_rates %}
     <span>
       {% for locale, rate in exchange_rates.items() %}
@@ -630,6 +630,18 @@ window.I18n = (function () {
 
   function applyDates() {
     var locale = I18n.localeString();
+    var metaUpdatedEl = document.getElementById('meta-updated');
+    if (metaUpdatedEl) {
+      var ts = parseInt(metaUpdatedEl.dataset.ts || '0', 10);
+      if (ts) {
+        metaUpdatedEl.textContent = new Intl.DateTimeFormat(locale, {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
+        }).format(new Date(ts * 1000));
+      } else {
+        metaUpdatedEl.textContent = I18n.t('meta.never');
+      }
+    }
     document.querySelectorAll('td.sale-end[data-date]').forEach(function (td) {
       td.textContent = formatSaleEnd(td.dataset.date, locale);
     });
