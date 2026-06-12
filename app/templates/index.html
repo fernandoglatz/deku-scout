@@ -253,20 +253,20 @@
       }
     }
     .ph-tip {
-      display: flex; align-items: center; gap: .75rem;
+      display: flex; align-items: center; gap: 1rem;
       background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: 8px; padding: .6rem 1rem;
-      font-size: .82rem; color: var(--text-sub);
-      margin-bottom: .75rem;
+      border-left: 4px solid var(--accent);
+      border-radius: 10px; padding: 1rem 1.25rem;
+      font-size: 1rem; color: var(--text-sub);
+      margin-bottom: 1rem;
       animation: phTipIn .25s ease;
     }
     .ph-tip b { color: var(--text); }
     .ph-tip-close {
       margin-left: auto; background: none; border: none;
       color: var(--text-muted); cursor: pointer;
-      font-size: .95rem; line-height: 1; padding: .1rem .35rem;
-      border-radius: 3px; transition: color .15s;
+      font-size: 1.15rem; line-height: 1; padding: .2rem .45rem;
+      border-radius: 4px; transition: color .15s;
     }
     .ph-tip-close:hover { color: var(--text); }
     @keyframes phTipIn {
@@ -966,7 +966,7 @@ window.I18n = (function () {
         }
       });
     } else {
-      el.addEventListener('mouseenter', function () { dismissTip(); clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
+      el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
       el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
     }
   });
