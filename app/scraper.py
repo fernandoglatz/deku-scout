@@ -12,6 +12,14 @@ from app.parsing import parse_release_date, parse_sale_end
 log = logging.getLogger(__name__)
 
 
+def _make_headers(user_agent: str = None, **extra) -> dict:
+    h = {**HEADERS}
+    if user_agent:
+        h["User-Agent"] = user_agent
+    h.update(extra)
+    return h
+
+
 def build_session(db_path: str, locale: str = "br") -> requests.Session:
     session = requests.Session()
     cookies = load_cookies(db_path, locale)
@@ -21,14 +29,16 @@ def build_session(db_path: str, locale: str = "br") -> requests.Session:
     return session
 
 
-def set_locale(session: requests.Session, country: str, wishlist_url: str = None) -> None:
+def set_locale(session: requests.Session, country: str, wishlist_url: str = None, user_agent: str = None) -> None:
     url = wishlist_url or WISHLIST_URL
-    headers = {
-        **HEADERS,
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Origin": "https://www.dekudeals.com",
-        "Referer": url,
-    }
+    headers = _make_headers(
+        user_agent,
+        **{
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Origin": "https://www.dekudeals.com",
+            "Referer": url,
+        },
+    )
     log.info("set_locale: switching to country=%s", country)
     t0 = time.monotonic()
     resp = session.post(LOCALE_URL, data={"country": country}, headers=headers, timeout=30)
@@ -36,11 +46,11 @@ def set_locale(session: requests.Session, country: str, wishlist_url: str = None
     log.info("set_locale: done (%.2fs, status=%d)", time.monotonic() - t0, resp.status_code)
 
 
-def fetch_wishlist(session: requests.Session, wishlist_url: str = None) -> str:
+def fetch_wishlist(session: requests.Session, wishlist_url: str = None, user_agent: str = None) -> str:
     url = wishlist_url or WISHLIST_URL
     log.info("fetch_wishlist: GET %s", url)
     t0 = time.monotonic()
-    response = session.get(url + "?sort=release_date", headers=HEADERS, timeout=30)
+    response = session.get(url + "?sort=release_date", headers=_make_headers(user_agent), timeout=30)
     response.raise_for_status()
     log.info("fetch_wishlist: done (%.2fs, %d bytes)", time.monotonic() - t0, len(response.content))
     return response.text
@@ -197,7 +207,7 @@ def _existing_icon_ext(slug: str) -> str:
     return ""
 
 
-def download_icons(games: list[dict]) -> dict[str, str]:
+def download_icons(games: list[dict], user_agent: str = None) -> dict[str, str]:
     """Download missing game icons into ICONS_DIR. Returns slug→ext mapping."""
     os.makedirs(ICONS_DIR, exist_ok=True)
     result: dict[str, str] = {}
@@ -215,7 +225,7 @@ def download_icons(games: list[dict]) -> dict[str, str]:
             continue
         try:
             log.debug("download_icons: fetching icon for %s", slug)
-            resp = requests.get(url, headers=HEADERS, timeout=15)
+            resp = requests.get(url, headers=_make_headers(user_agent), timeout=15)
             resp.raise_for_status()
             ext = _content_type_to_ext(resp.headers.get("content-type", ""))
             path = _icon_path(slug, ext)
@@ -233,6 +243,7 @@ def fetch_all_games(
     wishlist_url: str = None,
     locales: list[str] = None,
     reference_locale: str = None,
+    user_agent: str = None,
 ) -> tuple[list[dict], float]:
     url = wishlist_url or WISHLIST_URL
     if locales is None:
@@ -248,17 +259,17 @@ def fetch_all_games(
 
     for locale in locales:
         log.info("fetch_all_games: fetching locale=%s", locale)
-        set_locale(session, locale, wishlist_url=url)
-        games_by_locale[locale] = extract_games(fetch_wishlist(session, wishlist_url=url))
+        set_locale(session, locale, wishlist_url=url, user_agent=user_agent)
+        games_by_locale[locale] = extract_games(fetch_wishlist(session, wishlist_url=url, user_agent=user_agent))
         save_cookies(session.cookies, db_path, locale=locale)
 
     log.info("fetch_all_games: restoring reference locale=%s", reference_locale)
-    set_locale(session, reference_locale, wishlist_url=url)
+    set_locale(session, reference_locale, wishlist_url=url, user_agent=user_agent)
     save_cookies(session.cookies, db_path, locale=reference_locale)
 
     games = merge_prices(games_by_locale, reference_locale=reference_locale)
     log.info("fetch_all_games: merged %d games, downloading icons", len(games))
-    icon_exts = download_icons(games)
+    icon_exts = download_icons(games, user_agent=user_agent)
     for g in games:
         g["icon_ext"] = icon_exts.get(g["slug"], "")
     ts = save_games_cache(games, db_path)

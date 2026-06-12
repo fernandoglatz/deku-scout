@@ -24,7 +24,7 @@ from app.db import (
     set_config,
 )
 from app.exchange import fetch_rate
-from app.scraper import _content_type_to_ext, _icon_path, download_icons, fetch_all_games
+from app.scraper import _content_type_to_ext, _icon_path, _make_headers, download_icons, fetch_all_games
 from app.user import get_db_path, get_user_email
 
 web_bp = Blueprint("web", __name__)
@@ -33,9 +33,9 @@ _refresh_lock = threading.Lock()
 _refreshing_dbs: set[str] = set()
 
 
-def _background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str) -> None:
+def _background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str, user_agent: str = None) -> None:
     try:
-        fetch_all_games(db_path, wishlist_url=wishlist_url, locales=locales, reference_locale=reference_locale)
+        fetch_all_games(db_path, wishlist_url=wishlist_url, locales=locales, reference_locale=reference_locale, user_agent=user_agent)
     except Exception as exc:
         log.warning("background_refresh failed for %s: %s", db_path, exc)
     finally:
@@ -43,14 +43,14 @@ def _background_refresh(db_path: str, wishlist_url: str, locales: list[str], ref
             _refreshing_dbs.discard(db_path)
 
 
-def _trigger_background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str) -> None:
+def _trigger_background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str, user_agent: str = None) -> None:
     with _refresh_lock:
         if db_path in _refreshing_dbs:
             return
         _refreshing_dbs.add(db_path)
     threading.Thread(
         target=_background_refresh,
-        args=(db_path, wishlist_url, locales, reference_locale),
+        args=(db_path, wishlist_url, locales, reference_locale, user_agent),
         daemon=True,
     ).start()
 
@@ -116,9 +116,9 @@ def _parse_wishlist_input(input_str: str) -> Tuple[Optional[str], Optional[str]]
     return (None, "Please enter a valid wishlist code or full URL")
 
 
-def _validate_wishlist_url(url: str) -> Optional[str]:
+def _validate_wishlist_url(url: str, user_agent: str = None) -> Optional[str]:
     try:
-        response = requests.get(url, headers=HEADERS, timeout=5)
+        response = requests.get(url, headers=_make_headers(user_agent), timeout=5)
         if response.status_code == 404:
             return "Wishlist not found (404). Please check the code or URL."
         elif response.status_code != 200:
@@ -239,6 +239,8 @@ def index():
     reference_locale = _get_reference_locale(selected_locales)
     exchange_rates: dict = {}
 
+    user_agent = request.headers.get("User-Agent")
+
     if not wishlist_configured:
         return render_template(
             "index.html",
@@ -260,7 +262,7 @@ def index():
     games, fetched_at, is_stale = load_games_cache(db_path)
     if games is None:
         log.info("index: cache miss — starting background fetch (locales=%s)", selected_locales)
-        _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale)
+        _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale, user_agent)
         return render_template(
             "index.html",
             wishlist_configured=True,
@@ -281,10 +283,10 @@ def index():
     else:
         if is_stale:
             log.info("index: stale cache — serving %d games, refreshing in background", len(games))
-            _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale)
+            _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale, user_agent)
         else:
             log.info("index: cache hit — %d games from cache", len(games))
-        threading.Thread(target=download_icons, args=(games,), daemon=True).start()
+        threading.Thread(target=download_icons, args=(games, user_agent), daemon=True).start()
 
     last_updated = (
         datetime.fromtimestamp(fetched_at, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -383,7 +385,8 @@ def set_config_api():
     if parse_error:
         return jsonify({"success": False, "error": parse_error}), 400
 
-    validation_error = _validate_wishlist_url(url)
+    user_agent = request.headers.get("User-Agent")
+    validation_error = _validate_wishlist_url(url, user_agent)
     if validation_error:
         return jsonify({"success": False, "error": validation_error}), 400
 
@@ -408,11 +411,13 @@ def refresh():
     wishlist_url = get_config("WISHLIST_URL", db_path)
     selected_locales = _get_selected_locales()
     reference_locale = _get_reference_locale(selected_locales)
+    user_agent = request.headers.get("User-Agent")
     fetch_all_games(
         db_path,
         wishlist_url=wishlist_url,
         locales=selected_locales,
         reference_locale=reference_locale,
+        user_agent=user_agent,
     )
     return redirect(url_for("web.index"))
 
@@ -438,7 +443,7 @@ def serve_icon(slug: str):
                     "SELECT image_url FROM games_cache WHERE slug = ?", (slug,)
                 ).fetchone()
             if row and row[0]:
-                resp = requests.get(row[0], headers=HEADERS, timeout=15)
+                resp = requests.get(row[0], headers=_make_headers(request.headers.get("User-Agent")), timeout=15)
                 resp.raise_for_status()
                 os.makedirs(ICONS_DIR, exist_ok=True)
                 ext = _content_type_to_ext(resp.headers.get("content-type", ""))
@@ -471,11 +476,12 @@ def price_history_api(slug: str):
     try:
         from app.scraper import build_session, set_locale
 
+        user_agent = request.headers.get("User-Agent")
         sess = build_session(db_path, locale)
-        set_locale(sess, locale)
+        set_locale(sess, locale, user_agent=user_agent)
         resp = sess.get(
             f"https://www.dekudeals.com/items/{slug}",
-            headers=HEADERS,
+            headers=_make_headers(user_agent),
             timeout=30,
         )
         resp.raise_for_status()

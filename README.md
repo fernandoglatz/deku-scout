@@ -21,7 +21,12 @@ Visit `/demo` on any running instance to auto-configure the demo wishlist and go
 - Shows sale badges, sale end dates, and release dates
 - Caches game data locally (SQLite) with configurable TTL — no repeated scraping
 - Displays and caches game cover art locally
-- Price history chart per game (fetched from DekuDeals item pages)
+- Price history chart per game (hover on desktop, tap on mobile)
+- Search, filter (All / On Sale / Available / Best Buy per region), and sort by any column
+- Filter and sort state persisted across page loads
+- Mobile-responsive layout — card list view, hamburger menu, and bottom-sheet price history
+- Dark/light theme toggle
+- Internationalization (English, Spanish, Portuguese, Japanese)
 - Fully configurable through the UI — no config file editing required
 
 ## Screenshots
