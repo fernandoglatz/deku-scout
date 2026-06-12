@@ -40,6 +40,8 @@
   "modal.errorNoReference": "Please select a reference currency.",
   "modal.errorNetwork": "Network error. Please try again.",
   "modal.errorSave": "Failed to save. Please try again.",
+  "ph.tipHover": "Tip: hover any price to see its full price history chart.",
+  "ph.tipTap": "Tip: tap any price to see its full price history chart.",
   "ph.loading": "Loading...",
   "ph.priceHistory": "Price History",
   "ph.noHistory": "No price history available.",

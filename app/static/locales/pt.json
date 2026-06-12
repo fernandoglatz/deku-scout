@@ -40,6 +40,8 @@
   "modal.errorNoReference": "Selecione uma moeda de referência.",
   "modal.errorNetwork": "Erro de rede. Tente novamente.",
   "modal.errorSave": "Falha ao salvar. Tente novamente.",
+  "ph.tipHover": "Dica: passe o mouse sobre qualquer preço para ver o histórico completo.",
+  "ph.tipTap": "Dica: toque em qualquer preço para ver o histórico completo.",
   "ph.loading": "Carregando...",
   "ph.priceHistory": "Histórico de preços",
   "ph.noHistory": "Histórico de preços indisponível.",

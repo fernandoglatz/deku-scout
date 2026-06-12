@@ -40,6 +40,8 @@
   "modal.errorNoReference": "基準通貨を選択してください。",
   "modal.errorNetwork": "ネットワークエラーです。再試行してください。",
   "modal.errorSave": "保存に失敗しました。再試行してください。",
+  "ph.tipHover": "ヒント：任意の価格にカーソルを合わせると、価格履歴が表示されます。",
+  "ph.tipTap": "ヒント：任意の価格をタップすると、価格履歴が表示されます。",
   "ph.loading": "読み込み中...",
   "ph.priceHistory": "価格履歴",
   "ph.noHistory": "価格履歴がありません。",

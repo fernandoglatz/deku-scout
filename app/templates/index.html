@@ -943,8 +943,8 @@ window.I18n = (function () {
     try { alreadySeen = !!localStorage.getItem(TIP_KEY); } catch (e) {}
     if (!alreadySeen) {
       tipText.textContent = isTouchDevice
-        ? 'Tip: tap any price to see its full price history chart.'
-        : 'Tip: hover any price to see its full price history chart.';
+        ? I18n.t('ph.tipTap')
+        : I18n.t('ph.tipHover');
       tipEl.style.display = 'flex';
     } else {
       tipDismissed = true;
