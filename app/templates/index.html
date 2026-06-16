@@ -158,6 +158,11 @@
     thead th:first-child::after { content: '' !important; }
     .th-icon { width: 3rem; cursor: default !important; }
     .th-icon::after { content: '' !important; }
+    /* column drag-and-drop */
+    thead th { touch-action: none; }
+    thead th.col-dragging { opacity: .45; cursor: grabbing; }
+    thead th.col-drop-before { box-shadow: inset 2px 0 0 var(--accent); }
+    thead th.col-drop-after  { box-shadow: inset -2px 0 0 var(--accent); }
     tbody tr { border-top: 1px solid var(--surface); transition: background .1s; }
     tbody tr:hover { background: var(--row-hover) !important; }
     tbody tr.on-sale { background: var(--sale-row); }
@@ -679,6 +684,49 @@ window.I18n = (function () {
   var allThs = [...tbl.querySelectorAll('thead th')];
   var sortIdx = -1, sortDir = 1;
 
+  // --- stable column keys (so order/sort survive reordering) ---
+  function colKeyFor(th, i) {
+    if (i === 0) return 'idx';
+    if (th.classList.contains('th-icon')) return 'icon';
+    if (th.dataset.bestBuyCol) return 'bestbuy';
+    if (th.dataset.locale) return 'price:' + th.dataset.locale;
+    if (th.dataset.i18n === 'th.game') return 'game';
+    if (th.dataset.i18n === 'th.releaseDate') return 'reldate';
+    if (th.dataset.i18n === 'th.saleEnds') return 'saleends';
+    return 'col' + i;
+  }
+  allThs.forEach(function (th, i) { th.dataset.colKey = colKeyFor(th, i); });
+
+  function gameColIdx() {
+    var i = allThs.findIndex(function (th) { return th.dataset.colKey === 'game'; });
+    return i >= 0 ? i : 2;
+  }
+
+  // Reorder the header row and every body row to match an array of column keys.
+  function applyColumnOrder(orderKeys) {
+    var headRow = tbl.querySelector('thead tr');
+    var ths = [...headRow.children];
+    var curKeys = ths.map(function (t) { return t.dataset.colKey; });
+    var finalKeys = orderKeys.filter(function (k) { return curKeys.indexOf(k) !== -1; });
+    curKeys.forEach(function (k) { if (finalKeys.indexOf(k) === -1) finalKeys.push(k); });
+    var perm = finalKeys.map(function (k) { return curKeys.indexOf(k); });
+    if (perm.every(function (oldIdx, j) { return oldIdx === j; })) return; // no change
+    perm.forEach(function (oldIdx) { headRow.appendChild(ths[oldIdx]); });
+    tbl.querySelectorAll('tbody tr').forEach(function (tr) {
+      var cells = [...tr.children];
+      perm.forEach(function (oldIdx) { tr.appendChild(cells[oldIdx]); });
+    });
+    allThs = [...headRow.children];
+  }
+
+  function recomputeSortIdx() {
+    var i = allThs.findIndex(function (th) {
+      return th.classList.contains('asc') || th.classList.contains('desc');
+    });
+    if (i >= 0) sortIdx = i;
+  }
+  // --- end column keys ---
+
   function parsePrice(s) {
     var clean = s.replace(/[^\d,.]/g, '');
     if (!clean) return 0;
@@ -717,20 +765,99 @@ window.I18n = (function () {
         cmp = (parseDate(ad) - parseDate(bd)) * dir;
       } else { cmp = av.localeCompare(bv) * dir; }
       if (cmp !== 0) return cmp;
-      return (a.cells[2] ? a.cells[2].textContent : '').localeCompare(b.cells[2] ? b.cells[2].textContent : '');
+      var gi = gameColIdx();
+      return (a.cells[gi] ? a.cells[gi].textContent : '').localeCompare(b.cells[gi] ? b.cells[gi].textContent : '');
     });
     rows.forEach(function (r) { tbody.appendChild(r); });
   }
 
-  allThs.forEach(function (th, i) {
-    if (!th.dataset.type || th.dataset.type === 'none' || i < 2) return;
-    th.addEventListener('click', function () { doSort(i, sortIdx === i ? -sortDir : 1); saveUiState(); });
+  var suppressClick = false;
+  allThs.forEach(function (th) {
+    th.addEventListener('click', function () {
+      if (suppressClick) { suppressClick = false; return; }
+      if (!th.dataset.type || th.dataset.type === 'none') return;
+      var i = allThs.indexOf(th);
+      if (i < 2) return;
+      doSort(i, sortIdx === i ? -sortDir : 1); saveUiState();
+    });
   });
+
+  // --- column drag-and-drop (pointer events: mouse + touch + pen) ---
+  var DRAG_THRESH = 6;
+  var dragTh = null, dragKey = null, dragStartX = 0, dragging = false;
+  var dragOverTh = null, dragInsertAfter = false;
+
+  function clearDropMarkers() {
+    allThs.forEach(function (th) { th.classList.remove('col-drop-before', 'col-drop-after'); });
+  }
+  function headerThAtX(x) {
+    var found = null;
+    allThs.forEach(function (th) {
+      var r = th.getBoundingClientRect();
+      if (x >= r.left && x <= r.right) found = th;
+    });
+    return found;
+  }
+  function onPointerDown(e) {
+    if (e.button != null && e.button > 0) return; // primary button / touch only
+    dragTh = e.currentTarget;
+    dragKey = dragTh.dataset.colKey;
+    dragStartX = e.clientX;
+    dragging = false;
+    suppressClick = false;
+    try { dragTh.setPointerCapture(e.pointerId); } catch (_) {}
+    dragTh.addEventListener('pointermove', onPointerMove);
+    dragTh.addEventListener('pointerup', onPointerUp);
+    dragTh.addEventListener('pointercancel', onPointerUp);
+  }
+  function onPointerMove(e) {
+    if (!dragTh) return;
+    if (!dragging) {
+      if (Math.abs(e.clientX - dragStartX) < DRAG_THRESH) return;
+      dragging = true;
+      suppressClick = true;
+      dragTh.classList.add('col-dragging');
+    }
+    clearDropMarkers();
+    var target = headerThAtX(e.clientX);
+    if (!target || target === dragTh) { dragOverTh = null; return; }
+    var r = target.getBoundingClientRect();
+    dragInsertAfter = e.clientX > r.left + r.width / 2;
+    dragOverTh = target;
+    target.classList.add(dragInsertAfter ? 'col-drop-after' : 'col-drop-before');
+  }
+  function onPointerUp(e) {
+    if (!dragTh) return;
+    var moved = dragTh;
+    moved.removeEventListener('pointermove', onPointerMove);
+    moved.removeEventListener('pointerup', onPointerUp);
+    moved.removeEventListener('pointercancel', onPointerUp);
+    try { moved.releasePointerCapture(e.pointerId); } catch (_) {}
+    moved.classList.remove('col-dragging');
+    clearDropMarkers();
+    if (dragging && dragOverTh && dragOverTh !== moved) {
+      var keys = allThs.map(function (th) { return th.dataset.colKey; })
+        .filter(function (k) { return k !== dragKey; });
+      var ti = keys.indexOf(dragOverTh.dataset.colKey);
+      if (dragInsertAfter) ti += 1;
+      keys.splice(ti, 0, dragKey);
+      applyColumnOrder(keys);
+      recomputeSortIdx();
+      saveUiState();
+    }
+    dragTh = null; dragKey = null; dragOverTh = null; dragging = false;
+  }
+  allThs.forEach(function (th) { th.addEventListener('pointerdown', onPointerDown); });
+  // --- end column drag-and-drop ---
 
   // Default sort: best-buy column if present, else reference locale's current column
   var bestBuyTh = tbl.querySelector('thead th[data-best-buy-col="1"]');
   var refTh = tbl.querySelector('thead th[data-ref-cur="1"]');
-  var defaultCol = bestBuyTh ? allThs.indexOf(bestBuyTh) : (refTh ? allThs.indexOf(refTh) : 3);
+  function defaultColIdx() {
+    if (bestBuyTh) return allThs.indexOf(bestBuyTh);
+    if (refTh) return allThs.indexOf(refTh);
+    return Math.min(3, allThs.length - 1);
+  }
 
   var searchEl = document.getElementById('search');
   var filterBtns = [...document.querySelectorAll('.filter-btn')];
@@ -738,8 +865,9 @@ window.I18n = (function () {
 
   function applyFilters() {
     var q = searchEl.value.trim().toLowerCase();
+    var gi = gameColIdx();
     tbl.querySelector('tbody').querySelectorAll('tr').forEach(function (tr) {
-      var matchSearch = !q || tr.cells[2].textContent.toLowerCase().includes(q);
+      var matchSearch = !q || (tr.cells[gi] && tr.cells[gi].textContent.toLowerCase().includes(q));
       var matchFilter = true;
       if (activeFilters.size > 0) {
         activeFilters.forEach(function (f) {
@@ -756,6 +884,8 @@ window.I18n = (function () {
     try {
       localStorage.setItem('dekuscout_ui', JSON.stringify({
         si: sortIdx, sd: sortDir,
+        sk: allThs[sortIdx] ? allThs[sortIdx].dataset.colKey : null,
+        co: allThs.map(function (th) { return th.dataset.colKey; }),
         filters: [...activeFilters],
         search: searchEl ? searchEl.value : ''
       }));
@@ -770,6 +900,7 @@ window.I18n = (function () {
   var saleBtn = document.querySelector('.filter-btn[data-filter="sale"]');
 
   if (_saved) {
+    if (Array.isArray(_saved.co)) applyColumnOrder(_saved.co);
     if (typeof _saved.search === 'string') searchEl.value = _saved.search;
     if (Array.isArray(_saved.filters)) {
       if (_saved.filters.length === 0) {
@@ -784,7 +915,9 @@ window.I18n = (function () {
       }
     }
     applyFilters();
-    var si = typeof _saved.si === 'number' && _saved.si >= 0 ? _saved.si : defaultCol;
+    var si = -1;
+    if (_saved.sk) si = allThs.findIndex(function (th) { return th.dataset.colKey === _saved.sk; });
+    if (si < 0) si = (typeof _saved.si === 'number' && _saved.si >= 0) ? _saved.si : defaultColIdx();
     doSort(si, _saved.sd || 1);
   } else {
     // Default: sale filter, reference-price sort
@@ -792,7 +925,7 @@ window.I18n = (function () {
     allBtn.classList.remove('active');
     if (saleBtn) saleBtn.classList.add('active');
     applyFilters();
-    doSort(defaultCol, 1);
+    doSort(defaultColIdx(), 1);
   }
 
   searchEl.addEventListener('input', function() { applyFilters(); saveUiState(); });
