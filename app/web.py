@@ -224,7 +224,7 @@ def _compute_best_buy(games: list[dict], selected_locales: list[str], reference_
             g["best_buy_save"] = _format_price(diff, reference_locale)
         elif diff < -0.005:
             g["best_buy"] = reference_locale
-            g["best_buy_label"] = label
+            g["best_buy_label"] = _format_price(ref_val, reference_locale)
             g["best_buy_save"] = _format_price(-diff, reference_locale)
         else:
             g["best_buy"] = "eq"

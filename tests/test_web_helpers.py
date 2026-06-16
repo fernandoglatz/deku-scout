@@ -218,6 +218,9 @@ def test_compute_best_buy_reference_cheaper(monkeypatch):
 
     assert games[0]["best_buy"] == "br"
     assert games[0]["best_buy_save"] != ""
+    # label must be the actual lowest price (reference R$ 50,00), not the
+    # higher foreign price converted to the reference currency (R$ 100,00).
+    assert games[0]["best_buy_label"] == "R$ 50,00"
 
 
 def test_compute_best_buy_equal_prices(monkeypatch):
