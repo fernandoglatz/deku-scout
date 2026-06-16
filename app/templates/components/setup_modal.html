@@ -238,6 +238,10 @@
 
   buildGrid();
 
+  {% if not wishlist_configured %}
+  openModal();
+  {% endif %}
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     formError.style.display = 'none';

@@ -1,11 +1,14 @@
+import json
 import logging
 import os
+import re
 import time
+from typing import Callable, Optional
 
 import requests
 from bs4 import BeautifulSoup
 
-from app.config import DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, WISHLIST_URL
+from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
 from app.db import load_cookies, save_cookies, save_games_cache
 from app.parsing import parse_release_date, parse_sale_end
 
@@ -238,12 +241,138 @@ def download_icons(games: list[dict], user_agent: str = None) -> dict[str, str]:
     return result
 
 
+def _format_eshop_value(value: int, locale: str) -> str:
+    """Format an eShop price (in minor currency units from outAnalytics) as a locale string."""
+    info = COUNTRIES.get(locale, {})
+    symbol = info.get("symbol", "")
+    iso = info.get("iso", "")
+    if iso in NO_DECIMAL_ISOS:
+        amount = f"{int(round(value)):,}"
+        return f"{symbol}{amount}" if len(symbol) == 1 else f"{symbol} {amount}"
+    val = value / 100.0
+    if locale == "br":
+        formatted = f"{val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"{symbol} {formatted}"
+    if len(symbol) > 1:
+        return f"{symbol} {val:,.2f}"
+    return f"{symbol}{val:,.2f}"
+
+
+def _parse_eshop_analytics(html: str) -> dict:
+    """Extract eShop price data from outAnalytics scripts on a DekuDeals item page.
+
+    Matches both 'eshop:' (US) and 'eshop_br:', 'eshop_jp:' etc. (other locales).
+    Returns {"value": int, "discount": int} in minor currency units, or {}.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    for script in soup.find_all("script"):
+        content = script.string or ""
+        if "outAnalytics['eshop" not in content:
+            continue
+        m = re.search(r"outAnalytics\['eshop[^']*'\]\s*=\s*(\{[^\n]+)", content)
+        if not m:
+            continue
+        try:
+            data = json.loads(m.group(1).rstrip(";"))
+            value = data.get("value", 0)
+            items_list = data.get("items", [{}])
+            item = items_list[0] if items_list else {}
+            discount = item.get("discount", 0)
+            return {"value": value, "discount": discount}
+        except (json.JSONDecodeError, IndexError):
+            pass
+    return {}
+
+
+def _fetch_eshop_prices(
+    games: list[dict],
+    locale: str,
+    session: requests.Session,
+    user_agent: str = None,
+    on_progress: Optional[Callable[[int, int], None]] = None,
+) -> None:
+    """Fetch eShop price from each game's item page and overwrite wishlist prices in place.
+
+    The wishlist shows the best price across all stores (eShop, Amazon, etc.). This
+    function replaces those prices with eShop-only prices so retail discounts are ignored.
+    """
+    to_fetch = [g for g in games if g.get("current", "Unavailable") != "Unavailable"]
+    if not to_fetch:
+        return
+
+    cookies = [(c.name, c.value, c.domain, c.path) for c in session.cookies]
+    headers = _make_headers(user_agent)
+    total = len(to_fetch)
+    log.info("_fetch_eshop_prices: fetching %d item pages (locale=%s)", total, locale)
+
+    delay = 0.01
+    results = []
+    for i, game in enumerate(to_fetch):
+        slug = game["slug"]
+        while True:
+            try:
+                s = requests.Session()
+                for name, val, domain, path in cookies:
+                    s.cookies.set(name, val, domain=domain, path=path)
+                time.sleep(delay)
+                resp = s.get(
+                    f"https://www.dekudeals.com/items/{slug}",
+                    headers=headers,
+                    timeout=30,
+                )
+                resp.raise_for_status()
+                results.append((slug, _parse_eshop_analytics(resp.text)))
+                break
+            except requests.exceptions.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 429:
+                    delay += 0.01
+                    log.warning("_fetch_eshop_prices: 429 for %s, backing off 1s then retrying with delay=%.3fs", slug, delay)
+                    time.sleep(1.0)
+                    continue
+                log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
+                results.append((slug, {}))
+                break
+            except Exception as exc:
+                log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
+                results.append((slug, {}))
+                break
+        if on_progress:
+            on_progress(i + 1, total)
+
+    slug_to_game = {g["slug"]: g for g in to_fetch}
+    for slug, eshop in results:
+        if not eshop:
+            continue
+        game = slug_to_game.get(slug)
+        if not game:
+            continue
+
+        value = eshop["value"]
+        discount = eshop["discount"]
+
+        if value == 0:
+            game["current"] = "Unavailable"
+            game["original"] = ""
+            game["discount"] = ""
+            game["sale_end"] = ""
+            continue
+
+        game["current"] = _format_eshop_value(value, locale)
+        game["original"] = _format_eshop_value(value + discount, locale) if discount > 0 else ""
+        game["discount"] = f"-{round(discount / (value + discount) * 100)}%" if discount > 0 else ""
+        if not game["discount"]:
+            game["sale_end"] = ""
+
+    log.info("_fetch_eshop_prices: done (locale=%s)", locale)
+
+
 def fetch_all_games(
     db_path: str = DB_FILE,
     wishlist_url: str = None,
     locales: list[str] = None,
     reference_locale: str = None,
     user_agent: str = None,
+    on_progress: Optional[Callable[[str, str, Optional[int], Optional[int]], None]] = None,
 ) -> tuple[list[dict], float]:
     url = wishlist_url or WISHLIST_URL
     if locales is None:
@@ -254,21 +383,48 @@ def fetch_all_games(
     log.info("fetch_all_games: starting (locales=%s, reference=%s)", locales, reference_locale)
     t_start = time.monotonic()
 
-    session = build_session(db_path, reference_locale)
+    sessions: dict[str, requests.Session] = {}
     games_by_locale: dict[str, list[dict]] = {}
 
+    # Phase 1: fetch all wishlists first to know exact game counts per locale
     for locale in locales:
-        log.info("fetch_all_games: fetching locale=%s", locale)
-        set_locale(session, locale, wishlist_url=url, user_agent=user_agent)
+        log.info("fetch_all_games: fetching wishlist locale=%s", locale)
+        session = build_session(db_path, locale)
+        sessions[locale] = session
+        if not list(session.cookies):
+            log.info("fetch_all_games: no cookies for locale=%s, calling set_locale", locale)
+            if on_progress:
+                on_progress("set_locale", locale, None, None)
+            set_locale(session, locale, wishlist_url=url, user_agent=user_agent)
+        if on_progress:
+            on_progress("fetch_wishlist", locale, None, None)
         games_by_locale[locale] = extract_games(fetch_wishlist(session, wishlist_url=url, user_agent=user_agent))
-        save_cookies(session.cookies, db_path, locale=locale)
 
-    log.info("fetch_all_games: restoring reference locale=%s", reference_locale)
-    set_locale(session, reference_locale, wishlist_url=url, user_agent=user_agent)
-    save_cookies(session.cookies, db_path, locale=reference_locale)
+    # Phase 2: fetch prices using cumulative offsets across all locales
+    global_total = sum(len(g) for g in games_by_locale.values())
+    global_offset = 0
+
+    for locale in locales:
+        locale_games = games_by_locale[locale]
+        locale_offset = global_offset
+
+        def _make_price_progress(loc: str, offset: int) -> Callable[[int, int], None]:
+            def _cb(current: int, total: int) -> None:
+                if on_progress:
+                    on_progress("eshop_prices", loc, offset + current, global_total)
+            return _cb
+
+        _fetch_eshop_prices(
+            locale_games, locale, sessions[locale], user_agent=user_agent,
+            on_progress=_make_price_progress(locale, locale_offset) if on_progress else None,
+        )
+        save_cookies(sessions[locale].cookies, db_path, locale=locale)
+        global_offset += len(locale_games)
 
     games = merge_prices(games_by_locale, reference_locale=reference_locale)
     log.info("fetch_all_games: merged %d games, downloading icons", len(games))
+    if on_progress:
+        on_progress("icons", None, None, None)
     icon_exts = download_icons(games, user_agent=user_agent)
     for g in games:
         g["icon_ext"] = icon_exts.get(g["slug"], "")

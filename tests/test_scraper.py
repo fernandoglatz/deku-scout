@@ -291,3 +291,203 @@ def test_merge_prices_game_only_in_non_reference():
     assert result[0]["name"] == "US Only"
     assert "us" in result[0]["prices"]
     assert "br" not in result[0]["prices"]
+
+
+# ── _parse_eshop_analytics ────────────────────────────────────────────────────
+
+def test_parse_eshop_analytics_us_no_discount():
+    from app.scraper import _parse_eshop_analytics
+    html = """<html><body>
+    <script>outAnalytics['eshop:70010000018692'] = {"currency":"USD","value":999,"items":[{"item_id":"test","item_name":"Test","affiliation":"eshop","discount":0,"index":3,"item_category":"switch","item_variant":"digital","price":999,"quantity":1}]}</script>
+    </body></html>"""
+    assert _parse_eshop_analytics(html) == {"value": 999, "discount": 0}
+
+
+def test_parse_eshop_analytics_br_locale_key():
+    from app.scraper import _parse_eshop_analytics
+    html = """<html><body>
+    <script>outAnalytics['eshop_br:70010000018692'] = {"currency":"BRL","value":5490,"items":[{"item_id":"test","item_name":"Test","affiliation":"eshop_br","discount":0,"index":0,"item_category":"switch","item_variant":"digital","price":5490,"quantity":1}]}</script>
+    </body></html>"""
+    assert _parse_eshop_analytics(html) == {"value": 5490, "discount": 0}
+
+
+def test_parse_eshop_analytics_with_discount():
+    from app.scraper import _parse_eshop_analytics
+    html = """<html><body>
+    <script>outAnalytics['eshop:70010000099999'] = {"currency":"USD","value":999,"items":[{"item_id":"test","item_name":"Test","affiliation":"eshop","discount":1000,"index":0,"item_category":"switch","item_variant":"digital","price":999,"quantity":1}]}</script>
+    </body></html>"""
+    assert _parse_eshop_analytics(html) == {"value": 999, "discount": 1000}
+
+
+def test_parse_eshop_analytics_no_eshop_entry_returns_empty():
+    from app.scraper import _parse_eshop_analytics
+    html = """<html><body>
+    <script>outAnalytics['amazon:B07QZR4PFT'] = {"currency":"USD","value":949,"items":[{"discount":50}]}</script>
+    </body></html>"""
+    assert _parse_eshop_analytics(html) == {}
+
+
+def test_parse_eshop_analytics_no_scripts_returns_empty():
+    from app.scraper import _parse_eshop_analytics
+    assert _parse_eshop_analytics("<html><body><p>Nothing</p></body></html>") == {}
+
+
+# ── _format_eshop_value ───────────────────────────────────────────────────────
+
+def test_format_eshop_value_usd():
+    from app.scraper import _format_eshop_value
+    assert _format_eshop_value(999, "us") == "$9.99"
+
+
+def test_format_eshop_value_brl():
+    from app.scraper import _format_eshop_value
+    assert _format_eshop_value(5490, "br") == "R$ 54,90"
+
+
+def test_format_eshop_value_jpy_no_decimal():
+    from app.scraper import _format_eshop_value
+    assert _format_eshop_value(500, "jp") == "¥500"
+
+
+def test_format_eshop_value_eur():
+    from app.scraper import _format_eshop_value
+    assert _format_eshop_value(1499, "de") == "€14.99"
+
+
+# ── _fetch_eshop_prices ───────────────────────────────────────────────────────
+
+def test_fetch_eshop_prices_replaces_amazon_price_with_eshop(monkeypatch):
+    from app.scraper import _fetch_eshop_prices
+    import requests
+
+    _ESHOP_HTML = """<html><body>
+    <script>outAnalytics['eshop:123'] = {"currency":"USD","value":999,"items":[{"item_id":"boxboy","item_name":"BOXBOY","affiliation":"eshop","discount":0,"index":3,"item_category":"switch","item_variant":"digital","price":999,"quantity":1}]}</script>
+    </body></html>"""
+
+    class _FakeResponse:
+        text = _ESHOP_HTML
+        def raise_for_status(self): pass
+
+    class _FakeSession:
+        cookies = []
+        def get(self, url, **kwargs): return _FakeResponse()
+        def cookies_set(self, *a): pass
+
+    monkeypatch.setattr("app.scraper.requests.Session", lambda: _FakeSession())
+
+    games = [{"slug": "boxboy-and-boxgirl", "current": "$9.49", "original": "$9.99",
+              "discount": "-5%", "sale_end": "2026-07-01T00:00:00Z"}]
+    _fetch_eshop_prices(games, "us", _FakeSession())
+
+    assert games[0]["current"] == "$9.99"
+    assert games[0]["original"] == ""
+    assert games[0]["discount"] == ""
+    assert games[0]["sale_end"] == ""
+
+
+def test_fetch_eshop_prices_skips_unavailable_games(monkeypatch):
+    from app.scraper import _fetch_eshop_prices
+    import requests
+
+    fetch_called = []
+    class _FakeSession:
+        cookies = []
+        def get(self, url, **kwargs):
+            fetch_called.append(url)
+            class R:
+                text = "<html></html>"
+                def raise_for_status(self): pass
+            return R()
+
+    monkeypatch.setattr("app.scraper.requests.Session", lambda: _FakeSession())
+
+    games = [{"slug": "upcoming-game", "current": "Unavailable", "original": "",
+              "discount": "", "sale_end": ""}]
+    _fetch_eshop_prices(games, "us", _FakeSession())
+
+    assert fetch_called == []
+
+
+def test_fetch_eshop_prices_retries_on_429(monkeypatch):
+    from app.scraper import _fetch_eshop_prices
+    import requests as req
+
+    _ESHOP_HTML = """<html><body>
+    <script>outAnalytics['eshop:1'] = {"currency":"USD","value":999,"items":[{"discount":0}]}</script>
+    </body></html>"""
+
+    call_count = [0]
+    sleeps = []
+
+    class _FakeResponse429:
+        status_code = 429
+        def raise_for_status(self):
+            err = req.exceptions.HTTPError()
+            err.response = self
+            raise err
+
+    class _FakeResponseOk:
+        text = _ESHOP_HTML
+        def raise_for_status(self): pass
+
+    class _FakeSession:
+        cookies = []
+        def get(self, url, **kwargs):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return _FakeResponse429()
+            return _FakeResponseOk()
+
+    monkeypatch.setattr("app.scraper.requests.Session", lambda: _FakeSession())
+    monkeypatch.setattr("app.scraper.time.sleep", lambda d: sleeps.append(d))
+
+    games = [{"slug": "some-game", "current": "$9.99", "original": "", "discount": "", "sale_end": ""}]
+    _fetch_eshop_prices(games, "us", _FakeSession())
+
+    assert call_count[0] == 2
+    assert games[0]["current"] == "$9.99"
+    assert 1.0 in sleeps
+
+
+def test_fetch_eshop_prices_delay_increases_on_429(monkeypatch):
+    from app.scraper import _fetch_eshop_prices
+    import requests as req
+
+    _ESHOP_HTML = """<html><body>
+    <script>outAnalytics['eshop:1'] = {"currency":"USD","value":499,"items":[{"discount":0}]}</script>
+    </body></html>"""
+
+    responses = iter([429, 429, 200])
+    sleeps = []
+
+    class _FakeSession:
+        cookies = []
+        def get(self, url, **kwargs):
+            code = next(responses)
+            if code == 429:
+                class R429:
+                    status_code = 429
+                    def raise_for_status(self):
+                        err = req.exceptions.HTTPError()
+                        err.response = self
+                        raise err
+                return R429()
+            class ROk:
+                text = _ESHOP_HTML
+                def raise_for_status(self): pass
+            return ROk()
+
+    monkeypatch.setattr("app.scraper.requests.Session", lambda: _FakeSession())
+    monkeypatch.setattr("app.scraper.time.sleep", lambda d: sleeps.append(d))
+
+    games = [{"slug": "rate-limited", "current": "$4.99", "original": "", "discount": "", "sale_end": ""}]
+    _fetch_eshop_prices(games, "us", _FakeSession())
+
+    # sleeps: [delay_attempt1, 1.0_backoff, delay_attempt2, 1.0_backoff, delay_attempt3]
+    one_sec_sleeps = [s for s in sleeps if s == 1.0]
+    delay_sleeps = [s for s in sleeps if s != 1.0]
+    assert len(one_sec_sleeps) == 2
+    assert len(delay_sleeps) == 3
+    assert delay_sleeps[0] < delay_sleeps[1] < delay_sleeps[2]
+    assert round(delay_sleeps[1] - delay_sleeps[0], 3) == 0.01
+    assert round(delay_sleeps[2] - delay_sleeps[1], 3) == 0.01

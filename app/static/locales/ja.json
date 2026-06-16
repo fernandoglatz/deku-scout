@@ -1,6 +1,13 @@
 {
   "loading.fetching": "DekuDealsから価格を取得中…",
   "loading.wishlistData": "ウィッシュリストを読み込み中...",
+  "loading.setLocale": "{locale}ストアを設定中…",
+  "loading.fetchWishlist": "{locale}のウィッシュリストを取得中…",
+  "loading.eshopPrices": "{locale} eShop価格を取得中: {current} / {total}",
+  "loading.icons": "ゲームアイコンをダウンロード中…",
+  "loading.etaSecs": " — 残り約{s}秒",
+  "loading.etaMins": " — 残り約{m}分",
+  "loading.etaMinsAndSecs": " — 残り約{m}分{r}秒",
   "meta.updated": "更新:",
   "meta.never": "なし",
   "meta.onSale": "セール中",

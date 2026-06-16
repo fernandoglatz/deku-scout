@@ -1,6 +1,13 @@
 {
   "loading.fetching": "Fetching prices from DekuDeals…",
   "loading.wishlistData": "Loading wishlist data...",
+  "loading.setLocale": "Setting up {locale} store…",
+  "loading.fetchWishlist": "Fetching {locale} wishlist…",
+  "loading.eshopPrices": "Fetching {locale} eShop prices: {current} / {total}",
+  "loading.icons": "Downloading game icons…",
+  "loading.etaSecs": " — ~{s}s left",
+  "loading.etaMins": " — ~{m}m left",
+  "loading.etaMinsAndSecs": " — ~{m}m {r}s left",
   "meta.updated": "Updated:",
   "meta.never": "Never",
   "meta.onSale": "on sale",

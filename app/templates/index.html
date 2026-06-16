@@ -104,6 +104,24 @@
       border-radius: 50%; animation: spin .8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-bar-wrap {
+      width: 280px; height: 6px; background: rgba(255,255,255,.15);
+      border-radius: 3px; overflow: hidden;
+    }
+    #loading-bar {
+      height: 100%; background: var(--accent); border-radius: 3px;
+      width: 0%; transition: width .3s ease;
+    }
+    #loading-bar.indeterminate {
+      width: 35%; animation: bar-slide 1.4s ease-in-out infinite;
+    }
+    @keyframes bar-slide {
+      0%   { transform: translateX(-185%); }
+      100% { transform: translateX(380%);  }
+    }
+    #loading-sub {
+      font-size: .8rem; color: rgba(255,255,255,.55); min-height: 1.2em;
+    }
     main { padding: 1.5rem 2rem; }
     .stats { display: flex; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
     .stat {
@@ -280,7 +298,7 @@
   </style>
 </head>
 <body>
-<div id="loading"><div class="spinner"></div><span data-i18n="loading.fetching">Fetching prices from DekuDeals…</span></div>
+<div id="loading"><div class="spinner"></div><span data-i18n="loading.fetching">Fetching prices from DekuDeals…</span><div id="loading-bar-wrap"><div id="loading-bar" class="indeterminate"></div></div><span id="loading-sub"></span></div>
 <header>
   <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <h1>&#127918; DekuScout</h1>
@@ -358,7 +376,7 @@
           </th>
           {% endfor %}
           {% if selected_locales|length > 1 %}
-          <th data-type="price" data-i18n="th.bestBuy">Best Buy</th>
+          <th data-type="price" data-best-buy-col="1" data-i18n="th.bestBuy">Best Buy</th>
           {% endif %}
           <th data-type="date" data-i18n="th.releaseDate">Release Date</th>
           <th data-type="date" data-i18n="th.saleEnds">Sale Ends</th>
@@ -499,6 +517,8 @@ window.I18n = (function () {
 (function () {
   document.getElementById('rf').addEventListener('submit', function () {
     document.getElementById('loading').classList.add('show');
+    document.getElementById('loading-bar').className = 'indeterminate';
+    document.getElementById('loading-sub').textContent = '';
     this.querySelector('button').disabled = true;
   });
 
@@ -564,6 +584,8 @@ window.I18n = (function () {
     rfClone.id = 'rfMobile';
     rfClone.addEventListener('submit', function () {
       document.getElementById('loading').classList.add('show');
+      document.getElementById('loading-bar').className = 'indeterminate';
+      document.getElementById('loading-sub').textContent = '';
       rfClone.querySelector('button').disabled = true;
     });
     actionsRow.appendChild(rfClone);
@@ -636,7 +658,7 @@ window.I18n = (function () {
       if (ts) {
         metaUpdatedEl.textContent = new Intl.DateTimeFormat(locale, {
           year: 'numeric', month: 'short', day: 'numeric',
-          hour: '2-digit', minute: '2-digit', timeZone: 'UTC'
+          hour: '2-digit', minute: '2-digit'
         }).format(new Date(ts * 1000));
       } else {
         metaUpdatedEl.textContent = I18n.t('meta.never');
@@ -705,9 +727,10 @@ window.I18n = (function () {
     th.addEventListener('click', function () { doSort(i, sortIdx === i ? -sortDir : 1); saveUiState(); });
   });
 
-  // Default sort: reference locale's current column
+  // Default sort: best-buy column if present, else reference locale's current column
+  var bestBuyTh = tbl.querySelector('thead th[data-best-buy-col="1"]');
   var refTh = tbl.querySelector('thead th[data-ref-cur="1"]');
-  var defaultCol = refTh ? allThs.indexOf(refTh) : 3;
+  var defaultCol = bestBuyTh ? allThs.indexOf(bestBuyTh) : (refTh ? allThs.indexOf(refTh) : 3);
 
   var searchEl = document.getElementById('search');
   var filterBtns = [...document.querySelectorAll('.filter-btn')];
@@ -1014,14 +1037,69 @@ window.I18n = (function () {
 (function () {
   document.getElementById('loading').classList.add('show');
 
+  var barEl = document.getElementById('loading-bar');
+  var subEl = document.getElementById('loading-sub');
+
+  var STEP_KEYS = {
+    set_locale:    'loading.setLocale',
+    fetch_wishlist:'loading.fetchWishlist',
+    icons:         'loading.icons',
+  };
+
+  var eshopStart = null;
+
+  function fmtEta(ms) {
+    var s = Math.round(ms / 1000);
+    if (s <= 0) return '';
+    if (s < 60) return I18n.t('loading.etaSecs', { s: s });
+    var m = Math.floor(s / 60), r = s % 60;
+    return r ? I18n.t('loading.etaMinsAndSecs', { m: m, r: r }) : I18n.t('loading.etaMins', { m: m });
+  }
+
+  function updateProgress(data) {
+    var p = data.progress;
+    if (!p || !p.step) {
+      eshopStart = null;
+      barEl.className = 'indeterminate';
+      subEl.textContent = '';
+      return;
+    }
+    if (p.step === 'eshop_prices' && p.current != null && p.total) {
+      barEl.className = '';
+      barEl.style.width = Math.round(p.current / p.total * 100) + '%';
+
+      if (!eshopStart && p.current > 0) {
+        eshopStart = {time: Date.now(), current: p.current};
+      }
+
+      var eta = '';
+      if (eshopStart && p.current > eshopStart.current) {
+        var rate = (p.current - eshopStart.current) / (Date.now() - eshopStart.time);
+        eta = fmtEta((p.total - p.current) / rate);
+      }
+
+      subEl.textContent = I18n.t('loading.eshopPrices', {
+        locale: (p.locale || '').toUpperCase(),
+        current: p.current,
+        total: p.total
+      }) + eta;
+    } else {
+      eshopStart = null;
+      barEl.className = 'indeterminate';
+      var key = STEP_KEYS[p.step];
+      subEl.textContent = key ? I18n.t(key, {locale: (p.locale || '').toUpperCase()}) : '';
+    }
+  }
+
   function poll() {
     fetch('/api/status')
       .then(function (r) { return r.json(); })
       .then(function (data) {
+        updateProgress(data);
         if (data.ready) { window.location.reload(); }
-        else { setTimeout(poll, 2000); }
+        else { setTimeout(poll, 1000); }
       })
-      .catch(function () { setTimeout(poll, 3000); });
+      .catch(function () { setTimeout(poll, 1000); });
   }
 
   setTimeout(poll, 1000);

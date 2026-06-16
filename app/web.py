@@ -31,16 +31,28 @@ web_bp = Blueprint("web", __name__)
 
 _refresh_lock = threading.Lock()
 _refreshing_dbs: set[str] = set()
+_refresh_progress: dict[str, dict] = {}
 
 
 def _background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str, user_agent: str = None) -> None:
+    def _on_progress(step: str, locale, current, total) -> None:
+        _refresh_progress[db_path] = {"step": step, "locale": locale, "current": current, "total": total}
+
     try:
-        fetch_all_games(db_path, wishlist_url=wishlist_url, locales=locales, reference_locale=reference_locale, user_agent=user_agent)
+        fetch_all_games(
+            db_path,
+            wishlist_url=wishlist_url,
+            locales=locales,
+            reference_locale=reference_locale,
+            user_agent=user_agent,
+            on_progress=_on_progress,
+        )
     except Exception as exc:
         log.warning("background_refresh failed for %s: %s", db_path, exc)
     finally:
         with _refresh_lock:
             _refreshing_dbs.discard(db_path)
+        _refresh_progress.pop(db_path, None)
 
 
 def _trigger_background_refresh(db_path: str, wishlist_url: str, locales: list[str], reference_locale: str, user_agent: str = None) -> None:
@@ -332,6 +344,7 @@ def api_status():
     return jsonify({
         "ready": games is not None,
         "refreshing": refreshing,
+        "progress": _refresh_progress.get(db_path),
     })
 
 
@@ -412,13 +425,8 @@ def refresh():
     selected_locales = _get_selected_locales()
     reference_locale = _get_reference_locale(selected_locales)
     user_agent = request.headers.get("User-Agent")
-    fetch_all_games(
-        db_path,
-        wishlist_url=wishlist_url,
-        locales=selected_locales,
-        reference_locale=reference_locale,
-        user_agent=user_agent,
-    )
+    clear_games_cache(db_path)
+    _trigger_background_refresh(db_path, wishlist_url, selected_locales, reference_locale, user_agent)
     return redirect(url_for("web.index"))
 
 
