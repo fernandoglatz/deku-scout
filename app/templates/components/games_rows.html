@@ -1,0 +1,47 @@
+{% for g in games %}
+{% set is_on_sale = g.has_discount %}
+{% set is_unavail = g.all_unavailable %}
+<tr class="{{ 'on-sale' if is_on_sale else ('unavailable' if is_unavail else '') }}"
+    data-sale="{{ '1' if is_on_sale else '0' }}"
+    data-unavail="{{ '1' if is_unavail else '0' }}"
+    data-bestbuy="{{ g.best_buy }}"
+    data-switch1="{{ '1' if g.switch1 else '0' }}"
+    data-switch2="{{ '1' if g.switch2 else '0' }}">
+  <td>{{ loop.index }}</td>
+  <td class="td-icon">
+    <img class="game-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
+         onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'game-icon-placeholder',textContent:'🎮'}))"
+         alt="" loading="lazy">
+  </td>
+  <td class="name"><a href="https://www.dekudeals.com/items/{{ g.slug }}" target="_blank" rel="noopener">{{ g.name }}</a></td>
+  {% for locale in selected_locales %}
+  {% set p = g.prices.get(locale, {}) %}
+  <td class="cur" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}" data-sort="{{ p.get('current', '') if p else '' }}">
+    <span class="orig">{{ p.get('original', '') if p else '' }}</span><br>
+    {%- set cur = p.get('current', '') if p else '' -%}
+    {%- if not cur or cur == 'Unavailable' -%}
+    <span data-i18n="cell.unavailable">Unavailable</span>
+    {%- else -%}
+    {{ cur }}
+    {%- endif -%}
+    {%- if p and p.get('discount') %} <span class="disc">({{ p.discount }})</span>{% endif %}
+  </td>
+  {% endfor %}
+  {% if selected_locales|length > 1 %}
+  <td data-sort="{{ g.best_buy_label or '' }}">
+    {% if g.best_buy == 'eq' %}
+      <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+      <span class="bb-eq bb-save" data-i18n="bb.samePrice">≈ same price</span>
+    {% elif g.best_buy == reference_locale %}
+      <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+      <span class="bb-ref bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ reference_locale.upper() }}</span>
+    {% elif g.best_buy %}
+      <span class="bb-conv">{{ g.best_buy_label }}</span><br>
+      <span class="bb-winner bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ g.best_buy.upper() }}</span>
+    {% endif %}
+  </td>
+  {% endif %}
+  <td class="rel-date" data-date="{{ g.release_date }}"></td>
+  <td class="sale-end" data-date="{{ g.sale_end }}"></td>
+</tr>
+{% endfor %}

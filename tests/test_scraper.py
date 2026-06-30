@@ -491,3 +491,63 @@ def test_fetch_eshop_prices_delay_increases_on_429(monkeypatch):
     assert delay_sleeps[0] < delay_sleeps[1] < delay_sleeps[2]
     assert round(delay_sleeps[1] - delay_sleeps[0], 3) == 0.01
     assert round(delay_sleeps[2] - delay_sleeps[1], 3) == 0.01
+
+
+# ---- _parse_platforms ----
+
+def _details_html(platforms_inner: str) -> str:
+    return (
+        '<ul class="details list-group list-group-flush">'
+        '<li class="list-group-item"><strong>MSRP:</strong> R$59,99</li>'
+        '<li class="list-group-item"><strong>Release date:</strong>'
+        '<ul><li><strong>PS4, PS5, Switch</strong><br/>October 30, 2025</li></ul></li>'
+        f'{platforms_inner}'
+        '</ul>'
+    )
+
+
+def test_parse_platforms_switch1_only():
+    from app.scraper import _parse_platforms
+    html = _details_html(
+        '<li class="list-group-item"><strong>Platforms:</strong> '
+        '<a href="?platform=all">Nintendo Switch, PlayStation 5, Steam</a></li>'
+    )
+    assert _parse_platforms(html) == {"switch1": True, "switch2": False}
+
+
+def test_parse_platforms_switch2_only():
+    from app.scraper import _parse_platforms
+    html = _details_html(
+        '<li class="list-group-item"><strong>Platforms:</strong> '
+        '<a href="?platform=all">Nintendo Switch 2, PlayStation 5, Steam</a></li>'
+    )
+    assert _parse_platforms(html) == {"switch1": False, "switch2": True}
+
+
+def test_parse_platforms_both():
+    from app.scraper import _parse_platforms
+    html = _details_html(
+        '<li class="list-group-item"><strong>Platforms:</strong> '
+        '<a href="?platform=all">Nintendo Switch, Nintendo Switch 2, Steam</a></li>'
+    )
+    assert _parse_platforms(html) == {"switch1": True, "switch2": True}
+
+
+def test_parse_platforms_neither():
+    from app.scraper import _parse_platforms
+    html = _details_html(
+        '<li class="list-group-item"><strong>Platforms:</strong> '
+        '<a href="?platform=all">PlayStation 5, Xbox Series X|S, Steam</a></li>'
+    )
+    assert _parse_platforms(html) == {"switch1": False, "switch2": False}
+
+
+def test_parse_platforms_missing_line():
+    from app.scraper import _parse_platforms
+    html = _details_html("")
+    assert _parse_platforms(html) == {"switch1": False, "switch2": False}
+
+
+def test_parse_platforms_no_details():
+    from app.scraper import _parse_platforms
+    assert _parse_platforms("<html><body>nope</body></html>") == {"switch1": False, "switch2": False}

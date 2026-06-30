@@ -190,3 +190,24 @@ def test_save_games_cache_multiple_games(temp_db):
     assert len(loaded) == 5
     assert loaded[0]["name"] == "Game 0"
     assert loaded[4]["name"] == "Game 4"
+
+
+# ── games_cache platform flags ─────────────────────────────────────────────────
+
+def test_games_cache_persists_platform_flags(temp_db):
+    from app.db import save_games_cache, load_games_cache
+
+    games = [
+        {"name": "Switch 1 Game", "slug": "s1", "switch1": True, "switch2": False},
+        {"name": "Switch 2 Game", "slug": "s2", "switch1": False, "switch2": True},
+        {"name": "Both Game", "slug": "both", "switch1": True, "switch2": True},
+        {"name": "Neither Game", "slug": "none"},
+    ]
+    save_games_cache(games, temp_db)
+
+    loaded, _, _ = load_games_cache(temp_db)
+    by_slug = {g["slug"]: g for g in loaded}
+    assert by_slug["s1"]["switch1"] is True and by_slug["s1"]["switch2"] is False
+    assert by_slug["s2"]["switch1"] is False and by_slug["s2"]["switch2"] is True
+    assert by_slug["both"]["switch1"] is True and by_slug["both"]["switch2"] is True
+    assert by_slug["none"]["switch1"] is False and by_slug["none"]["switch2"] is False

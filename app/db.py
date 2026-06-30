@@ -43,8 +43,8 @@ def save_games_cache(games: list[dict], db_path: str) -> float:
         conn.execute("DELETE FROM games_cache")
         conn.executemany(
             "INSERT INTO games_cache"
-            " (name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends)"
-            " VALUES (?,?,?,?,?,?,?,?,?)",
+            " (name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends, switch1, switch2)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
             [
                 (
                     g["name"],
@@ -56,6 +56,8 @@ def save_games_cache(games: list[dict], db_path: str) -> float:
                     g.get("icon_ext", ""),
                     ts,
                     json.dumps(g.get("sale_ends", {})),
+                    1 if g.get("switch1") else 0,
+                    1 if g.get("switch2") else 0,
                 )
                 for g in games
             ],
@@ -69,7 +71,7 @@ def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float
     try:
         with sqlite3.connect(db_path) as conn:
             rows = conn.execute(
-                "SELECT name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends"
+                "SELECT name, slug, prices, release_date, sale_end, image_url, icon_ext, fetched_at, sale_ends, switch1, switch2"
                 " FROM games_cache ORDER BY id"
             ).fetchall()
         if not rows:
@@ -109,6 +111,8 @@ def load_games_cache(db_path: str) -> tuple[Optional[list[dict]], Optional[float
                     "image_url": r[5],
                     "icon_ext": r[6],
                     "sale_ends": _normalize_sale_ends(r[8]),
+                    "switch1": bool(r[9]),
+                    "switch2": bool(r[10]),
                 }
                 for r in rows
             ],

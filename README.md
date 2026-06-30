@@ -22,7 +22,7 @@ Visit `/demo` on any running instance to auto-configure the demo wishlist and go
 - Caches game data locally (SQLite) with configurable TTL — no repeated scraping
 - Displays and caches game cover art locally
 - Price history chart per game (hover on desktop, tap on mobile)
-- Search, filter (All / On Sale / Available / Best Buy per region), and sort by any column
+- Search and filter (All / On Sale / Available / Switch 1 / Switch 2 / Best Buy per region) — applied server-side — plus sort by any column
 - Drag column headers to reorder columns (works with mouse, touch, and pen)
 - Filter, sort, and column order persisted across page loads
 - Mobile-responsive layout — card list view, hamburger menu, and bottom-sheet price history
@@ -120,8 +120,12 @@ app/
 ├── exchange.py     # Live exchange rate fetching (open.er-api.com)
 ├── web.py          # Flask routes and REST endpoints
 └── templates/
-    └── index.html  # Single-page UI
+    ├── index.html             # Single-page UI
+    └── components/
+        └── games_rows.html    # Table rows partial (shared by index + filter endpoint)
 ```
+
+Toolbar filtering is performed server-side: the UI calls `GET /api/games-table` with the active criteria (`platform`, `sale`, `available`, `bestbuy`, `q`) and swaps in the rendered rows, reusing the `games_rows.html` partial.
 
 Data is persisted in a single SQLite file (`DATA_DIR/session.db`). Game data is cached for 30 minutes; price history is cached for 6 hours. Exchange rates are fetched at most once per hour.
 
