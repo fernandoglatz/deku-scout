@@ -354,6 +354,8 @@
     <button class="filter-btn active" data-filter="all" data-i18n="filter.all">All</button>
     <button class="filter-btn" data-filter="sale" data-i18n="filter.onSale">On Sale</button>
     <button class="filter-btn" data-filter="available" data-i18n="filter.available">Available</button>
+    <button class="filter-btn" data-filter="switch1" data-i18n="filter.switch1">Switch 1</button>
+    <button class="filter-btn" data-filter="switch2" data-i18n="filter.switch2">Switch 2</button>
     {% if selected_locales|length > 1 %}
       {% for locale in selected_locales %}
         {% if locale != reference_locale %}
@@ -394,7 +396,9 @@
         <tr class="{{ 'on-sale' if is_on_sale else ('unavailable' if is_unavail else '') }}"
             data-sale="{{ '1' if is_on_sale else '0' }}"
             data-unavail="{{ '1' if is_unavail else '0' }}"
-            data-bestbuy="{{ g.best_buy }}">
+            data-bestbuy="{{ g.best_buy }}"
+            data-switch1="{{ '1' if g.switch1 else '0' }}"
+            data-switch2="{{ '1' if g.switch2 else '0' }}">
           <td>{{ loop.index }}</td>
           <td class="td-icon">
             <img class="game-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
@@ -873,6 +877,8 @@ window.I18n = (function () {
         activeFilters.forEach(function (f) {
           if (f === 'sale'      && tr.dataset.sale !== '1')    matchFilter = false;
           if (f === 'available' && tr.dataset.unavail === '1') matchFilter = false;
+          if (f === 'switch1'   && tr.dataset.switch1 !== '1') matchFilter = false;
+          if (f === 'switch2'   && tr.dataset.switch2 !== '1') matchFilter = false;
           if (f.startsWith('bb-') && tr.dataset.bestbuy !== f.slice(3)) matchFilter = false;
         });
       }

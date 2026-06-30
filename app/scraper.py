@@ -155,7 +155,13 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
                     "release_date": g["release_date"],
                     "sale_ends": {},
                     "image_url": g.get("image_url", ""),
+                    "switch1": g.get("switch1", False),
+                    "switch2": g.get("switch2", False),
                 }
+            # Platform flags only come from item pages of available games; OR across
+            # locales so a game classified in any locale keeps its flags.
+            meta_by_name[name]["switch1"] = meta_by_name[name].get("switch1", False) or g.get("switch1", False)
+            meta_by_name[name]["switch2"] = meta_by_name[name].get("switch2", False) or g.get("switch2", False)
             if locale == reference_locale:
                 meta_by_name[name]["slug"] = g["slug"]
                 meta_by_name[name]["release_date"] = g["release_date"]
@@ -178,6 +184,8 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
             "sale_end": sale_ends.get(reference_locale, ""),
             "sale_ends": sale_ends,
             "image_url": meta["image_url"],
+            "switch1": meta.get("switch1", False),
+            "switch2": meta.get("switch2", False),
         })
     return result
 
@@ -284,6 +292,35 @@ def _parse_eshop_analytics(html: str) -> dict:
     return {}
 
 
+def _parse_platforms(html: str) -> dict:
+    """Extract Nintendo console availability from a DekuDeals item page.
+
+    The item page lists supported platforms in `ul.details` under a `Platforms:`
+    line, e.g. "Nintendo Switch, PlayStation 5, Steam". Returns
+    {"switch1": bool, "switch2": bool}. A game may support both.
+
+    Matches exact comma-separated tokens (not a substring search over the whole
+    details text) so the release-date line — which also contains "Switch" — does
+    not produce a false positive.
+    """
+    result = {"switch1": False, "switch2": False}
+    soup = BeautifulSoup(html, "html.parser")
+    details = soup.find("ul", class_="details")
+    if details is None:
+        return result
+    for li in details.find_all("li", class_="list-group-item", recursive=False):
+        strong = li.find("strong")
+        if not strong or not strong.get_text(strip=True).startswith("Platforms"):
+            continue
+        text = li.get_text(" ", strip=True)
+        text = text.split(":", 1)[1] if ":" in text else text
+        tokens = [t.strip() for t in text.split(",")]
+        result["switch1"] = "Nintendo Switch" in tokens
+        result["switch2"] = "Nintendo Switch 2" in tokens
+        break
+    return result
+
+
 def _fetch_eshop_prices(
     games: list[dict],
     locale: str,
@@ -321,7 +358,7 @@ def _fetch_eshop_prices(
                     timeout=30,
                 )
                 resp.raise_for_status()
-                results.append((slug, _parse_eshop_analytics(resp.text)))
+                results.append((slug, _parse_eshop_analytics(resp.text), _parse_platforms(resp.text)))
                 break
             except requests.exceptions.HTTPError as exc:
                 if exc.response is not None and exc.response.status_code == 429:
@@ -330,21 +367,25 @@ def _fetch_eshop_prices(
                     time.sleep(1.0)
                     continue
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}))
+                results.append((slug, {}, {}))
                 break
             except Exception as exc:
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}))
+                results.append((slug, {}, {}))
                 break
         if on_progress:
             on_progress(i + 1, total)
 
     slug_to_game = {g["slug"]: g for g in to_fetch}
-    for slug, eshop in results:
-        if not eshop:
-            continue
+    for slug, eshop, platforms in results:
         game = slug_to_game.get(slug)
         if not game:
+            continue
+
+        game["switch1"] = platforms.get("switch1", False)
+        game["switch2"] = platforms.get("switch2", False)
+
+        if not eshop:
             continue
 
         value = eshop["value"]
