@@ -68,8 +68,6 @@
       transition: background .15s, border-color .15s;
     }
     .theme-btn:hover { border-color: var(--accent); }
-    #mobileMenuBtn { display: none; }
-    #mobileMenu    { display: none; }
     .user-badge {
       background: var(--surface); color: var(--text-muted);
       border: 1px solid var(--border);
@@ -145,6 +143,7 @@
     .filter-btn:hover, .filter-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
     .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
     table { width: 100%; border-collapse: collapse; }
+    table.loading tbody { opacity: .5; transition: opacity .15s ease; }
     thead th {
       background: var(--surface); padding: .7rem .9rem;
       text-align: left; font-size: .7rem; font-weight: 600;
@@ -212,49 +211,28 @@
     #ph-backdrop.show { display: block; }
     @media (max-width: 640px) {
       header, main { padding-left: 1rem; padding-right: 1rem; }
-      .meta { display: none; }
+      header { flex-wrap: wrap; gap: .5rem 1rem; }
+      /* show Updated + exchange rates as a wrapped row */
+      .meta {
+        flex-basis: 100%; order: 7;
+        gap: .25rem 1rem; font-size: .72rem;
+        padding-top: .5rem; border-top: 1px solid var(--border);
+      }
       .search-box { width: 100%; }
 
-      /* hide all header controls on mobile */
-      header .theme-btn,
-      header .lang-select,
-      header .user-badge,
-      header #openModalBtn,
-      header #rf { display: none; }
+      /* show all controls inline in the header; title takes row 1 and
+         pushes the icon buttons to the right, the badge wraps below */
+      header h1 { flex: 1; order: 1; }
+      header #themeToggle { order: 2; }
+      header #openModalBtn { order: 4; }
+      header #rf { order: 5; }
+      header .user-badge { order: 6; flex-basis: 100%; max-width: 100%; }
 
-      /* show hamburger */
-      #mobileMenuBtn { display: flex; }
-
-      /* mobile dropdown panel */
-      #mobileMenu {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0; right: 0;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        padding: 0.75rem 1rem;
-        z-index: 19;
-        flex-direction: column;
-        gap: 0.65rem;
+      /* compact language selector: inline, showing only the flag */
+      header .lang-select {
+        order: 3; width: 3.1rem;
+        padding-left: .5rem; padding-right: 1.3rem; overflow: hidden;
       }
-      #mobileMenu.open { display: flex; }
-
-      #mobileMenu .lang-select,
-      #mobileMenu .user-badge,
-      #mobileMenu .theme-btn,
-      #mobileMenu #openModalBtn,
-      #mobileMenu #rf { display: flex !important; }
-
-      #mobileMenu .lang-select { width: 100%; }
-      #mobileMenu .user-badge  { max-width: 100%; width: 100%; }
-
-      #mobileMenuActions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-      }
-      #mobileMenuActions .btn { flex: 1; justify-content: center; }
 
       #ph-popup {
         position: fixed !important;
@@ -305,7 +283,6 @@
 <body>
 <div id="loading"><div class="spinner"></div><span data-i18n="loading.fetching">Fetching prices from DekuDeals…</span><div id="loading-bar-wrap"><div id="loading-bar" class="indeterminate"></div></div><span id="loading-sub"></span></div>
 <header>
-  <button class="theme-btn" id="mobileMenuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">&#9776;</button>
   <h1>&#127918; DekuScout</h1>
   <div class="meta">
     <span><span data-i18n="meta.updated">Updated:</span> <b id="meta-updated" data-ts="{{ fetched_at_ts | default(0) }}">{{ last_updated }}</b></span>
@@ -316,8 +293,6 @@
       {% endfor %}
     </span>
     {% endif %}
-    <span><b class="c-green">{{ on_sale }}</b> <span data-i18n="meta.onSale">on sale</span></span>
-    <span><b class="c-yellow">{{ unavailable }}</b> <span data-i18n="meta.unavailable">unavailable</span></span>
   </div>
   <button class="theme-btn" id="themeToggle" title="Toggle light/dark theme">&#9790;</button>
   <select class="lang-select" id="langSelect" title="Language / Idioma">
@@ -337,9 +312,6 @@
   <form id="rf" action="/refresh" method="post" style="margin:0">
     <button class="btn" type="submit">&#8635; <span data-i18n="btn.refresh">Refresh</span></button>
   </form>
-  <div id="mobileMenu" role="navigation" aria-label="Mobile menu">
-    <!-- clones are inserted by JS -->
-  </div>
 </header>
 <main>
   {% include 'components/config_banner.html' %}
@@ -390,53 +362,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for g in games %}
-        {% set is_on_sale = g.has_discount %}
-        {% set is_unavail = g.all_unavailable %}
-        <tr class="{{ 'on-sale' if is_on_sale else ('unavailable' if is_unavail else '') }}"
-            data-sale="{{ '1' if is_on_sale else '0' }}"
-            data-unavail="{{ '1' if is_unavail else '0' }}"
-            data-bestbuy="{{ g.best_buy }}"
-            data-switch1="{{ '1' if g.switch1 else '0' }}"
-            data-switch2="{{ '1' if g.switch2 else '0' }}">
-          <td>{{ loop.index }}</td>
-          <td class="td-icon">
-            <img class="game-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
-                 onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'game-icon-placeholder',textContent:'🎮'}))"
-                 alt="" loading="lazy">
-          </td>
-          <td class="name"><a href="https://www.dekudeals.com/items/{{ g.slug }}" target="_blank" rel="noopener">{{ g.name }}</a></td>
-          {% for locale in selected_locales %}
-          {% set p = g.prices.get(locale, {}) %}
-          <td class="cur" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}" data-sort="{{ p.get('current', '') if p else '' }}">
-            <span class="orig">{{ p.get('original', '') if p else '' }}</span><br>
-            {%- set cur = p.get('current', '') if p else '' -%}
-            {%- if not cur or cur == 'Unavailable' -%}
-            <span data-i18n="cell.unavailable">Unavailable</span>
-            {%- else -%}
-            {{ cur }}
-            {%- endif -%}
-            {%- if p and p.get('discount') %} <span class="disc">({{ p.discount }})</span>{% endif %}
-          </td>
-          {% endfor %}
-          {% if selected_locales|length > 1 %}
-          <td data-sort="{{ g.best_buy_label or '' }}">
-            {% if g.best_buy == 'eq' %}
-              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
-              <span class="bb-eq bb-save" data-i18n="bb.samePrice">≈ same price</span>
-            {% elif g.best_buy == reference_locale %}
-              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
-              <span class="bb-ref bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ reference_locale.upper() }}</span>
-            {% elif g.best_buy %}
-              <span class="bb-conv">{{ g.best_buy_label }}</span><br>
-              <span class="bb-winner bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ g.best_buy.upper() }}</span>
-            {% endif %}
-          </td>
-          {% endif %}
-          <td class="rel-date" data-date="{{ g.release_date }}"></td>
-          <td class="sale-end" data-date="{{ g.sale_end }}"></td>
-        </tr>
-        {% endfor %}
+        {% include 'components/games_rows.html' %}
       </tbody>
     </table>
   </div>
@@ -517,6 +443,7 @@ window.I18n = (function () {
   return {
     t: t,
     init: init,
+    apply: applyDOM,
     current: function () { return current; },
     localeString: function () { return LOCALE_MAP[current] || 'en-US'; }
   };
@@ -541,97 +468,6 @@ window.I18n = (function () {
     html.dataset.theme = next;
     localStorage.setItem('theme', next);
     themeBtn.textContent = next === 'dark' ? '☀️' : '☾';
-  });
-
-  // Mobile menu — populate with clones of header controls on first open
-  var mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  var mobileMenu    = document.getElementById('mobileMenu');
-  var mobileMenuReady = false;
-
-  function buildMobileMenu() {
-    if (mobileMenuReady) return;
-    mobileMenuReady = true;
-
-    // Clone lang select
-    var langOrig = document.getElementById('langSelect');
-    var langClone = langOrig.cloneNode(true);
-    langClone.id = 'langSelectMobile';
-    langClone.value = langOrig.value;
-    langClone.addEventListener('change', function () {
-      document.getElementById('langSelect').value = langClone.value;
-      document.getElementById('langSelect').dispatchEvent(new Event('change'));
-    });
-    mobileMenu.appendChild(langClone);
-
-    // Clone user badge (display only)
-    var badge = document.querySelector('header .user-badge');
-    if (badge) mobileMenu.appendChild(badge.cloneNode(true));
-
-    // Actions row: theme + settings + refresh
-    var actionsRow = document.createElement('div');
-    actionsRow.id = 'mobileMenuActions';
-
-    var themeClone = document.getElementById('themeToggle').cloneNode(true);
-    themeClone.id = 'themeToggleMobile';
-    themeClone.addEventListener('click', function () {
-      document.getElementById('themeToggle').click();
-      themeClone.textContent = document.getElementById('themeToggle').textContent;
-    });
-    actionsRow.appendChild(themeClone);
-
-    var settingsBtn = document.getElementById('openModalBtn');
-    if (settingsBtn) {
-      var settingsClone = settingsBtn.cloneNode(true);
-      settingsClone.addEventListener('click', function () {
-        closeMobileMenu();
-        settingsBtn.click();
-      });
-      actionsRow.appendChild(settingsClone);
-    }
-
-    var rfClone = document.getElementById('rf').cloneNode(true);
-    rfClone.id = 'rfMobile';
-    rfClone.addEventListener('submit', function () {
-      document.getElementById('loading').classList.add('show');
-      document.getElementById('loading-bar').className = 'indeterminate';
-      document.getElementById('loading-sub').textContent = '';
-      rfClone.querySelector('button').disabled = true;
-    });
-    actionsRow.appendChild(rfClone);
-
-    mobileMenu.appendChild(actionsRow);
-  }
-
-  function closeMobileMenu() {
-    mobileMenu.classList.remove('open');
-    mobileMenuBtn.setAttribute('aria-expanded', 'false');
-  }
-
-  mobileMenuBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    var isOpen = mobileMenu.classList.contains('open');
-    if (!isOpen) {
-      buildMobileMenu();
-      // Sync theme button text in case it changed since last open
-      var themeClone = document.getElementById('themeToggleMobile');
-      if (themeClone) themeClone.textContent = document.getElementById('themeToggle').textContent;
-      mobileMenu.classList.add('open');
-      mobileMenuBtn.setAttribute('aria-expanded', 'true');
-    } else {
-      closeMobileMenu();
-    }
-  });
-
-  document.addEventListener('click', function (e) {
-    if (mobileMenu.classList.contains('open') &&
-        !mobileMenu.contains(e.target) &&
-        e.target !== mobileMenuBtn) {
-      closeMobileMenu();
-    }
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeMobileMenu();
   });
 
   function formatReleaseDate(val, locale) {
@@ -700,6 +536,8 @@ window.I18n = (function () {
     return 'col' + i;
   }
   allThs.forEach(function (th, i) { th.dataset.colKey = colKeyFor(th, i); });
+  // Column order the server renders rows in (before any user reordering).
+  var defaultColKeys = allThs.map(function (th) { return th.dataset.colKey; });
 
   function gameColIdx() {
     var i = allThs.findIndex(function (th) { return th.dataset.colKey === 'game'; });
@@ -867,23 +705,63 @@ window.I18n = (function () {
   var filterBtns = [...document.querySelectorAll('.filter-btn')];
   var activeFilters = new Set();
 
-  function applyFilters() {
-    var q = searchEl.value.trim().toLowerCase();
-    var gi = gameColIdx();
-    tbl.querySelector('tbody').querySelectorAll('tr').forEach(function (tr) {
-      var matchSearch = !q || (tr.cells[gi] && tr.cells[gi].textContent.toLowerCase().includes(q));
-      var matchFilter = true;
-      if (activeFilters.size > 0) {
-        activeFilters.forEach(function (f) {
-          if (f === 'sale'      && tr.dataset.sale !== '1')    matchFilter = false;
-          if (f === 'available' && tr.dataset.unavail === '1') matchFilter = false;
-          if (f === 'switch1'   && tr.dataset.switch1 !== '1') matchFilter = false;
-          if (f === 'switch2'   && tr.dataset.switch2 !== '1') matchFilter = false;
-          if (f.startsWith('bb-') && tr.dataset.bestbuy !== f.slice(3)) matchFilter = false;
-        });
-      }
-      tr.style.display = matchSearch && matchFilter ? '' : 'none';
+  // Active platform filters. Subset of activeFilters.
+  function platformParams() {
+    return [...activeFilters].filter(function (f) { return f === 'switch1' || f === 'switch2'; });
+  }
+
+  // Build the query string for the server-side table endpoint from the current
+  // toolbar state. All filtering happens on the backend.
+  function buildQuery() {
+    var params = [];
+    var plats = platformParams();
+    if (plats.length) params.push('platform=' + plats.join(','));
+    if (activeFilters.has('sale')) params.push('sale=1');
+    if (activeFilters.has('available')) params.push('available=1');
+    activeFilters.forEach(function (f) {
+      if (f.indexOf('bb-') === 0) params.push('bestbuy=' + encodeURIComponent(f.slice(3)));
     });
+    var q = searchEl.value.trim();
+    if (q) params.push('q=' + encodeURIComponent(q));
+    return params.length ? '?' + params.join('&') : '';
+  }
+
+  function hasActiveCriteria() {
+    return activeFilters.size > 0 || searchEl.value.trim() !== '';
+  }
+
+  // Newly fetched rows render in defaultColKeys order; reorder their cells to
+  // match the current (possibly user-reordered) header order.
+  function alignRowsToHeader(tbody) {
+    var headerKeys = allThs.map(function (th) { return th.dataset.colKey; });
+    var aligned = headerKeys.map(function (k) { return defaultColKeys.indexOf(k); })
+      .filter(function (idx) { return idx >= 0; });
+    if (aligned.every(function (oldIdx, j) { return oldIdx === j; })) return;
+    tbody.querySelectorAll('tr').forEach(function (tr) {
+      var cells = [...tr.children];
+      aligned.forEach(function (oldIdx) { tr.appendChild(cells[oldIdx]); });
+    });
+  }
+
+  var reloadSeq = 0;
+  function reloadTable() {
+    var url = '/api/games-table' + buildQuery();
+    var seq = ++reloadSeq;
+    var tbody = tbl.querySelector('tbody');
+    tbl.classList.add('loading');
+    fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        if (seq !== reloadSeq) return; // a newer request superseded this one
+        tbody.innerHTML = html;
+        alignRowsToHeader(tbody);
+        I18n.apply();
+        applyDates();
+        if (window.DekuTable && window.DekuTable.bindRows) window.DekuTable.bindRows(tbody);
+        doSort(sortIdx >= 0 ? sortIdx : defaultColIdx(), sortDir);
+        tbl.classList.remove('loading');
+      })
+      .catch(function () { if (seq === reloadSeq) tbl.classList.remove('loading'); });
   }
 
   function saveUiState() {
@@ -920,21 +798,29 @@ window.I18n = (function () {
         });
       }
     }
-    applyFilters();
     var si = -1;
     if (_saved.sk) si = allThs.findIndex(function (th) { return th.dataset.colKey === _saved.sk; });
     if (si < 0) si = (typeof _saved.si === 'number' && _saved.si >= 0) ? _saved.si : defaultColIdx();
-    doSort(si, _saved.sd || 1);
+    sortIdx = si; sortDir = _saved.sd || 1;
   } else {
     // Default: sale filter, reference-price sort
     activeFilters.add('sale');
     allBtn.classList.remove('active');
     if (saleBtn) saleBtn.classList.add('active');
-    applyFilters();
-    doSort(defaultColIdx(), 1);
+    sortIdx = defaultColIdx(); sortDir = 1;
   }
 
-  searchEl.addEventListener('input', function() { applyFilters(); saveUiState(); });
+  // All filtering happens server-side. With active criteria, fetch the filtered
+  // rows (the initial page renders all games); otherwise just sort what's here.
+  // (reloadTable runs async; price-history bindRows is registered by then.)
+  if (hasActiveCriteria()) reloadTable();
+  else doSort(sortIdx, sortDir);
+
+  var searchTimer;
+  searchEl.addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () { reloadTable(); saveUiState(); }, 250);
+  });
   filterBtns.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var filter = btn.dataset.filter;
@@ -962,7 +848,7 @@ window.I18n = (function () {
         }
         if (activeFilters.size === 0) allBtn.classList.add('active');
       }
-      applyFilters();
+      reloadTable(); // all filtering is server-side
       saveUiState();
     });
   });
@@ -1143,23 +1029,30 @@ window.I18n = (function () {
   }
   // --- end tip banner ---
 
-  document.querySelectorAll('[data-ph-slug]').forEach(function (el) {
-    el.classList.add('ph-trigger');
-    if (isTouchDevice) {
-      el.addEventListener('touchend', function (e) {
-        e.preventDefault();
-        dismissTip();
-        if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
-          hideBottomSheet();
-        } else {
-          showBottomSheet(el);
-        }
-      });
-    } else {
-      el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
-      el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
-    }
-  });
+  // Bind price-history triggers within a root (whole document on first load, or
+  // a freshly fetched tbody after a server-side platform filter).
+  function bindRows(root) {
+    (root || document).querySelectorAll('[data-ph-slug]').forEach(function (el) {
+      el.classList.add('ph-trigger');
+      if (isTouchDevice) {
+        el.addEventListener('touchend', function (e) {
+          e.preventDefault();
+          dismissTip();
+          if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
+            hideBottomSheet();
+          } else {
+            showBottomSheet(el);
+          }
+        });
+      } else {
+        el.addEventListener('mouseenter', function () { clearTimeout(hideTimer); showTimer = setTimeout(function () { showPopup(el); }, 280); });
+        el.addEventListener('mouseleave', function () { clearTimeout(showTimer); hideTimer = setTimeout(hidePopup, 180); });
+      }
+    });
+  }
+  window.DekuTable = window.DekuTable || {};
+  window.DekuTable.bindRows = bindRows;
+  bindRows(document);
 
   if (!isTouchDevice) {
     popup.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });

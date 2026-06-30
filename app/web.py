@@ -335,6 +335,55 @@ def index():
     )
 
 
+def _filter_games(games: list[dict], args) -> list[dict]:
+    """Apply every toolbar filter server-side. All criteria are AND-combined.
+
+    Query params:
+      platform  comma-separated switch1/switch2 (a game must match every flag)
+      sale=1    only games currently discounted
+      available=1  hide games that are unavailable in all selected currencies
+      bestbuy   only games whose cheapest currency equals this locale code
+      q         case-insensitive substring match on the game name
+    """
+    platforms = [p for p in args.get("platform", "").split(",") if p in ("switch1", "switch2")]
+    if platforms:
+        games = [g for g in games if all(g.get(p) for p in platforms)]
+    if args.get("sale") == "1":
+        games = [g for g in games if g.get("has_discount")]
+    if args.get("available") == "1":
+        games = [g for g in games if not g.get("all_unavailable")]
+    bestbuy = args.get("bestbuy", "")
+    if bestbuy:
+        games = [g for g in games if g.get("best_buy") == bestbuy]
+    q = args.get("q", "").strip().lower()
+    if q:
+        games = [g for g in games if q in g.get("name", "").lower()]
+    return games
+
+
+@web_bp.route("/api/games-table")
+def api_games_table():
+    """Render the games table rows server-side, filtered by the toolbar criteria."""
+    db_path = get_db_path()
+    selected_locales = _get_selected_locales()
+    reference_locale = _get_reference_locale(selected_locales)
+
+    games, _fetched_at, _is_stale = load_games_cache(db_path)
+    if games is None:
+        games = []
+    else:
+        _compute_best_buy(games, selected_locales, reference_locale)
+        games = _filter_games(games, request.args)
+
+    return render_template(
+        "components/games_rows.html",
+        games=games,
+        selected_locales=selected_locales,
+        reference_locale=reference_locale,
+        countries=COUNTRIES,
+    )
+
+
 @web_bp.route("/api/status")
 def api_status():
     db_path = get_db_path()
