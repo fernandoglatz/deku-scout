@@ -8,11 +8,19 @@ from app import config
 
 
 def get_user_email() -> Optional[str]:
-    if not has_request_context():
-        return None
-    raw = request.headers.get("X-Forwarded-User", "")
-    value = raw.strip()
-    return value if value else None
+    """Resolve the current user's email.
+
+    A reverse proxy's ``X-Forwarded-User`` header takes precedence (real
+    per-request auth); otherwise fall back to the fixed ``USER_EMAIL`` env
+    config for single-user deployments without such a proxy.
+    """
+    if has_request_context():
+        raw = request.headers.get("X-Forwarded-User", "")
+        value = raw.strip()
+        if value:
+            return value
+    fixed = (config.USER_EMAIL or "").strip()
+    return fixed if fixed else None
 
 
 def resolve_db_path(email: str) -> str:

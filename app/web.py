@@ -14,7 +14,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, send_f
 
 log = logging.getLogger(__name__)
 
-from app.config import COUNTRIES, HEADERS, ICONS_DIR
+from app.config import APP_VERSION, COUNTRIES, HEADERS, ICONS_DIR
 from app.db import (
     clear_games_cache,
     get_cached_price_history,
@@ -28,6 +28,12 @@ from app.scraper import _content_type_to_ext, _icon_path, _make_headers, downloa
 from app.user import get_db_path, get_user_email
 
 web_bp = Blueprint("web", __name__)
+
+
+@web_bp.app_context_processor
+def inject_app_version():
+    """Expose the running build's version to every template."""
+    return {"app_version": APP_VERSION}
 
 _refresh_lock = threading.Lock()
 _refreshing_dbs: set[str] = set()

@@ -52,8 +52,14 @@
       position: sticky; top: 0; z-index: 20;
     }
     header h1 { font-size: 1.1rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
-    .meta { flex: 1; display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.8rem; flex-wrap: wrap; }
-    .meta b { color: var(--text-sub); }
+    .meta { flex: 1; display: flex; align-items: center; gap: 1.5rem; color: var(--text-muted); font-size: 0.8rem; flex-wrap: wrap; }
+    .meta b { color: var(--text-sub); white-space: nowrap; }
+    .app-version {
+      align-self: center; font-size: .68rem; font-weight: 600;
+      color: var(--text-muted); letter-spacing: .02em;
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: .05rem .45rem; cursor: default;
+    }
     .btn {
       background: #2563eb; color: #fff; border: none;
       padding: 0.45rem 1.1rem; border-radius: 6px;
@@ -77,6 +83,7 @@
       display: inline-flex; align-items: center; gap: 0.3rem;
       cursor: default;
     }
+    .account { display: inline-flex; align-items: center; gap: .6rem; min-width: 0; }
     .lang-select {
       background: var(--surface); color: var(--text); border: 1px solid var(--border);
       padding: 0.45rem 1.7rem 0.45rem 0.65rem; border-radius: 6px;
@@ -209,7 +216,30 @@
       background: rgba(0,0,0,.5);
     }
     #ph-backdrop.show { display: block; }
-    @media (max-width: 640px) {
+    #err-backdrop {
+      display: none;
+      position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,.5);
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    #err-backdrop.show { display: flex; }
+    #err-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.4rem 1.1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,.45);
+      width: 100%; max-width: 360px; text-align: center;
+    }
+    #err-modal .err-icon { font-size: 2rem; line-height: 1; color: #f87171; }
+    #err-title { font-size: .95rem; font-weight: 700; margin: .6rem 0 .4rem; }
+    #err-body { font-size: .82rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1.1rem; }
+    #err-actions { display: flex; flex-direction: column; gap: .5rem; }
+    #err-actions .btn { width: 100%; }
+    .btn-secondary {
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+    @media (max-width: 1024px) {
       header, main { padding-left: 1rem; padding-right: 1rem; }
       header { flex-wrap: wrap; gap: .5rem 1rem; }
       /* show Updated + exchange rates as a wrapped row */
@@ -223,14 +253,23 @@
       /* show all controls inline in the header; title takes row 1 and
          pushes the icon buttons to the right, the badge wraps below */
       header h1 { flex: 1; order: 1; }
-      header #themeToggle { order: 2; }
+      header #themeToggle { order: 3; }
       header #openModalBtn { order: 4; }
       header #rf { order: 5; }
-      header .user-badge { order: 6; flex-basis: 100%; max-width: 100%; }
+      /* email + version share one right-aligned row, as subtle text not a boxed badge */
+      header .account {
+        order: 6; flex-basis: 100%;
+        justify-content: flex-end; gap: .5rem;
+      }
+      header .user-badge {
+        max-width: 100%; min-width: 0;
+        background: none; border: none; padding: .15rem 0;
+        font-size: .72rem;
+      }
 
       /* compact language selector: inline, showing only the flag */
       header .lang-select {
-        order: 3; width: 3.1rem;
+        order: 2; width: 3.1rem;
         padding-left: .5rem; padding-right: 1.3rem; overflow: hidden;
       }
 
@@ -294,16 +333,23 @@
     </span>
     {% endif %}
   </div>
-  <button class="theme-btn" id="themeToggle" title="Toggle light/dark theme">&#9790;</button>
   <select class="lang-select" id="langSelect" title="Language / Idioma">
     <option value="en">🇺🇸 English</option>
     <option value="pt">🇧🇷 Português</option>
     <option value="es">🇪🇸 Español</option>
     <option value="ja">🇯🇵 日本語</option>
   </select>
-  {% if user_email %}
-  <span class="user-badge" title="{{ user_email }}">&#128100; {{ user_email }}</span>
+  {% if user_email or app_version %}
+  <div class="account">
+    {% if user_email %}
+    <span class="user-badge" title="{{ user_email }}">&#128100; {{ user_email }}</span>
+    {% endif %}
+    {% if app_version %}
+    <span class="app-version" title="DekuScout {{ app_version }}">{{ app_version }}</span>
+    {% endif %}
+  </div>
   {% endif %}
+  <button class="theme-btn" id="themeToggle" title="Toggle light/dark theme">&#9790;</button>
   {% if not wishlist_configured %}
   <button class="btn" id="openModalBtn" type="button" data-i18n="btn.setupWishlist">Setup Wishlist</button>
   {% else %}
@@ -761,7 +807,11 @@ window.I18n = (function () {
         doSort(sortIdx >= 0 ? sortIdx : defaultColIdx(), sortDir);
         tbl.classList.remove('loading');
       })
-      .catch(function () { if (seq === reloadSeq) tbl.classList.remove('loading'); });
+      .catch(function () {
+        if (seq !== reloadSeq) return;
+        tbl.classList.remove('loading');
+        if (window.DekuError) window.DekuError.show(reloadTable);
+      });
   }
 
   function saveUiState() {
@@ -853,6 +903,87 @@ window.I18n = (function () {
     });
   });
 
+}());
+</script>
+
+<div id="err-backdrop">
+  <div id="err-modal" role="alertdialog" aria-modal="true" aria-labelledby="err-title">
+    <div class="err-icon">⚠</div>
+    <div id="err-title" data-i18n="error.offlineTitle">Connection problem</div>
+    <div id="err-body" data-i18n="error.offlineBody">Couldn't reach the server. Please check your connection and try again.</div>
+    <div id="err-actions">
+      <button id="err-retry" class="btn" data-i18n="error.retry">Retry</button>
+      <button id="err-dismiss" class="btn btn-secondary" data-i18n="error.dismiss">Dismiss</button>
+    </div>
+  </div>
+</div>
+<script>
+window.DekuError = (function () {
+  var backdrop = document.getElementById('err-backdrop');
+  var dismissBtn = document.getElementById('err-dismiss');
+  var retryBtn = document.getElementById('err-retry');
+  var lastRetry = null;
+  var lastDismiss = null;
+  function hide() { backdrop.classList.remove('show'); }
+  // retryFn re-runs the failed operation (omit to hide the button);
+  // onDismiss runs when the user dismisses (e.g. to clear a stuck overlay).
+  function show(retryFn, onDismiss) {
+    lastRetry = (typeof retryFn === 'function') ? retryFn : null;
+    lastDismiss = (typeof onDismiss === 'function') ? onDismiss : null;
+    retryBtn.style.display = lastRetry ? '' : 'none';
+    if (backdrop.classList.contains('show')) return; // already shown; don't stack
+    backdrop.classList.add('show');
+    (lastRetry ? retryBtn : dismissBtn).focus();
+  }
+  retryBtn.addEventListener('click', function () {
+    var fn = lastRetry;
+    hide();
+    if (fn) fn();
+  });
+  function dismiss() {
+    var fn = lastDismiss;
+    hide();
+    if (fn) fn();
+  }
+  dismissBtn.addEventListener('click', dismiss);
+  backdrop.addEventListener('click', function (e) { if (e.target === backdrop) dismiss(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && backdrop.classList.contains('show')) dismiss();
+  });
+  return { show: show, hide: hide };
+}());
+
+// Submit the Refresh form via fetch so an offline backend shows the error
+// modal (with retry) instead of the browser's default failure page.
+(function () {
+  var rf = document.getElementById('rf');
+  if (!rf) return;
+  var loading = document.getElementById('loading');
+  var btn = rf.querySelector('button');
+  var submitting = false;
+  // Another submit listener shows the loading overlay and disables the button;
+  // undo that when the request fails so the user isn't stuck on the overlay.
+  function resetUi() {
+    submitting = false;
+    if (loading) loading.classList.remove('show');
+    if (btn) btn.disabled = false;
+  }
+  rf.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (submitting) return;
+    submitting = true;
+    fetch(rf.action, { method: 'POST' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('bad status');
+        window.location.reload(); // reload to show refresh progress
+      })
+      .catch(function () {
+        resetUi();
+        if (window.DekuError) {
+          window.DekuError.show(function () { rf.requestSubmit(); }, resetUi);
+        }
+      });
+  });
 }());
 </script>
 
@@ -1131,7 +1262,18 @@ window.I18n = (function () {
         if (data.ready) { window.location.reload(); }
         else { setTimeout(poll, 1000); }
       })
-      .catch(function () { setTimeout(poll, 1000); });
+      .catch(function () {
+        // Backend unreachable: surface the modal instead of looping forever
+        // behind the loading overlay. Retry resumes polling; dismissing clears
+        // the stuck overlay so the user can see the (stale) page.
+        if (window.DekuError) {
+          window.DekuError.show(poll, function () {
+            document.getElementById('loading').classList.remove('show');
+          });
+        } else {
+          setTimeout(poll, 1000);
+        }
+      });
   }
 
   setTimeout(poll, 1000);

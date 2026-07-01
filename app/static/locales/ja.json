@@ -57,5 +57,12 @@
   "ph.noHistory": "価格履歴がありません。",
   "ph.failed": "価格履歴の読み込みに失敗しました。",
   "btn.setupWishlist": "リストを設定",
-  "btn.refresh": "更新"
+  "btn.refresh": "更新",
+  "error.offlineTitle": "接続の問題",
+  "error.offlineBody": "サーバーに接続できませんでした。接続を確認して、もう一度お試しください。",
+  "error.dismiss": "閉じる",
+  "error.retry": "再試行",
+  "modal.themeLabel": "テーマ",
+  "theme.switchLight": "ライトテーマに切り替え",
+  "theme.switchDark": "ダークテーマに切り替え"
 }

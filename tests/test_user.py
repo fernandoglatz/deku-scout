@@ -65,6 +65,40 @@ def test_get_user_email_returns_none_when_header_blank():
         assert get_user_email() is None
 
 
+def test_get_user_email_falls_back_to_fixed_env(monkeypatch):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "USER_EMAIL", "fixed@example.com")
+    from app.user import get_user_email
+    app = Flask(__name__)
+    with app.test_request_context():
+        assert get_user_email() == "fixed@example.com"
+
+
+def test_get_user_email_header_wins_over_fixed_env(monkeypatch):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "USER_EMAIL", "fixed@example.com")
+    from app.user import get_user_email
+    app = Flask(__name__)
+    with app.test_request_context(headers={"X-Forwarded-User": "alice@example.com"}):
+        assert get_user_email() == "alice@example.com"
+
+
+def test_get_user_email_fixed_env_outside_request(monkeypatch):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "USER_EMAIL", "fixed@example.com")
+    from app.user import get_user_email
+    assert get_user_email() == "fixed@example.com"
+
+
+def test_get_user_email_blank_fixed_env_returns_none(monkeypatch):
+    import app.config as config_module
+    monkeypatch.setattr(config_module, "USER_EMAIL", "   ")
+    from app.user import get_user_email
+    app = Flask(__name__)
+    with app.test_request_context():
+        assert get_user_email() is None
+
+
 def test_get_db_path_outside_request_returns_default():
     from app.user import get_db_path
     from app.config import DB_FILE

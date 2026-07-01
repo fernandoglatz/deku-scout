@@ -1,7 +1,37 @@
 """Configuration settings for DekuScout."""
 import os
+import subprocess
 
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _resolve_version() -> str:
+    """Resolve the app version.
+
+    Prefers the ``APP_VERSION`` env var (baked into the Docker image at build
+    time from the release tag). Falls back to the current git branch name for
+    local dev so the running checkout is identifiable, and ``"dev"`` if git is
+    absent.
+    """
+    env_version = os.environ.get("APP_VERSION")
+    if env_version:
+        return env_version
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=_PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return "dev"
+
+
+APP_VERSION = _resolve_version()
 
 DATA_DIR = os.path.abspath(os.environ.get("DATA_DIR", os.path.join(_PROJECT_ROOT, "data")))
 
@@ -10,6 +40,11 @@ WISHLIST_URL = os.environ.get(
     "https://www.dekudeals.com/wishlist/x8kxhn96yf"
 )
 LOCALE_URL = "https://www.dekudeals.com/locale"
+
+# Fixed user email for single-user deployments without a reverse proxy that
+# injects the X-Forwarded-User header. When set, it's used as the email
+# whenever the request carries no X-Forwarded-User header.
+USER_EMAIL = os.environ.get("USER_EMAIL")
 
 DB_FILE = os.path.abspath(os.path.join(DATA_DIR, "session.db"))
 ICONS_DIR = os.path.abspath(os.path.join(DATA_DIR, "icons"))

@@ -57,5 +57,12 @@
   "ph.noHistory": "No price history available.",
   "ph.failed": "Failed to load price history.",
   "btn.setupWishlist": "Setup Wishlist",
-  "btn.refresh": "Refresh"
+  "btn.refresh": "Refresh",
+  "error.offlineTitle": "Connection problem",
+  "error.offlineBody": "Couldn't reach the server. Please check your connection and try again.",
+  "error.dismiss": "Dismiss",
+  "error.retry": "Retry",
+  "modal.themeLabel": "Theme",
+  "theme.switchLight": "Switch to light theme",
+  "theme.switchDark": "Switch to dark theme"
 }

@@ -27,6 +27,7 @@ Visit `/demo` on any running instance to auto-configure the demo wishlist and go
 - Filter, sort, and column order persisted across page loads
 - Mobile-responsive layout — card list view, hamburger menu, and bottom-sheet price history
 - Dark/light theme toggle
+- Running build version shown in the header
 - Internationalization (English, Spanish, Portuguese, Japanese)
 - Fully configurable through the UI — no config file editing required
 
@@ -76,16 +77,18 @@ All runtime settings are stored in the local SQLite database and can be changed 
 
 Environment variables (used at startup / for Docker):
 
-| Variable       | Default  | Description                                      |
-| -------------- | -------- | ------------------------------------------------ |
-| `WISHLIST_URL` | —        | Pre-seeds the wishlist URL on first run          |
-| `DATA_DIR`     | `./data` | Directory for the SQLite database and icon cache |
+| Variable       | Default  | Description                                                      |
+| -------------- | -------- | --------------------------------------------------------------- |
+| `WISHLIST_URL` | —        | Pre-seeds the wishlist URL on first run                         |
+| `DATA_DIR`     | `./data` | Directory for the SQLite database and icon cache                |
+| `USER_EMAIL`   | —        | Fixed user email for single-user deployments without an auth proxy (see [User Management](#user-management)) |
+| `APP_VERSION`  | git branch / `dev` | Version label shown in the UI header; baked into the Docker image from the release tag |
 
 ## User Management
 
 DekuScout supports multi-user deployments via an auth proxy that injects an `X-Forwarded-User` header containing the user's email address. When this header is present, each user gets a fully isolated SQLite database (config, wishlist, games cache, price history). Icons are shared globally across users.
 
-When the header is absent, the app falls back to a single shared `session.db` — preserving local / single-user behavior unchanged.
+When the header is absent, the app falls back to the `USER_EMAIL` environment variable if set — giving a single-user deployment its own isolated, identifiable database without needing an auth proxy. If neither is present, the app uses a single shared `session.db`, preserving local / single-user behavior unchanged.
 
 ### Auth Proxy Setup
 

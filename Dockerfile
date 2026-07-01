@@ -15,6 +15,9 @@ COPY wsgi.py .
 RUN useradd -m appuser && mkdir -p /data && chown appuser:appuser /data
 USER appuser
 
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
+
 ENV DB_FILE=/data/session.db
 ENV ICONS_DIR=/data/icons
 

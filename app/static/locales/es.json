@@ -57,5 +57,12 @@
   "ph.noHistory": "No hay historial de precios disponible.",
   "ph.failed": "Error al cargar el historial de precios.",
   "btn.setupWishlist": "Configurar lista",
-  "btn.refresh": "Actualizar"
+  "btn.refresh": "Actualizar",
+  "error.offlineTitle": "Problema de conexión",
+  "error.offlineBody": "No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.",
+  "error.dismiss": "Cerrar",
+  "error.retry": "Reintentar",
+  "modal.themeLabel": "Tema",
+  "theme.switchLight": "Cambiar a tema claro",
+  "theme.switchDark": "Cambiar a tema oscuro"
 }
