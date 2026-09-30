@@ -423,6 +423,24 @@ def _refresh_performance(db_path: str, user_agent: str = None) -> None:
     except Exception as exc:
         log.warning("_refresh_performance: failed, keeping previous cache: %s", exc)
 
+    # Refresh handheld-performance.com data if stale
+    from app.performance import _HANDED_DATA_PATH, refresh_handheld_performance
+    from app.config import HANDED_REFRESH_TTL
+
+    if os.path.exists(_HANDED_DATA_PATH):
+        age = (time.time() - os.path.getmtime(_HANDED_DATA_PATH))
+        if HANDED_REFRESH_TTL > 0 and age >= HANDED_REFRESH_TTL:
+            log.info("_refresh_performance: handheld data is %dh old, refreshing", int(age / 3600))
+            count = refresh_handheld_performance()
+            if count:
+                log.info("_refresh_performance: saved %d handheld games", count)
+    elif HANDED_REFRESH_TTL > 0 or not os.path.exists(_HANDED_DATA_PATH):
+        # First run or forced refresh  
+        log.info("_refresh_performance: refreshing handheld data (initial)")
+        count = refresh_handheld_performance()
+        if count:
+            log.info("_refresh_performance: saved %d handheld games", count)
+
 
 def fetch_all_games(
     db_path: str = DB_FILE,

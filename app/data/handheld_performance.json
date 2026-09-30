@@ -1,0 +1,4143 @@
+{
+  "source": "handheld-performance.com",
+  "total_games": 170,
+  "games": [
+    {
+      "slug": "mortal-kombat-11",
+      "title": "Mortal Kombat 11",
+      "url": "https://handheld-performance.com/games/mortal-kombat-11",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "480p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 720p-540p docked and 480p-384p in handheld mode. Credits to SirDanOfCamelot for the Nintendo Switch screenshots."
+      ],
+      "video_id": "qvJUWZxlAlA"
+    },
+    {
+      "slug": "ark-ultimate-survivor-edition",
+      "title": "ARK: Ultimate Survivor Edition",
+      "url": "https://handheld-performance.com/games/ark-ultimate-survivor-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 1080p-540p docked and 720p-396p in handheld mode."
+      ],
+      "video_id": "egGFxbzsX7Y"
+    },
+    {
+      "slug": "arms",
+      "title": "ARMS",
+      "url": "https://handheld-performance.com/games/arms",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 900p in multiplayer mode. 30 FPS in 3-4P mode."
+      ],
+      "video_id": "nP3l19Uio1g"
+    },
+    {
+      "slug": "ace-combat-7-skies-unknown-deluxe-edition",
+      "title": "Ace Combat 7: Skies Unknown Deluxe Edition",
+      "url": "https://handheld-performance.com/games/ace-combat-7-skies-unknown-deluxe-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "504p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) User Interface renders at 1080p in docked mode and 720p in handheld mode."
+      ],
+      "video_id": "WznKKwSBeHc"
+    },
+    {
+      "slug": "advance-wars-1-2-re-boot-camp",
+      "title": "Advance Wars 1+2: Re-Boot Camp",
+      "url": "https://handheld-performance.com/games/advance-wars-1-2-re-boot-camp",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Cinematics: 30 FPS"
+      ],
+      "video_id": "w3EsbCmfp2k"
+    },
+    {
+      "slug": "alien-isolation",
+      "title": "Alien: Isolation",
+      "url": "https://handheld-performance.com/games/alien-isolation",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "u8kvSGUwAyc"
+    },
+    {
+      "slug": "apollo-justice-ace-attorney-trilogy",
+      "title": "Apollo Justice: Ace Attorney Trilogy",
+      "url": "https://handheld-performance.com/games/apollo-justice-ace-attorney-trilogy",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "DViI2mpE8Gg"
+    },
+    {
+      "slug": "ark-survival-evolved",
+      "title": "Ark: Survival Evolved",
+      "url": "https://handheld-performance.com/games/ark-survival-evolved",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "432p",
+          "framerate": "~20 FPS",
+          "fps": 20,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "240p",
+          "framerate": "~20 FPS",
+          "fps": 20,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 432p-360p docked and 240p-170p in handheld mode. There is an improved port developed by Groove Street Games called ARK: Ultimate Survivor Edition."
+      ],
+      "video_id": "O6kN73PuygI"
+    },
+    {
+      "slug": "assassins-creed-iii-remastered",
+      "title": "Assassin&#x27;s Creed III: Remastered",
+      "url": "https://handheld-performance.com/games/assassins-creed-iii-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Assassin&#x27;s Creed III Liberation: 900p in docked mode."
+      ],
+      "video_id": "g-TbwwW90iY"
+    },
+    {
+      "slug": "assassins-creed-the-ezio-collection",
+      "title": "Assassin&#x27;s Creed: The Ezio Collection",
+      "url": "https://handheld-performance.com/games/assassins-creed-the-ezio-collection",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 1080p-936p in docked mode and 720p-540p in handheld mode."
+      ],
+      "video_id": "GF3ppNhtbGM"
+    },
+    {
+      "slug": "assassins-creed-the-rebel-collection",
+      "title": "Assassin&#x27;s Creed: The Rebel Collection",
+      "url": "https://handheld-performance.com/games/assassins-creed-the-rebel-collection",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution between 1080p-824p."
+      ],
+      "video_id": "-v5EiyL88dg"
+    },
+    {
+      "slug": "astral-chain",
+      "title": "Astral Chain",
+      "url": "https://handheld-performance.com/games/astral-chain",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "gPT652uw1uM"
+    },
+    {
+      "slug": "batman-arkham-asylum",
+      "title": "Batman: Arkham Asylum",
+      "url": "https://handheld-performance.com/games/batman-arkham-asylum",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "oVPPOoTcr_E"
+    },
+    {
+      "slug": "batman-arkham-city",
+      "title": "Batman: Arkham City",
+      "url": "https://handheld-performance.com/games/batman-arkham-city",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "oVPPOoTcr_E"
+    },
+    {
+      "slug": "batman-arkham-knight",
+      "title": "Batman: Arkham Knight",
+      "url": "https://handheld-performance.com/games/batman-arkham-knight",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [],
+      "video_id": "oVPPOoTcr_E"
+    },
+    {
+      "slug": "bayonetta",
+      "title": "Bayonetta",
+      "url": "https://handheld-performance.com/games/bayonetta",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "R_M0gX0GE0o"
+    },
+    {
+      "slug": "bayonetta-2",
+      "title": "Bayonetta 2",
+      "url": "https://handheld-performance.com/games/bayonetta-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "B_dOIAfVHxo"
+    },
+    {
+      "slug": "bioshock-the-collection",
+      "title": "BioShock: The Collection",
+      "url": "https://handheld-performance.com/games/bioshock-the-collection",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "0VwyyO4gQiQ"
+    },
+    {
+      "slug": "borderlands-legendary-collection",
+      "title": "Borderlands Legendary Collection",
+      "url": "https://handheld-performance.com/games/borderlands-legendary-collection",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 2P Splitscreen: 30 FPS"
+      ],
+      "video_id": "-FuSiIdcZRI"
+    },
+    {
+      "slug": "captain-toad-treasure-tracker",
+      "title": "Captain Toad: Treasure Tracker",
+      "url": "https://handheld-performance.com/games/captain-toad-treasure-tracker",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "iq0N-AsZ8Vo"
+    },
+    {
+      "slug": "crash-bandicoot-4-its-about-time",
+      "title": "Crash Bandicoot 4: It&#x27;s About Time",
+      "url": "https://handheld-performance.com/games/crash-bandicoot-4-its-about-time",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Noticeable visual cuts in textures, shadows and effects.",
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "qcAyJ8gjKmg"
+    },
+    {
+      "slug": "crash-bandicoot-n-sane-trilogy",
+      "title": "Crash Bandicoot: N. Sane Trilogy",
+      "url": "https://handheld-performance.com/games/crash-bandicoot-n-sane-trilogy",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "480p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Noticeable visual cuts in textures, shadows and effects."
+      ],
+      "video_id": "bCteF4zvd2c"
+    },
+    {
+      "slug": "crash-team-racing-nitro-fueled",
+      "title": "Crash Team Racing Nitro-Fueled",
+      "url": "https://handheld-performance.com/games/crash-team-racing-nitro-fueled",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Noticeable visual cuts in textures, shadows and effects."
+      ],
+      "video_id": "LCe4fy3O0pA"
+    },
+    {
+      "slug": "crysis-remastered",
+      "title": "Crysis Remastered",
+      "url": "https://handheld-performance.com/games/crysis-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution. Framepacing problems.",
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "WRBwVAy03O8"
+    },
+    {
+      "slug": "cuphead",
+      "title": "Cuphead",
+      "url": "https://handheld-performance.com/games/cuphead",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "High loading times when starting a level."
+      ],
+      "video_id": "9VSBFy9Wxb8"
+    },
+    {
+      "slug": "dark-souls-remastered",
+      "title": "Dark Souls: Remastered",
+      "url": "https://handheld-performance.com/games/dark-souls-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "JZdfO8ECwdo"
+    },
+    {
+      "slug": "darksiders-warmastered-edition",
+      "title": "Darksiders Warmastered Edition",
+      "url": "https://handheld-performance.com/games/darksiders-warmastered-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "PTF0ZvWraMA"
+    },
+    {
+      "slug": "donkey-kong-country-returns-hd",
+      "title": "Donkey Kong Country Returns HD",
+      "url": "https://handheld-performance.com/games/donkey-kong-country-returns-hd",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "xaYJz9cKPYw"
+    },
+    {
+      "slug": "donkey-kong-country-tropical-freeze",
+      "title": "Donkey Kong Country: Tropical Freeze",
+      "url": "https://handheld-performance.com/games/donkey-kong-country-tropical-freeze",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "648p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "0DEGLO7dpxo"
+    },
+    {
+      "slug": "doom",
+      "title": "Doom",
+      "url": "https://handheld-performance.com/games/doom",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "auMBfnHYA7I"
+    },
+    {
+      "slug": "doom-eternal",
+      "title": "Doom Eternal",
+      "url": "https://handheld-performance.com/games/doom-eternal",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "612p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "PqnUHecJ01U"
+    },
+    {
+      "slug": "dragon-quest-builders",
+      "title": "Dragon Quest Builders",
+      "url": "https://handheld-performance.com/games/dragon-quest-builders",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "lWesD2osYOQ"
+    },
+    {
+      "slug": "dragon-quest-builders-2",
+      "title": "Dragon Quest Builders 2",
+      "url": "https://handheld-performance.com/games/dragon-quest-builders-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [],
+      "video_id": "p8aF1DyLCfA"
+    },
+    {
+      "slug": "dragon-quest-xi-s-echoes-of-an-elusive-age",
+      "title": "Dragon Quest XI S: Echoes of an Elusive Age",
+      "url": "https://handheld-performance.com/games/dragon-quest-xi-s-echoes-of-an-elusive-age",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "Qdm4pB-1Dlc"
+    },
+    {
+      "slug": "final-fantasy-x-x-2-hd-remaster",
+      "title": "Final Fantasy X/X-2 HD Remaster",
+      "url": "https://handheld-performance.com/games/final-fantasy-x-x-2-hd-remaster",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "r9IGpIehFmQ"
+    },
+    {
+      "slug": "final-fantasy-xii-the-zodiac-age",
+      "title": "Final Fantasy XII The Zodiac Age",
+      "url": "https://handheld-performance.com/games/final-fantasy-xii-the-zodiac-age",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "864p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "r9IGpIehFmQ"
+    },
+    {
+      "slug": "fire-emblem-engage",
+      "title": "Fire Emblem Engage",
+      "url": "https://handheld-performance.com/games/fire-emblem-engage",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "648p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 1080p-972p."
+      ],
+      "video_id": "Yw8GXd8UhXo"
+    },
+    {
+      "slug": "fire-emblem-warriors-three-hopes",
+      "title": "Fire Emblem Warriors: Three Hopes",
+      "url": "https://handheld-performance.com/games/fire-emblem-warriors-three-hopes",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "FLAldgi0djw"
+    },
+    {
+      "slug": "fire-emblem-warriors",
+      "title": "Fire Emblem: Warriors",
+      "url": "https://handheld-performance.com/games/fire-emblem-warriors",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "Iq67NQfIdKg"
+    },
+    {
+      "slug": "hellblade-senuas-sacrifice",
+      "title": "Hellblade: Senua&#x27;s Sacrifice",
+      "url": "https://handheld-performance.com/games/hellblade-senuas-sacrifice",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "Xb1BGLGS_UY"
+    },
+    {
+      "slug": "hogwarts-legacy",
+      "title": "Hogwarts Legacy",
+      "url": "https://handheld-performance.com/games/hogwarts-legacy",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: docked 720p-540p and handheld 576p-360p."
+      ],
+      "video_id": "QWMpPABozKo"
+    },
+    {
+      "slug": "hollow-knight",
+      "title": "Hollow Knight",
+      "url": "https://handheld-performance.com/games/hollow-knight",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "hyrule-warriors-age-of-calamity",
+      "title": "Hyrule Warriors: Age of Calamity",
+      "url": "https://handheld-performance.com/games/hyrule-warriors-age-of-calamity",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "LqUbpfJ5rws"
+    },
+    {
+      "slug": "hyrule-warriors-definitive-edition",
+      "title": "Hyrule Warriors: Definitive Edition",
+      "url": "https://handheld-performance.com/games/hyrule-warriors-definitive-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [],
+      "video_id": "rMfpXkROIMw"
+    },
+    {
+      "slug": "kirbys-return-to-dream-land-deluxe",
+      "title": "Kirby&#x27;s Return to Dream Land Deluxe",
+      "url": "https://handheld-performance.com/games/kirbys-return-to-dream-land-deluxe",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "zcYaXiCtOIk"
+    },
+    {
+      "slug": "klonoa-phantasy-reverie-series",
+      "title": "Klonoa Phantasy Reverie Series",
+      "url": "https://handheld-performance.com/games/klonoa-phantasy-reverie-series",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "kWFsRdnDZSw"
+    },
+    {
+      "slug": "la-noire",
+      "title": "L.A. Noire",
+      "url": "https://handheld-performance.com/games/la-noire",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "8ljTX9R5QhA"
+    },
+    {
+      "slug": "lego-city-undercover",
+      "title": "LEGO CITY Undercover",
+      "url": "https://handheld-performance.com/games/lego-city-undercover",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "Noticeable frame drops in 2P mode. Lighting effects and graphical detail are reduced compared to other versions."
+      ],
+      "video_id": "FP1ErZ8YuzQ"
+    },
+    {
+      "slug": "luigi-s-mansion-2-hd",
+      "title": "Luigi&#x27;s Mansion 2 HD",
+      "url": "https://handheld-performance.com/games/luigi-s-mansion-2-hd",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "HbamkxOgbe0"
+    },
+    {
+      "slug": "luigis-mansion-3",
+      "title": "Luigi&#x27;s Mansion 3",
+      "url": "https://handheld-performance.com/games/luigis-mansion-3",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Cinematics: 900p"
+      ],
+      "video_id": "xq_ayMLGDNo"
+    },
+    {
+      "slug": "mario-rabbids-kingdom-battle",
+      "title": "Mario + Rabbids: Kingdom Battle",
+      "url": "https://handheld-performance.com/games/mario-rabbids-kingdom-battle",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "DRIpIcM0W9k"
+    },
+    {
+      "slug": "mario-rabbids-sparks-of-hope",
+      "title": "Mario + Rabbids: Sparks of Hope",
+      "url": "https://handheld-performance.com/games/mario-rabbids-sparks-of-hope",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "ySsS3B0erBk"
+    },
+    {
+      "slug": "mario-kart-8-deluxe",
+      "title": "Mario Kart 8 Deluxe",
+      "url": "https://handheld-performance.com/games/mario-kart-8-deluxe",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 30 FPS in 3-4P mode."
+      ],
+      "video_id": "NDTNNjWbYoo"
+    },
+    {
+      "slug": "mario-party-superstars",
+      "title": "Mario Party Superstars",
+      "url": "https://handheld-performance.com/games/mario-party-superstars",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "mario-strikers-battle-league",
+      "title": "Mario Strikers: Battle League",
+      "url": "https://handheld-performance.com/games/mario-strikers-battle-league",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Cinematics: 30 FPS"
+      ],
+      "video_id": "wH7gRNh3rNA"
+    },
+    {
+      "slug": "mario-vs-donkey-kong",
+      "title": "Mario vs. Donkey Kong",
+      "url": "https://handheld-performance.com/games/mario-vs-donkey-kong",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "yzEZpFPLLT8"
+    },
+    {
+      "slug": "metal-gear-solid-master-collection-vol-1",
+      "title": "Metal Gear Solid: Master Collection Vol. 1",
+      "url": "https://handheld-performance.com/games/metal-gear-solid-master-collection-vol-1",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Metal Gear Solid title runs 30 FPS in all platforms."
+      ],
+      "video_id": "o92IeqnD_zE"
+    },
+    {
+      "slug": "metro-redux",
+      "title": "Metro Redux",
+      "url": "https://handheld-performance.com/games/metro-redux",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "480p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) TSR upscaling."
+      ],
+      "video_id": "CXP3t3uPeTE"
+    },
+    {
+      "slug": "metroid-dread",
+      "title": "Metroid Dread",
+      "url": "https://handheld-performance.com/games/metroid-dread",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Cinematics: 30 FPS"
+      ],
+      "video_id": "8KrzJo15oSU"
+    },
+    {
+      "slug": "metroid-prime-remastered",
+      "title": "Metroid Prime Remastered",
+      "url": "https://handheld-performance.com/games/metroid-prime-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "600p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "RnGZ82y-xi4"
+    },
+    {
+      "slug": "minecraft",
+      "title": "Minecraft",
+      "url": "https://handheld-performance.com/games/minecraft",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 2P Mode: ~40 FPS"
+      ],
+      "video_id": "8a2k-zbj0hY"
+    },
+    {
+      "slug": "minecraft-dungeons",
+      "title": "Minecraft Dungeons",
+      "url": "https://handheld-performance.com/games/minecraft-dungeons",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 1080p-900p",
+        "(*) Rescaled resolution."
+      ],
+      "video_id": "E1ZHZa8Lgig"
+    },
+    {
+      "slug": "monster-boy-and-the-cursed-kingdom",
+      "title": "Monster Boy and the Cursed Kingdom",
+      "url": "https://handheld-performance.com/games/monster-boy-and-the-cursed-kingdom",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "monster-hunter-generations-ultimate",
+      "title": "Monster Hunter Generations Ultimate",
+      "url": "https://handheld-performance.com/games/monster-hunter-generations-ultimate",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "FUy9lrTS28c"
+    },
+    {
+      "slug": "monster-hunter-rise",
+      "title": "Monster Hunter Rise",
+      "url": "https://handheld-performance.com/games/monster-hunter-rise",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "iiVgTBROwNY"
+    },
+    {
+      "slug": "monster-hunter-stories-2-wings-of-ruin",
+      "title": "Monster Hunter Stories 2: Wings of Ruin",
+      "url": "https://handheld-performance.com/games/monster-hunter-stories-2-wings-of-ruin",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "zXbfEX016WM"
+    },
+    {
+      "slug": "mortal-kombat-1",
+      "title": "Mortal Kombat 1",
+      "url": "https://handheld-performance.com/games/mortal-kombat-1",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "756p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution: 756p-576p docked and 720-396p in handheld mode. Significant graphical compromises."
+      ],
+      "video_id": "pDsTFWOqlrg"
+    },
+    {
+      "slug": "new-super-mario-bros-u-deluxe",
+      "title": "New Super Mario Bros. U Deluxe",
+      "url": "https://handheld-performance.com/games/new-super-mario-bros-u-deluxe",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "kOYRk5U8CVs"
+    },
+    {
+      "slug": "nier-automata-the-end-of-yorha-edition",
+      "title": "NieR:Automata The End of YoRHa Edition",
+      "url": "https://handheld-performance.com/games/nier-automata-the-end-of-yorha-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "-EgqUmzq004"
+    },
+    {
+      "slug": "nintendo-switch-sports",
+      "title": "Nintendo Switch Sports",
+      "url": "https://handheld-performance.com/games/nintendo-switch-sports",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "Ox64WSEbBcQ"
+    },
+    {
+      "slug": "no-mans-sky",
+      "title": "No Man&#x27;s Sky",
+      "url": "https://handheld-performance.com/games/no-mans-sky",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "648p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "504p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "sbiXpDmJq14"
+    },
+    {
+      "slug": "octopath-traveler",
+      "title": "Octopath Traveler",
+      "url": "https://handheld-performance.com/games/octopath-traveler",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "2jKOJsoVcro"
+    },
+    {
+      "slug": "octopath-traveler-ii",
+      "title": "Octopath Traveler II",
+      "url": "https://handheld-performance.com/games/octopath-traveler-ii",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Source: https://support.jp.square-enix.com/faqarticle.php?kid=81707&amp;id=19167&amp;la=0&amp;ret=faq&amp;pv=10&amp;page=0&amp;c=0&amp;sc=0&amp;so=0"
+      ],
+      "video_id": null
+    },
+    {
+      "slug": "ori-and-the-blind-forest-definitive-edition",
+      "title": "Ori and the Blind Forest: Definitive Edition",
+      "url": "https://handheld-performance.com/games/ori-and-the-blind-forest-definitive-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "56zk2vnkODg"
+    },
+    {
+      "slug": "ori-and-the-will-of-the-wisps",
+      "title": "Ori and the Will of the Wisps",
+      "url": "https://handheld-performance.com/games/ori-and-the-will-of-the-wisps",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "kH6wTpIObxE"
+    },
+    {
+      "slug": "paper-mario-the-thousand-year-door",
+      "title": "Paper Mario: The Thousand-Year Door",
+      "url": "https://handheld-performance.com/games/paper-mario-the-thousand-year-door",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "640p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "fVWINNRvfB4"
+    },
+    {
+      "slug": "persona-5-royal",
+      "title": "Persona 5: Royal",
+      "url": "https://handheld-performance.com/games/persona-5-royal",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "6XlIpSOI40Q"
+    },
+    {
+      "slug": "pikmin-1-2",
+      "title": "Pikmin 1+2",
+      "url": "https://handheld-performance.com/games/pikmin-1-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "eJwPqwTyoXA"
+    },
+    {
+      "slug": "pikmin-3-deluxe",
+      "title": "Pikmin 3 Deluxe",
+      "url": "https://handheld-performance.com/games/pikmin-3-deluxe",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "576p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "FnN93OnEvBI"
+    },
+    {
+      "slug": "pikmin-4",
+      "title": "Pikmin 4",
+      "url": "https://handheld-performance.com/games/pikmin-4",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution"
+      ],
+      "video_id": "6iz5uliQN3M"
+    },
+    {
+      "slug": "pokken-tournament-dx",
+      "title": "Pokk\u00e9n Tournament DX",
+      "url": "https://handheld-performance.com/games/pokken-tournament-dx",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 25% fewer pixels than a standard 720p."
+      ],
+      "video_id": "Vc6vshN8K3U"
+    },
+    {
+      "slug": "pokemon-brilliant-diamond",
+      "title": "Pok\u00e9mon Brilliant Diamond",
+      "url": "https://handheld-performance.com/games/pokemon-brilliant-diamond",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "-9r-qqy3R2A"
+    },
+    {
+      "slug": "pokemon-legends-arceus",
+      "title": "Pok\u00e9mon Legends: Arceus",
+      "url": "https://handheld-performance.com/games/pokemon-legends-arceus",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "df0uMcDe41A"
+    },
+    {
+      "slug": "pokemon-shield",
+      "title": "Pok\u00e9mon Shield",
+      "url": "https://handheld-performance.com/games/pokemon-shield",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "czXsJwfjps8"
+    },
+    {
+      "slug": "pokemon-shining-pearl",
+      "title": "Pok\u00e9mon Shining Pearl",
+      "url": "https://handheld-performance.com/games/pokemon-shining-pearl",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "-9r-qqy3R2A"
+    },
+    {
+      "slug": "pokemon-sword",
+      "title": "Pok\u00e9mon Sword",
+      "url": "https://handheld-performance.com/games/pokemon-sword",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "czXsJwfjps8"
+    },
+    {
+      "slug": "pokemon-lets-go-eevee",
+      "title": "Pok\u00e9mon: Let&#x27;s Go, Eevee!",
+      "url": "https://handheld-performance.com/games/pokemon-lets-go-eevee",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "_ahNhq2Pj48"
+    },
+    {
+      "slug": "pokemon-lets-go-pikachu",
+      "title": "Pok\u00e9mon: Let&#x27;s Go, Pikachu!",
+      "url": "https://handheld-performance.com/games/pokemon-lets-go-pikachu",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "_ahNhq2Pj48"
+    },
+    {
+      "slug": "portal-companion-collection",
+      "title": "Portal: Companion Collection",
+      "url": "https://handheld-performance.com/games/portal-companion-collection",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "No antialiasing (AA) in handheld mode."
+      ],
+      "video_id": "h7ZzVDahhQU"
+    },
+    {
+      "slug": "prince-of-persia-the-lost-crown",
+      "title": "Prince of Persia: The Lost Crown",
+      "url": "https://handheld-performance.com/games/prince-of-persia-the-lost-crown",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Cutscenes: 30 FPS.",
+        "(*) Cutscenes: 30 FPS."
+      ],
+      "video_id": "Juhb32ZEu5c"
+    },
+    {
+      "slug": "red-dead-redemption",
+      "title": "Red Dead Redemption",
+      "url": "https://handheld-performance.com/games/red-dead-redemption",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "RhhkHHsEzL4"
+    },
+    {
+      "slug": "resident-evil",
+      "title": "Resident Evil",
+      "url": "https://handheld-performance.com/games/resident-evil",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "High loading times."
+      ],
+      "video_id": "sAbcc2C0r6w"
+    },
+    {
+      "slug": "resident-evil-0",
+      "title": "Resident Evil 0",
+      "url": "https://handheld-performance.com/games/resident-evil-0",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "High loading times."
+      ],
+      "video_id": "sAbcc2C0r6w"
+    },
+    {
+      "slug": "resident-evil-4",
+      "title": "Resident Evil 4",
+      "url": "https://handheld-performance.com/games/resident-evil-4",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "600p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "sAbcc2C0r6w"
+    },
+    {
+      "slug": "resident-evil-5",
+      "title": "Resident Evil 5",
+      "url": "https://handheld-performance.com/games/resident-evil-5",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "~30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "~30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [],
+      "video_id": "SgIUYW3blFE"
+    },
+    {
+      "slug": "resident-evil-6",
+      "title": "Resident Evil 6",
+      "url": "https://handheld-performance.com/games/resident-evil-6",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "~30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "~30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [],
+      "video_id": "SgIUYW3blFE"
+    },
+    {
+      "slug": "resident-evil-revelations",
+      "title": "Resident Evil Revelations",
+      "url": "https://handheld-performance.com/games/resident-evil-revelations",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "s58Ei38aKIM"
+    },
+    {
+      "slug": "resident-evil-revelations-2",
+      "title": "Resident Evil Revelations 2",
+      "url": "https://handheld-performance.com/games/resident-evil-revelations-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "~40 FPS",
+          "fps": 40,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "~40 FPS",
+          "fps": 40,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "s58Ei38aKIM"
+    },
+    {
+      "slug": "rocket-league",
+      "title": "Rocket League",
+      "url": "https://handheld-performance.com/games/rocket-league",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Patch 2.64 required for rendering enhancements. Dynamic resolution in handheld mode."
+      ],
+      "video_id": "KiJPXT2VceM"
+    },
+    {
+      "slug": "sea-of-stars",
+      "title": "Sea of Stars",
+      "url": "https://handheld-performance.com/games/sea-of-stars",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Pixel art graphics originally designed for a native resolution of 640x360, upscaled 2x in handheld mode and 3x when docked."
+      ],
+      "video_id": "0ltco2pZXQw"
+    },
+    {
+      "slug": "shin-megami-tensei-v",
+      "title": "Shin Megami Tensei V",
+      "url": "https://handheld-performance.com/games/shin-megami-tensei-v",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "864p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "2VfuNQ0yKRA"
+    },
+    {
+      "slug": "civilization-vii",
+      "title": "Sid Meier&#x27;s Civilization VII",
+      "url": "https://handheld-performance.com/games/civilization-vii",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "The game has not been released yet. Information provided by developer.",
+        "(*) Low framerate in the last turns."
+      ],
+      "video_id": "cziWHAo2G4E"
+    },
+    {
+      "slug": "civilization-vi",
+      "title": "Sid Meier\u2019s Civilization VI",
+      "url": "https://handheld-performance.com/games/civilization-vi",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "qiVSQ6nkHQ8"
+    },
+    {
+      "slug": "sonic-colors-ultimate",
+      "title": "Sonic Colors: Ultimate",
+      "url": "https://handheld-performance.com/games/sonic-colors-ultimate",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "600p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "8kMvqJ-giic"
+    },
+    {
+      "slug": "sonic-forces",
+      "title": "Sonic Forces",
+      "url": "https://handheld-performance.com/games/sonic-forces",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Reduced level of detail."
+      ],
+      "video_id": "lz-FCuGduuQ"
+    },
+    {
+      "slug": "sonic-frontiers",
+      "title": "Sonic Frontiers",
+      "url": "https://handheld-performance.com/games/sonic-frontiers",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "480p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Reduced lighting effects and graphics.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "MmD1PUgqzEk"
+    },
+    {
+      "slug": "sonic-mania",
+      "title": "Sonic Mania",
+      "url": "https://handheld-performance.com/games/sonic-mania",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Noticeable frame drops in bonus stages."
+      ],
+      "video_id": "DXturRMOzU4"
+    },
+    {
+      "slug": "sonic-mania-plus",
+      "title": "Sonic Mania Plus",
+      "url": "https://handheld-performance.com/games/sonic-mania-plus",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Noticeable frame drops in bonus stages."
+      ],
+      "video_id": "DXturRMOzU4"
+    },
+    {
+      "slug": "sonic-superstars",
+      "title": "Sonic Superstars",
+      "url": "https://handheld-performance.com/games/sonic-superstars",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "Reduced level of detail. Some stages render at a lower resolution."
+      ],
+      "video_id": "QdyvhqUgYMo"
+    },
+    {
+      "slug": "sonic-x-shadow-generations",
+      "title": "Sonic X Shadow Generations",
+      "url": "https://handheld-performance.com/games/sonic-x-shadow-generations",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS (*)",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS (*)",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Sonic Generations remastered is locked to 31.5 FPS causing stutters. Shadow Generations runs dynamic 900p in docked mode.",
+        "(*) Sonic Generations remastered runs at 60 FPS and 1080p in all platforms."
+      ],
+      "video_id": "F_8t-su-weU"
+    },
+    {
+      "slug": "splatoon-2",
+      "title": "Splatoon 2",
+      "url": "https://handheld-performance.com/games/splatoon-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "Fg9ptMnVJmI"
+    },
+    {
+      "slug": "splatoon-3",
+      "title": "Splatoon 3",
+      "url": "https://handheld-performance.com/games/splatoon-3",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution. City segments: 30 FPS."
+      ],
+      "video_id": "ttfJ0rEDtj0"
+    },
+    {
+      "slug": "streets-of-rage-4",
+      "title": "Streets of Rage 4",
+      "url": "https://handheld-performance.com/games/streets-of-rage-4",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "hkHtw4MTSho"
+    },
+    {
+      "slug": "super-mario-3d-all-stars",
+      "title": "Super Mario 3D All-Stars",
+      "url": "https://handheld-performance.com/games/super-mario-3d-all-stars",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Super Mario Galaxy runs dynamic resolution. Super Mario Sunshine is limited to 30 FPS."
+      ],
+      "video_id": "0q5qOYp9ihY"
+    },
+    {
+      "slug": "super-mario-3d-world-bowsers-fury",
+      "title": "Super Mario 3D World + Bowser\u2019s Fury",
+      "url": "https://handheld-performance.com/games/super-mario-3d-world-bowsers-fury",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Bowser&#x27;s Fury: Docked 720p 60 FPS / Handheld 720p 30 FPS"
+      ],
+      "video_id": "8moc-XHuu6I"
+    },
+    {
+      "slug": "super-mario-maker-2",
+      "title": "Super Mario Maker 2",
+      "url": "https://handheld-performance.com/games/super-mario-maker-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Super Mario 3D World mode runs on dynamic 900p."
+      ],
+      "video_id": "hnvuL1lJFeU"
+    },
+    {
+      "slug": "super-mario-party",
+      "title": "Super Mario Party",
+      "url": "https://handheld-performance.com/games/super-mario-party",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "super-mario-rpg",
+      "title": "Super Mario RPG",
+      "url": "https://handheld-performance.com/games/super-mario-rpg",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Noticeable frame drops in cinematics."
+      ],
+      "video_id": "yWGmO1QoFDE"
+    },
+    {
+      "slug": "super-smash-bros-ultimate",
+      "title": "Super Smash Bros. Ultimate",
+      "url": "https://handheld-performance.com/games/super-smash-bros-ultimate",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "LEZLvXDZOqA"
+    },
+    {
+      "slug": "tales-of-symphonia-remastered",
+      "title": "Tales of Symphonia Remastered",
+      "url": "https://handheld-performance.com/games/tales-of-symphonia-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "kDH_fhNdCuM"
+    },
+    {
+      "slug": "tales-of-vesperia-definitive-edition",
+      "title": "Tales of Vesperia: Definitive Edition",
+      "url": "https://handheld-performance.com/games/tales-of-vesperia-definitive-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Map: ~50 FPS"
+      ],
+      "video_id": "nQKDy9hOOOo"
+    },
+    {
+      "slug": "team-sonic-racing",
+      "title": "Team Sonic Racing",
+      "url": "https://handheld-performance.com/games/team-sonic-racing",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS (*)",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS (*)",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Frame drops in multiplayer modes."
+      ],
+      "video_id": "xtmdrYpxx04"
+    },
+    {
+      "slug": "the-legend-of-zelda-breath-of-the-wild",
+      "title": "The Legend of Zelda: Breath of the Wild",
+      "url": "https://handheld-performance.com/games/the-legend-of-zelda-breath-of-the-wild",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution. It can lower the resolution to keep the framerate as stable as possible."
+      ],
+      "video_id": "w6NkNgI1ssw"
+    },
+    {
+      "slug": "the-legend-of-zelda-echoes-of-wisdom",
+      "title": "The Legend of Zelda: Echoes of Wisdom",
+      "url": "https://handheld-performance.com/games/the-legend-of-zelda-echoes-of-wisdom",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Resolution between 1080p and 720p. Framerate between 60 and 30 FPS."
+      ],
+      "video_id": "XhHFABnLfVg"
+    },
+    {
+      "slug": "the-legend-of-zelda-links-awakening",
+      "title": "The Legend of Zelda: Link&#x27;s Awakening",
+      "url": "https://handheld-performance.com/games/the-legend-of-zelda-links-awakening",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Resolution between 1080p and 720p. Framerate between 60 and 30 FPS."
+      ],
+      "video_id": "KREpHaA0Tbo"
+    },
+    {
+      "slug": "the-legend-of-zelda-skyward-sword-hd",
+      "title": "The Legend of Zelda: Skyward Sword HD",
+      "url": "https://handheld-performance.com/games/the-legend-of-zelda-skyward-sword-hd",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "hmqwAIe0W8U"
+    },
+    {
+      "slug": "the-legend-of-zelda-tears-of-the-kingdom",
+      "title": "The Legend of Zelda: Tears of the Kingdom",
+      "url": "https://handheld-performance.com/games/the-legend-of-zelda-tears-of-the-kingdom",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution. It can lower the resolution to keep the frame rate as stable as possible."
+      ],
+      "video_id": "BLlZBwN_-C4"
+    },
+    {
+      "slug": "the-witcher-3-wild-hunt",
+      "title": "The Witcher 3: Wild Hunt",
+      "url": "https://handheld-performance.com/games/the-witcher-3-wild-hunt",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(*) Rescaled."
+      ],
+      "video_id": "hUHNowimzDA"
+    },
+    {
+      "slug": "the-wonderful-101-remastered",
+      "title": "The Wonderful 101 Remastered",
+      "url": "https://handheld-performance.com/games/the-wonderful-101-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(*) 60 FPS target, but the actual framerate ranges between 30-50 FPS."
+      ],
+      "video_id": "4BOCR4pdwuo"
+    },
+    {
+      "slug": "tokyo-mirage-sessions-fe-encore",
+      "title": "Tokyo Mirage Sessions \u266fFE: Encore",
+      "url": "https://handheld-performance.com/games/tokyo-mirage-sessions-fe-encore",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "H-rF6EYYCLI"
+    },
+    {
+      "slug": "tomb-raider-i-iii-remastered",
+      "title": "Tomb Raider I-III Remastered",
+      "url": "https://handheld-performance.com/games/tomb-raider-i-iii-remastered",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Retro mode: 30 FPS."
+      ],
+      "video_id": "6yw5Xn-2FiE"
+    },
+    {
+      "slug": "triangle-strategy",
+      "title": "Triangle Strategy",
+      "url": "https://handheld-performance.com/games/triangle-strategy",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic resolution (Docked: 900p-720p and Handheld: 720p-600p)"
+      ],
+      "video_id": "8ay86ZC1p7E"
+    },
+    {
+      "slug": "unravel-two",
+      "title": "Unravel Two",
+      "url": "https://handheld-performance.com/games/unravel-two",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "y37o8-1nmXs"
+    },
+    {
+      "slug": "wolfenstein-ii-the-new-colossus",
+      "title": "Wolfenstein II: The New Colossus",
+      "url": "https://handheld-performance.com/games/wolfenstein-ii-the-new-colossus",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "360p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "g6b8FUSB89s"
+    },
+    {
+      "slug": "wolfenstein-youngblood",
+      "title": "Wolfenstein: Youngblood",
+      "url": "https://handheld-performance.com/games/wolfenstein-youngblood",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Low"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "kSnz46HiLLc"
+    },
+    {
+      "slug": "xenoblade-chronicles-2",
+      "title": "Xenoblade Chronicles 2",
+      "url": "https://handheld-performance.com/games/xenoblade-chronicles-2",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "552p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "MnyKDzX7lqo"
+    },
+    {
+      "slug": "xenoblade-chronicles-3",
+      "title": "Xenoblade Chronicles 3",
+      "url": "https://handheld-performance.com/games/xenoblade-chronicles-3",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Rescaled (540p/360p)"
+      ],
+      "video_id": "SPKDX5B8X0s"
+    },
+    {
+      "slug": "xenoblade-chronicles-x-definitive-edition",
+      "title": "Xenoblade Chronicles X: Definitive Edition",
+      "url": "https://handheld-performance.com/games/xenoblade-chronicles-x-definitive-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p (D)",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "x6miwExra3o"
+    },
+    {
+      "slug": "xenoblade-chronicles-definitive-edition",
+      "title": "Xenoblade Chronicles: Definitive Edition",
+      "url": "https://handheld-performance.com/games/xenoblade-chronicles-definitive-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "TbF59jGO3ho"
+    },
+    {
+      "slug": "yooka-laylee",
+      "title": "Yooka-Laylee",
+      "url": "https://handheld-performance.com/games/yooka-laylee",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "900p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "630p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "High loading times."
+      ],
+      "video_id": "NfBeett5FII"
+    },
+    {
+      "slug": "yooka-laylee-and-the-impossible-lair",
+      "title": "Yooka-Laylee and the Impossible Lair",
+      "url": "https://handheld-performance.com/games/yooka-laylee-and-the-impossible-lair",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "765p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "yihbcvEcD-s"
+    },
+    {
+      "slug": "yoshis-crafted-world",
+      "title": "Yoshi&#x27;s Crafted World",
+      "url": "https://handheld-performance.com/games/yoshis-crafted-world",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "675p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "495p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "w95yC7wfdUA"
+    },
+    {
+      "slug": "metroid-prime-4-beyond",
+      "title": "Metroid Prime 4: Beyond",
+      "url": "https://handheld-performance.com/games/metroid-prime-4-beyond",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "The game has not been released yet. Information provided by Nintendo."
+      ],
+      "video_id": null
+    },
+    {
+      "slug": "mario-kart-world",
+      "title": "Mario Kart World",
+      "url": "https://handheld-performance.com/games/mario-kart-world",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1440p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) 30 FPS in photo mode, when using binoculars, and in 3-4P split-screen."
+      ],
+      "video_id": "4162BZMMLLM"
+    },
+    {
+      "slug": "pokemon-scarlet",
+      "title": "Pok\u00e9mon Scarlet",
+      "url": "https://handheld-performance.com/games/pokemon-scarlet",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Update required. Rescaled with DSR from 648p in handheld mode.",
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "YWRt-PiOzlI"
+    },
+    {
+      "slug": "pokemon-violet",
+      "title": "Pok\u00e9mon Violet",
+      "url": "https://handheld-performance.com/games/pokemon-violet",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Update required. Rescaled with DSR from 648p in handheld mode.",
+        "(*) Dynamic maximum resolution."
+      ],
+      "video_id": "YWRt-PiOzlI"
+    },
+    {
+      "slug": "warioware-move-it",
+      "title": "WarioWare: Move It!",
+      "url": "https://handheld-performance.com/games/warioware-move-it",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "fast-fusion",
+      "title": "Fast Fusion",
+      "url": "https://handheld-performance.com/games/fast-fusion",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p (DLSS)",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p (DLSS)",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Compatible with HDR."
+      ],
+      "video_id": "JJUn7Kc3W3A"
+    },
+    {
+      "slug": "warioware-get-it-together",
+      "title": "WarioWare: Get It Together!",
+      "url": "https://handheld-performance.com/games/warioware-get-it-together",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": null
+    },
+    {
+      "slug": "hollow-knight-silksong",
+      "title": "Hollow Knight: Silksong",
+      "url": "https://handheld-performance.com/games/hollow-knight-silksong",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "120 FPS",
+          "fps": 120,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "NmDo9syiNmk"
+    },
+    {
+      "slug": "ninja-gaiden-ragebound",
+      "title": "Ninja Gaiden: Ragebound",
+      "url": "https://handheld-performance.com/games/ninja-gaiden-ragebound",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) With the D1 patch, a 60 FPS option is added to the main menu. Recommended only for Nintendo Switch 2 users.",
+        "(*) With the D1 patch, a 60 FPS option is added to the main menu, but is not recommended for Nintendo Switch users."
+      ],
+      "video_id": "Y36Q99tr-7w"
+    },
+    {
+      "slug": "donkey-kong-bananza",
+      "title": "Donkey Kong Bananza",
+      "url": "https://handheld-performance.com/games/donkey-kong-bananza",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p-1200p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Native resolution. Output resolution rescaled with AMD FSR 1.0 and SMAA anti-aliasing filter."
+      ],
+      "video_id": "hRX0Ep7gacQ"
+    },
+    {
+      "slug": "bayonetta-3",
+      "title": "Bayonetta 3",
+      "url": "https://handheld-performance.com/games/bayonetta-3",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "810p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "480p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "jiZCwkKnmlQ"
+    },
+    {
+      "slug": "borderlands-3-ultimate-edition",
+      "title": "Borderlands 3 Ultimate Edition",
+      "url": "https://handheld-performance.com/games/borderlands-3-ultimate-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(D) Dynamic maximum resolution.",
+        "(D) Dynamic maximum resolution."
+      ],
+      "video_id": "jiZCwkKnmlQ"
+    },
+    {
+      "slug": "kirby-and-the-forgotten-land",
+      "title": "Kirby and the Forgotten Land",
+      "url": "https://handheld-performance.com/games/kirby-and-the-forgotten-land",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1440p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) CInematics: 30 FPS",
+        "(*) Dynamic maximum resolution"
+      ],
+      "video_id": "go9MblMc3a8"
+    },
+    {
+      "slug": "persona-3-reload",
+      "title": "Persona 3 Reload",
+      "url": "https://handheld-performance.com/games/persona-3-reload",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) 60 FPS needs 1.03 patch"
+      ],
+      "video_id": null
+    },
+    {
+      "slug": "factorio",
+      "title": "Factorio",
+      "url": "https://handheld-performance.com/games/factorio",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Factorio: Space Age DLC is not available in Nintendo Switch."
+      ],
+      "video_id": null
+    },
+    {
+      "slug": "devil-may-cry-3-special-edition",
+      "title": "Devil May Cry 3 Special Edition",
+      "url": "https://handheld-performance.com/games/devil-may-cry-3-special-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS (*)",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Cutscenes are rendered in 30 FPS."
+      ],
+      "video_id": "yw82bPL9k8U"
+    },
+    {
+      "slug": "super-mario-odyssey",
+      "title": "Super Mario Odyssey",
+      "url": "https://handheld-performance.com/games/super-mario-odyssey",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Upscaled from 1440p. Update 1.4.0 required to improved performance.",
+        "(*) Maximum dynamic resolution"
+      ],
+      "video_id": null
+    },
+    {
+      "slug": "terraria",
+      "title": "Terraria",
+      "url": "https://handheld-performance.com/games/terraria",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "Co-op mode not available in Nintendo Switch."
+      ],
+      "video_id": "1s-Q9Y_KRGw"
+    },
+    {
+      "slug": "stardew-valley",
+      "title": "Stardew Valley",
+      "url": "https://handheld-performance.com/games/stardew-valley",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "4 co-op mode. GameShare compatible."
+      ],
+      "video_id": "8ac2-LRIAeU"
+    },
+    {
+      "slug": "animal-crossing-new-horizons",
+      "title": "Animal Crossing: New Horizons",
+      "url": "https://handheld-performance.com/games/animal-crossing-new-horizons",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "Paid update."
+      ],
+      "video_id": "Iw5epbkgSQM"
+    },
+    {
+      "slug": "etrange-overlord",
+      "title": "Etrange Overlord",
+      "url": "https://handheld-performance.com/games/etrange-overlord",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Most cutscenes renders at 648p",
+        "(*) Most cutscenes renders at 648p"
+      ],
+      "video_id": "fA_0wYzuR8M"
+    },
+    {
+      "slug": "tomodachi-life-living-the-dream",
+      "title": "Tomodachi Life: Living the Dream",
+      "url": "https://handheld-performance.com/games/tomodachi-life-living-the-dream",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1080p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "720p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "8ol6AUwuN-s"
+    },
+    {
+      "slug": "braid-anniversary-edition",
+      "title": "Braid: Anniversary Edition",
+      "url": "https://handheld-performance.com/games/braid-anniversary-edition",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "120 FPS",
+          "fps": 120,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "120 FPS",
+          "fps": 120,
+          "stability": "High"
+        }
+      ],
+      "notes": [],
+      "video_id": "RKQSZqelJ28"
+    },
+    {
+      "slug": "kena-bridge-of-spirits",
+      "title": "Kena: Bridge of Spirits",
+      "url": "https://handheld-performance.com/games/kena-bridge-of-spirits",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "864p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "540p",
+          "framerate": "30 FPS",
+          "fps": 30,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [
+        "(*) Rescaled from lower resolution. Low image quality with many artifacts."
+      ],
+      "video_id": "X2vX3ry1rEI"
+    },
+    {
+      "slug": "subnautica",
+      "title": "Subnautica",
+      "url": "https://handheld-performance.com/games/subnautica",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1440p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "0K77WvfCI04"
+    },
+    {
+      "slug": "subnautica-below-zero",
+      "title": "Subnautica: Below Zero",
+      "url": "https://handheld-performance.com/games/subnautica-below-zero",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "1440p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "Medium"
+        }
+      ],
+      "notes": [],
+      "video_id": "8VW8c4Lbiek"
+    },
+    {
+      "slug": "mario-tennis-fever",
+      "title": "Mario Tennis Fever",
+      "url": "https://handheld-performance.com/games/mario-tennis-fever",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) DLSS upscaled from lower resolution"
+      ],
+      "video_id": "GgVflMPH3Dk"
+    },
+    {
+      "slug": "super-mario-bros-wonder",
+      "title": "Super Mario Bros. Wonder",
+      "url": "https://handheld-performance.com/games/super-mario-bros-wonder",
+      "performance": [
+        {
+          "mode": "Docked",
+          "resolution": "2160p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        },
+        {
+          "mode": "Handheld",
+          "resolution": "1080p",
+          "framerate": "60 FPS",
+          "fps": 60,
+          "stability": "High"
+        }
+      ],
+      "notes": [
+        "(*) Dynamic maximum resolution"
+      ],
+      "video_id": "d3yhU6hLVOY"
+    }
+  ]
+}

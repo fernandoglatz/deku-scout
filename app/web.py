@@ -257,12 +257,26 @@ def _annotate_performance(games: list[dict], db_path: str) -> None:
 
     Smart column: show the sheet's fps; mark perf_sw2 when a genuine Switch 2
     version exists (DekuDeals switch2 flag OR a Switch 2 patch type).
+    Falls back to fuzzy name matching for abbreviation/variant mismatches.
+    Second fallback: handheld-performance.com data (no patch_type info).
     """
+    from app.performance import fuzzy_match, load_handheld_performance
+
     perf = load_performance_cache(db_path)
+    handheld_perf = load_handheld_performance()
     for g in games:
-        row = perf.get(normalize_name(g.get("name", "")))
+        name = g.get("name", "")
+        norm_name = normalize_name(name)
+        row = perf.get(norm_name)
         if not row:
-            g["perf_label"] = "—"
+            _, row = fuzzy_match(name, perf)
+        if not row:
+            # Try handheld-performance.com data as second fallback
+            row = handheld_perf.get(norm_name)
+            if not row:
+                _, row = fuzzy_match(name, handheld_perf)
+        if not row:
+            g["perf_label"] = ""
             g["perf_sort"] = 0
             g["perf_sw2"] = False
             continue
