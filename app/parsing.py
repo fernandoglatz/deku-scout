@@ -58,48 +58,57 @@ def parse_sale_end(raw: str) -> str:
     return ""
 
 
-def last_sale_start(history: dict, on_sale_now: bool = False, max_sale_days: int = 60) -> str:
-    """Return the ISO date the most recent eShop sale started, or "" if none.
+def last_sale_end(history: dict, max_sale_days: int = 60) -> str:
+    """Return the last day (ISO date) of the most recent finished eShop sale, or "".
 
     `history` is DekuDeals' price_history_data: {"headers": [store, ...],
     "data": [[date, _, price_per_store...], ...]}. Only "Nintendo eShop" series
     are used (cheapest one per day when there are several, e.g. Switch/Switch 2).
 
     A sale starts when the price drops below the regular price and ends when it
-    returns. A drop lasting longer than `max_sale_days` is a permanent price cut,
-    not a sale. Histories can begin mid-sale: a short opening stretch that later
-    rises counts as a sale, and `on_sale_now` (from the item page) covers one
-    still running, where the regular price never appears.
+    returns. A sale still running at the end of the history is ignored. A drop
+    lasting longer than `max_sale_days` is a permanent price cut, not a sale.
+    Histories can begin mid-sale (launch discounts): a short opening stretch
+    that later rises counts as a sale.
     """
     headers = history.get("headers") or []
     cols = [i + 2 for i, h in enumerate(headers) if "eshop" in str(h).lower()]
     if not cols:
         return ""
 
-    regular = last_price = None
-    start = prev_start = run_start = first_day = ""
-    in_sale = changed = False
+    # Collapse days into runs of the same price: [first_day, last_day, price].
+    runs: list[list] = []
     for row in history.get("data") or []:
         prices = [row[c] for c in cols if c < len(row) and row[c] is not None]
         if not prices:
             continue
         day, price = row[0], min(prices)
-        first_day = first_day or day
-        if price != last_price:
-            # History that begins at a sale price and later rises: that first
-            # stretch was a sale (unless it lasted long enough to be a price hike).
-            if (not changed and last_price is not None and price > last_price
-                    and (date.fromisoformat(day) - date.fromisoformat(first_day)).days <= max_sale_days):
-                start = first_day
-            changed = changed or last_price is not None
-            run_start, last_price = day, price
-        if regular is None or price >= regular:
-            regular, in_sale = price, False
-        elif not in_sale:
-            in_sale, prev_start, start = True, start, day
-        elif (date.fromisoformat(day) - date.fromisoformat(start)).days > max_sale_days:
-            regular, in_sale, start = price, False, prev_start
+        if runs and runs[-1][2] == price:
+            runs[-1][1] = day
+        else:
+            runs.append([day, day, price])
 
-    if on_sale_now and not in_sale:
-        return run_start
-    return start
+    def days(a: str, b: str) -> int:
+        return (date.fromisoformat(b) - date.fromisoformat(a)).days
+
+    last_end = ""
+    regular = None
+    sale_start = sale_end = ""
+    for i, (first, last, price) in enumerate(runs):
+        if i == 0:
+            nxt = runs[1] if len(runs) > 1 else None
+            if nxt and nxt[2] > price and days(first, nxt[0]) <= max_sale_days:
+                last_end = last  # history began mid-sale; the next run seeds regular
+            else:
+                regular = price
+            continue
+        if regular is None or price >= regular:
+            if sale_start:
+                last_end = sale_end
+            regular, sale_start = price, ""
+        else:
+            sale_start = sale_start or first
+            sale_end = last
+            if days(sale_start, last) > max_sale_days:  # permanent price cut
+                regular, sale_start = price, ""
+    return last_end
