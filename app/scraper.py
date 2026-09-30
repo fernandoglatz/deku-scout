@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
 from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache
-from app.parsing import last_sale_start, parse_release_date, parse_sale_end
+from app.parsing import last_sale_end, parse_release_date, parse_sale_end
 from app.performance import fetch_performance_sheet
 
 log = logging.getLogger(__name__)
@@ -149,7 +149,7 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
                 "original": g["original"],
                 "current": g["current"],
                 "discount": g["discount"],
-                "last_sale": g.get("last_sale", ""),
+                "last_sale_end": g.get("last_sale_end", ""),
             }
             if name not in meta_by_name:
                 meta_by_name[name] = {
@@ -408,7 +408,7 @@ def _fetch_eshop_prices(
 
         value = eshop["value"]
         discount = eshop["discount"]
-        game["last_sale"] = last_sale_start(history, on_sale_now=discount > 0)
+        game["last_sale_end"] = last_sale_end(history)
 
         if value == 0:
             game["current"] = "Unavailable"
