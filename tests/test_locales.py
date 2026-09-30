@@ -26,3 +26,15 @@ def test_locale_values_are_strings():
         data = _load(lang)
         for key, val in data.items():
             assert isinstance(val, str), f'{lang}.json key {key!r} is not a string'
+
+
+def test_index_embeds_translations(client):
+    # Strings ship inside the page, so a cached /static/locales/*.json (browser or
+    # CDN) can't serve stale keys after a deploy.
+    import re
+    html = client.get("/").get_data(as_text=True)
+    assert "/static/locales/" not in html
+    m = re.search(r'<script id="i18n-data" type="application/json">(.*?)</script>', html, re.S)
+    assert m, "i18n bundle not embedded"
+    bundle = json.loads(m.group(1))
+    assert bundle == {lang: _load(lang) for lang in SUPPORTED}

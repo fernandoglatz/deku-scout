@@ -1,3 +1,4 @@
+import functools
 import json
 import logging
 import os
@@ -36,6 +37,27 @@ web_bp = Blueprint("web", __name__)
 def inject_app_version():
     """Expose the running build's version to every template."""
     return {"app_version": APP_VERSION}
+
+
+_LOCALES_DIR = os.path.join(os.path.dirname(__file__), "static", "locales")
+
+
+@functools.lru_cache(maxsize=1)
+def _i18n_bundle() -> dict:
+    """All UI translations, {lang: {key: text}}, read once per process."""
+    bundle = {}
+    for fname in sorted(os.listdir(_LOCALES_DIR)):
+        if fname.endswith(".json"):
+            with open(os.path.join(_LOCALES_DIR, fname), encoding="utf-8") as f:
+                bundle[fname[:-5]] = json.load(f)
+    return bundle
+
+
+@web_bp.app_context_processor
+def inject_i18n():
+    """Embed translations in the page so a cached locale file (browser or CDN)
+    can't serve stale keys after a deploy."""
+    return {"i18n_bundle": _i18n_bundle()}
 
 _refresh_lock = threading.Lock()
 _refreshing_dbs: set[str] = set()
