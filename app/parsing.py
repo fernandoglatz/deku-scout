@@ -67,8 +67,9 @@ def last_sale_start(history: dict, on_sale_now: bool = False, max_sale_days: int
 
     A sale starts when the price drops below the regular price and ends when it
     returns. A drop lasting longer than `max_sale_days` is a permanent price cut,
-    not a sale. `on_sale_now` (from the item page) covers histories that begin
-    mid-sale, where the regular price never appears.
+    not a sale. Histories can begin mid-sale: a short opening stretch that later
+    rises counts as a sale, and `on_sale_now` (from the item page) covers one
+    still running, where the regular price never appears.
     """
     headers = history.get("headers") or []
     cols = [i + 2 for i, h in enumerate(headers) if "eshop" in str(h).lower()]
@@ -76,14 +77,21 @@ def last_sale_start(history: dict, on_sale_now: bool = False, max_sale_days: int
         return ""
 
     regular = last_price = None
-    start = prev_start = run_start = ""
-    in_sale = False
+    start = prev_start = run_start = first_day = ""
+    in_sale = changed = False
     for row in history.get("data") or []:
         prices = [row[c] for c in cols if c < len(row) and row[c] is not None]
         if not prices:
             continue
         day, price = row[0], min(prices)
+        first_day = first_day or day
         if price != last_price:
+            # History that begins at a sale price and later rises: that first
+            # stretch was a sale (unless it lasted long enough to be a price hike).
+            if (not changed and last_price is not None and price > last_price
+                    and (date.fromisoformat(day) - date.fromisoformat(first_day)).days <= max_sale_days):
+                start = first_day
+            changed = changed or last_price is not None
             run_start, last_price = day, price
         if regular is None or price >= regular:
             regular, in_sale = price, False

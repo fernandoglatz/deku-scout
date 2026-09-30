@@ -468,9 +468,11 @@
   <p style="color:var(--text-muted);text-align:center;padding:3rem 0;" data-i18n="loading.wishlistData">Loading wishlist data...</p>
   {% endif %}
 </main>
+<script id="i18n-data" type="application/json">{{ i18n_bundle|tojson }}</script>
 <script>
 window.I18n = (function () {
-  var cache = {};
+  var bundle = {};
+  try { bundle = JSON.parse(document.getElementById('i18n-data').textContent); } catch (e) {}
   var current = 'en';
   var strings = {};
   var SUPPORTED = ['en', 'pt', 'es', 'ja'];
@@ -509,21 +511,9 @@ window.I18n = (function () {
   function load(lang, cb) {
     current = lang;
     document.documentElement.lang = LOCALE_MAP[lang] || lang;
-    if (cache[lang]) {
-      strings = cache[lang];
-      applyDOM();
-      if (cb) cb();
-      return;
-    }
-    fetch('/static/locales/' + lang + '.json')
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (data) {
-        cache[lang] = data;
-        strings = data;
-        applyDOM();
-        if (cb) cb();
-      })
-      .catch(function () { if (cb) cb(); });
+    strings = bundle[lang] || bundle.en || {};
+    applyDOM();
+    if (cb) cb();
   }
 
   function init(selectEl, cb) {

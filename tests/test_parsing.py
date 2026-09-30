@@ -162,7 +162,10 @@ def test_last_sale_start_never_on_sale():
 
 
 def test_last_sale_start_price_increase_is_not_a_sale():
-    assert last_sale_start(_history([20, 20, 25, 25])) == ""
+    # rises after a long stretch are price hikes; a short opening stretch that
+    # rises is read as a launch sale (see ..._history_begins_mid_sale_then_ends)
+    assert last_sale_start(_history([20, 20, 20, 25, 25]), max_sale_days=1) == ""
+    assert last_sale_start(_history([20, 10, 20, 20, 25, 25])) == "2026-01-02"
 
 
 def test_last_sale_start_permanent_price_cut_is_not_a_sale():
@@ -192,3 +195,14 @@ def test_last_sale_start_multiple_eshop_series_uses_cheapest():
 def test_last_sale_start_empty_or_malformed():
     assert last_sale_start({}) == ""
     assert last_sale_start({"headers": ["Amazon"], "data": [["2026-01-01", None, 5]]}) == ""
+
+
+def test_last_sale_start_history_begins_mid_sale_then_ends():
+    # DMC5 on prod: tracked from 06-09 at the sale price, back to regular later
+    h = _history([15, 15, 15, 20, 20])
+    assert last_sale_start(h) == "2026-01-01"
+
+
+def test_last_sale_start_long_first_stretch_then_rise_is_price_increase():
+    h = _history([15] * 20 + [20, 20])
+    assert last_sale_start(h, max_sale_days=10) == ""
