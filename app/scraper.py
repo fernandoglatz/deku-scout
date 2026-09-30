@@ -9,8 +9,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
-from app.db import load_cookies, save_cookies, save_games_cache
-from app.parsing import parse_release_date, parse_sale_end
+from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache
+from app.parsing import last_sale_start, parse_release_date, parse_sale_end
+from app.performance import fetch_performance_sheet
 
 log = logging.getLogger(__name__)
 
@@ -148,6 +149,7 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
                 "original": g["original"],
                 "current": g["current"],
                 "discount": g["discount"],
+                "last_sale": g.get("last_sale", ""),
             }
             if name not in meta_by_name:
                 meta_by_name[name] = {
@@ -158,8 +160,8 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
                     "switch1": g.get("switch1", False),
                     "switch2": g.get("switch2", False),
                 }
-            # Platform flags only come from item pages of available games; OR across
-            # locales so a game classified in any locale keeps its flags.
+            # Platform flags come from item pages; OR across locales so a game
+            # classified in any locale keeps its flags.
             meta_by_name[name]["switch1"] = meta_by_name[name].get("switch1", False) or g.get("switch1", False)
             meta_by_name[name]["switch2"] = meta_by_name[name].get("switch2", False) or g.get("switch2", False)
             if locale == reference_locale:
@@ -292,6 +294,18 @@ def _parse_eshop_analytics(html: str) -> dict:
     return {}
 
 
+def _parse_price_history(html: str) -> dict:
+    """Extract the price_history_data JSON embedded in a DekuDeals item page, or {}."""
+    soup = BeautifulSoup(html, "html.parser")
+    script = soup.find("script", id="price_history_data")
+    if not script or not script.string:
+        return {}
+    try:
+        return json.loads(script.string)
+    except json.JSONDecodeError:
+        return {}
+
+
 def _parse_platforms(html: str) -> dict:
     """Extract Nintendo console availability from a DekuDeals item page.
 
@@ -333,18 +347,17 @@ def _fetch_eshop_prices(
     The wishlist shows the best price across all stores (eShop, Amazon, etc.). This
     function replaces those prices with eShop-only prices so retail discounts are ignored.
     """
-    to_fetch = [g for g in games if g.get("current", "Unavailable") != "Unavailable"]
-    if not to_fetch:
+    if not games:
         return
 
     cookies = [(c.name, c.value, c.domain, c.path) for c in session.cookies]
     headers = _make_headers(user_agent)
-    total = len(to_fetch)
+    total = len(games)
     log.info("_fetch_eshop_prices: fetching %d item pages (locale=%s)", total, locale)
 
     delay = 0.01
     results = []
-    for i, game in enumerate(to_fetch):
+    for i, game in enumerate(games):
         slug = game["slug"]
         while True:
             try:
@@ -358,7 +371,12 @@ def _fetch_eshop_prices(
                     timeout=30,
                 )
                 resp.raise_for_status()
-                results.append((slug, _parse_eshop_analytics(resp.text), _parse_platforms(resp.text)))
+                results.append((
+                    slug,
+                    _parse_eshop_analytics(resp.text),
+                    _parse_platforms(resp.text),
+                    _parse_price_history(resp.text),
+                ))
                 break
             except requests.exceptions.HTTPError as exc:
                 if exc.response is not None and exc.response.status_code == 429:
@@ -367,17 +385,17 @@ def _fetch_eshop_prices(
                     time.sleep(1.0)
                     continue
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}, {}))
+                results.append((slug, {}, {}, {}))
                 break
             except Exception as exc:
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}, {}))
+                results.append((slug, {}, {}, {}))
                 break
         if on_progress:
             on_progress(i + 1, total)
 
-    slug_to_game = {g["slug"]: g for g in to_fetch}
-    for slug, eshop, platforms in results:
+    slug_to_game = {g["slug"]: g for g in games}
+    for slug, eshop, platforms, history in results:
         game = slug_to_game.get(slug)
         if not game:
             continue
@@ -390,6 +408,7 @@ def _fetch_eshop_prices(
 
         value = eshop["value"]
         discount = eshop["discount"]
+        game["last_sale"] = last_sale_start(history, on_sale_now=discount > 0)
 
         if value == 0:
             game["current"] = "Unavailable"
@@ -405,6 +424,42 @@ def _fetch_eshop_prices(
             game["sale_end"] = ""
 
     log.info("_fetch_eshop_prices: done (locale=%s)", locale)
+
+
+def _refresh_performance(db_path: str, user_agent: str = None) -> None:
+    """Best-effort: fetch+parse the community FPS sheet and save it. Outage-safe.
+
+    Also refreshes handheld-performance.com data if stale (default: every 24h).
+    Only overwrites performance_cache on a successful, non-empty fetch, so a
+    transient sheet outage keeps the previous data instead of blanking it.
+    """
+    try:
+        rows = fetch_performance_sheet(user_agent=user_agent)
+        if rows:
+            save_performance_cache(rows, db_path)
+            log.info("_refresh_performance: saved %d entries", len(rows))
+        else:
+            log.warning("_refresh_performance: sheet parsed to 0 rows, keeping previous cache")
+    except Exception as exc:
+        log.warning("_refresh_performance: failed, keeping previous cache: %s", exc)
+
+    # Refresh handheld-performance.com data if stale
+    from app.performance import _HANDED_DATA_PATH, refresh_handheld_performance
+    from app.config import HANDED_REFRESH_TTL
+
+    if os.path.exists(_HANDED_DATA_PATH):
+        age = (time.time() - os.path.getmtime(_HANDED_DATA_PATH))
+        if HANDED_REFRESH_TTL > 0 and age >= HANDED_REFRESH_TTL:
+            log.info("_refresh_performance: handheld data is %dh old, refreshing", int(age / 3600))
+            count = refresh_handheld_performance()
+            if count:
+                log.info("_refresh_performance: saved %d handheld games", count)
+    elif HANDED_REFRESH_TTL > 0 or not os.path.exists(_HANDED_DATA_PATH):
+        # First run or forced refresh  
+        log.info("_refresh_performance: refreshing handheld data (initial)")
+        count = refresh_handheld_performance()
+        if count:
+            log.info("_refresh_performance: saved %d handheld games", count)
 
 
 def fetch_all_games(
@@ -469,6 +524,9 @@ def fetch_all_games(
     icon_exts = download_icons(games, user_agent=user_agent)
     for g in games:
         g["icon_ext"] = icon_exts.get(g["slug"], "")
+    if on_progress:
+        on_progress("performance", None, None, None)
+    _refresh_performance(db_path, user_agent=user_agent)
     ts = save_games_cache(games, db_path)
     log.info("fetch_all_games: done in %.2fs", time.monotonic() - t_start)
     return games, ts

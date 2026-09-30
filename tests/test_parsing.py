@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from app.parsing import parse_release_date, parse_sale_end
+from app.parsing import last_sale_start, parse_release_date, parse_sale_end
 
 
 # ── parse_release_date ─────────────────────────────────────────────────────────
@@ -129,3 +129,66 @@ def test_parse_sale_end_unparseable_returns_empty():
 def test_parse_sale_end_result_is_iso_format():
     result = parse_sale_end("in 5 hours")
     assert re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", result)
+
+
+# ── last_sale_start ───────────────────────────────────────────────────────────
+
+def _history(prices, headers=("Nintendo eShop",), start_day=1):
+    """Build a DekuDeals-shaped price history: one row per day, one price per header."""
+    rows = []
+    for i, p in enumerate(prices):
+        vals = list(p) if isinstance(p, tuple) else [p]
+        rows.append([f"2026-01-{start_day + i:02d}", None] + vals)
+    return {"headers": list(headers), "data": rows}
+
+
+def test_last_sale_start_finds_most_recent_sale():
+    h = _history([20, 20, 10, 10, 20, 20, 15, 15, 20])
+    assert last_sale_start(h) == "2026-01-07"
+
+
+def test_last_sale_start_current_sale():
+    h = _history([20, 20, 10, 10], )
+    assert last_sale_start(h, on_sale_now=True) == "2026-01-03"
+
+
+def test_last_sale_start_deeper_discount_keeps_sale_start():
+    h = _history([20, 15, 10, 10, 20])
+    assert last_sale_start(h) == "2026-01-02"
+
+
+def test_last_sale_start_never_on_sale():
+    assert last_sale_start(_history([20, 20, 20])) == ""
+
+
+def test_last_sale_start_price_increase_is_not_a_sale():
+    assert last_sale_start(_history([20, 20, 25, 25])) == ""
+
+
+def test_last_sale_start_permanent_price_cut_is_not_a_sale():
+    # sale on day 2, then a permanent cut on day 5 lasting longer than max_sale_days
+    h = _history([20, 10, 20, 20] + [12] * 20)
+    assert last_sale_start(h, max_sale_days=10) == "2026-01-02"
+
+
+def test_last_sale_start_history_begins_mid_sale():
+    # launched on sale: no regular price in history, but the page says it's discounted
+    h = _history([15, 15, 15])
+    assert last_sale_start(h, on_sale_now=True) == "2026-01-01"
+
+
+def test_last_sale_start_uses_only_eshop_series():
+    h = _history([(9, 20), (9, 20), (9, 10), (9, 20)],
+                 headers=("Walmart (physical)", "Nintendo eShop (digital)"))
+    assert last_sale_start(h) == "2026-01-03"
+
+
+def test_last_sale_start_multiple_eshop_series_uses_cheapest():
+    h = _history([(20, None), (20, 20), (20, 10), (20, 20)],
+                 headers=("Nintendo eShop (Switch)", "Nintendo eShop (Switch 2)"))
+    assert last_sale_start(h) == "2026-01-03"
+
+
+def test_last_sale_start_empty_or_malformed():
+    assert last_sale_start({}) == ""
+    assert last_sale_start({"headers": ["Amazon"], "data": [["2026-01-01", None, 5]]}) == ""

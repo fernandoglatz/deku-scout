@@ -385,7 +385,7 @@ def test_fetch_eshop_prices_replaces_amazon_price_with_eshop(monkeypatch):
     assert games[0]["sale_end"] == ""
 
 
-def test_fetch_eshop_prices_skips_unavailable_games(monkeypatch):
+def test_fetch_eshop_prices_includes_unavailable_for_platforms(monkeypatch):
     from app.scraper import _fetch_eshop_prices
     import requests
 
@@ -395,7 +395,10 @@ def test_fetch_eshop_prices_skips_unavailable_games(monkeypatch):
         def get(self, url, **kwargs):
             fetch_called.append(url)
             class R:
-                text = "<html></html>"
+                text = """<html><body>
+                <ul class="details"><li class="list-group-item">
+                <strong>Platforms:</strong>Nintendo Switch 2</li></ul>
+                </body></html>"""
                 def raise_for_status(self): pass
             return R()
 
@@ -405,7 +408,9 @@ def test_fetch_eshop_prices_skips_unavailable_games(monkeypatch):
               "discount": "", "sale_end": ""}]
     _fetch_eshop_prices(games, "us", _FakeSession())
 
-    assert fetch_called == []
+    assert fetch_called == ["https://www.dekudeals.com/items/upcoming-game"]
+    assert games[0]["switch2"] is True
+    assert games[0]["switch1"] is False
 
 
 def test_fetch_eshop_prices_retries_on_429(monkeypatch):
@@ -551,3 +556,67 @@ def test_parse_platforms_missing_line():
 def test_parse_platforms_no_details():
     from app.scraper import _parse_platforms
     assert _parse_platforms("<html><body>nope</body></html>") == {"switch1": False, "switch2": False}
+
+
+def test_refresh_performance_saves_on_success(temp_db, monkeypatch):
+    import app.scraper as scraper
+
+    monkeypatch.setattr(scraper, "fetch_performance_sheet",
+                        lambda **kw: {"arms": {"fps": 60, "label": "60fps", "patch_type": ""}})
+    saved = {}
+    monkeypatch.setattr(scraper, "save_performance_cache",
+                        lambda rows, db: saved.update(rows))
+    scraper._refresh_performance(temp_db, user_agent="x")
+    assert saved["arms"]["fps"] == 60
+
+
+def test_refresh_performance_swallows_errors(temp_db, monkeypatch):
+    import app.scraper as scraper
+
+    def boom(**kw):
+        raise RuntimeError("network down")
+
+    called = {"saved": False}
+    monkeypatch.setattr(scraper, "fetch_performance_sheet", boom)
+    monkeypatch.setattr(scraper, "save_performance_cache",
+                        lambda rows, db: called.update(saved=True))
+    # Must not raise, and must not save (so previous cache is preserved).
+    scraper._refresh_performance(temp_db, user_agent="x")
+    assert called["saved"] is False
+
+
+def test_refresh_performance_skips_empty(temp_db, monkeypatch):
+    import app.scraper as scraper
+
+    monkeypatch.setattr(scraper, "fetch_performance_sheet", lambda **kw: {})
+    called = {"saved": False}
+    monkeypatch.setattr(scraper, "save_performance_cache",
+                        lambda rows, db: called.update(saved=True))
+    scraper._refresh_performance(temp_db, user_agent="x")
+    assert called["saved"] is False
+
+
+# ── _parse_price_history / last_sale ──────────────────────────────────────────
+
+def test_parse_price_history_reads_script_json():
+    from app.scraper import _parse_price_history
+    html = ('<script id="price_history_data" type="application/json">'
+            '{"headers": ["Nintendo eShop"], "data": [["2026-01-01", null, 20]]}</script>')
+    assert _parse_price_history(html) == {"headers": ["Nintendo eShop"], "data": [["2026-01-01", None, 20]]}
+
+
+def test_parse_price_history_missing_or_invalid():
+    from app.scraper import _parse_price_history
+    assert _parse_price_history("<html></html>") == {}
+    assert _parse_price_history('<script id="price_history_data">not json</script>') == {}
+
+
+def test_merge_prices_keeps_last_sale_per_locale():
+    from app.scraper import merge_prices
+    base = {"name": "G", "slug": "g", "original": "", "current": "R$ 10", "discount": "", "release_date": ""}
+    result = merge_prices(
+        {"br": [dict(base, last_sale="2026-06-25")], "us": [dict(base, last_sale="2026-05-01")]},
+        reference_locale="br",
+    )
+    assert result[0]["prices"]["br"]["last_sale"] == "2026-06-25"
+    assert result[0]["prices"]["us"]["last_sale"] == "2026-05-01"

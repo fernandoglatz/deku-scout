@@ -7,7 +7,7 @@
     data-bestbuy="{{ g.best_buy }}"
     data-switch1="{{ '1' if g.switch1 else '0' }}"
     data-switch2="{{ '1' if g.switch2 else '0' }}">
-  <td>{{ loop.index }}</td>
+  <td class="idx">{{ loop.index }}</td>
   <td class="td-icon">
     <img class="game-icon" src="/icons/{{ g.slug }}{% if g.icon_ext %}.{{ g.icon_ext }}{% endif %}"
          onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'game-icon-placeholder',textContent:'🎮'}))"
@@ -16,7 +16,7 @@
   <td class="name"><a href="https://www.dekudeals.com/items/{{ g.slug }}" target="_blank" rel="noopener">{{ g.name }}</a></td>
   {% for locale in selected_locales %}
   {% set p = g.prices.get(locale, {}) %}
-  <td class="cur" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}" data-sort="{{ p.get('current', '') if p else '' }}">
+  <td class="cur" data-label="{{ countries[locale].symbol }} {{ locale.upper() }}" data-ph-slug="{{ g.slug }}" data-ph-currency="{{ locale }}" data-sort="{{ p.get('current', '') if p else '' }}">
     <span class="orig">{{ p.get('original', '') if p else '' }}</span><br>
     {%- set cur = p.get('current', '') if p else '' -%}
     {%- if not cur or cur == 'Unavailable' -%}
@@ -28,8 +28,8 @@
   </td>
   {% endfor %}
   {% if selected_locales|length > 1 %}
-  <td data-sort="{{ g.best_buy_label or '' }}">
-    {% if g.best_buy == 'eq' %}
+  <td class="bb" data-label="Best Buy" data-i18n-label="th.bestBuy" data-sort="{{ g.best_buy_label or '' }}">
+    {%- if g.best_buy == 'eq' %}
       <span class="bb-conv">{{ g.best_buy_label }}</span><br>
       <span class="bb-eq bb-save" data-i18n="bb.samePrice">≈ same price</span>
     {% elif g.best_buy == reference_locale %}
@@ -38,10 +38,14 @@
     {% elif g.best_buy %}
       <span class="bb-conv">{{ g.best_buy_label }}</span><br>
       <span class="bb-winner bb-save">▼ {{ g.best_buy_save }} <span data-i18n="bb.buyIn">buy in</span> {{ g.best_buy.upper() }}</span>
-    {% endif %}
+    {%- endif -%}
   </td>
   {% endif %}
-  <td class="rel-date" data-date="{{ g.release_date }}"></td>
-  <td class="sale-end" data-date="{{ g.sale_end }}"></td>
+  <td class="last-sale" data-label="Last Sale" data-i18n-label="th.lastSale" data-date="{{ g.prices.get(reference_locale, {}).get('last_sale', '') }}"></td>
+  <td class="perf" data-label="FPS" data-i18n-label="th.performance" data-sort="{{ g.perf_sort }}">
+    {%- if g.perf_label -%}{{ g.perf_label }}{% if g.perf_sw2 %} <span class="perf-s2">S2</span>{% endif %}{%- endif -%}
+  </td>
+  <td class="rel-date" data-label="Release Date" data-i18n-label="th.releaseDate" data-date="{{ g.release_date }}"></td>
+  <td class="sale-end" data-label="Sale Ends" data-i18n-label="th.saleEnds" data-date="{{ g.sale_end }}"></td>
 </tr>
 {% endfor %}
