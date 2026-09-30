@@ -594,3 +594,29 @@ def test_refresh_performance_skips_empty(temp_db, monkeypatch):
                         lambda rows, db: called.update(saved=True))
     scraper._refresh_performance(temp_db, user_agent="x")
     assert called["saved"] is False
+
+
+# ── _parse_price_history / last_sale ──────────────────────────────────────────
+
+def test_parse_price_history_reads_script_json():
+    from app.scraper import _parse_price_history
+    html = ('<script id="price_history_data" type="application/json">'
+            '{"headers": ["Nintendo eShop"], "data": [["2026-01-01", null, 20]]}</script>')
+    assert _parse_price_history(html) == {"headers": ["Nintendo eShop"], "data": [["2026-01-01", None, 20]]}
+
+
+def test_parse_price_history_missing_or_invalid():
+    from app.scraper import _parse_price_history
+    assert _parse_price_history("<html></html>") == {}
+    assert _parse_price_history('<script id="price_history_data">not json</script>') == {}
+
+
+def test_merge_prices_keeps_last_sale_per_locale():
+    from app.scraper import merge_prices
+    base = {"name": "G", "slug": "g", "original": "", "current": "R$ 10", "discount": "", "release_date": ""}
+    result = merge_prices(
+        {"br": [dict(base, last_sale="2026-06-25")], "us": [dict(base, last_sale="2026-05-01")]},
+        reference_locale="br",
+    )
+    assert result[0]["prices"]["br"]["last_sale"] == "2026-06-25"
+    assert result[0]["prices"]["us"]["last_sale"] == "2026-05-01"

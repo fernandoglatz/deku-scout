@@ -170,7 +170,7 @@
     thead th.col-drop-before { box-shadow: inset 2px 0 0 var(--accent); }
     thead th.col-drop-after  { box-shadow: inset -2px 0 0 var(--accent); }
     tbody tr { border-top: 1px solid var(--surface); transition: background .1s; }
-    tbody tr:hover { background: var(--row-hover) !important; }
+    @media (hover: hover) { tbody tr:hover { background: var(--row-hover) !important; } }
     tbody tr.on-sale { background: var(--sale-row); }
     tbody tr.unavailable { opacity: .4; }
     td { padding: .6rem .9rem; vertical-align: middle; }
@@ -198,12 +198,12 @@
     .sale-end  { color: var(--yellow); font-size: .78rem; white-space: nowrap; }
     .c-green   { color: var(--green); }
     .c-yellow  { color: var(--yellow); }
-    .rel-date  { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
+    .rel-date, .last-sale { color: var(--text-muted); font-size: .78rem; white-space: nowrap; }
+    .ls-days { display: block; font-size: .72rem; font-weight: 600; color: var(--text-sub); }
     .perf { white-space: nowrap; font-variant-numeric: tabular-nums; }
     .perf-s2 { font-size: .62rem; font-weight: 700; color: var(--accent);
                border: 1px solid var(--accent); border-radius: 3px;
                padding: 0 .2rem; vertical-align: middle; }
-    .perf-na { color: var(--text-muted); opacity: .4; }
     .ph-trigger { cursor: help; }
     #ph-popup {
       background: var(--surface); border: 1px solid var(--border);
@@ -297,6 +297,47 @@
         margin: 0.65rem auto 0.75rem;
       }
     }
+    .sort-mobile { display: none; gap: .5rem; align-items: center; width: 100%; }
+    .sort-mobile .lang-select { flex: 1; font-size: .8rem; font-weight: 600; letter-spacing: 0; }
+    /* phones: each row becomes a card (the table markup stays so sorting/filtering keep working) */
+    @media (max-width: 640px) {
+      .sort-mobile { display: flex; }
+      .table-wrap { overflow: visible; border: none; border-radius: 0; }
+      #tbl thead { display: none; }
+      #tbl, #tbl tbody { display: block; }
+      #tbl tbody tr {
+        display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .6rem;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: .75rem; margin-bottom: .6rem;
+      }
+      #tbl tbody tr.on-sale {
+        background: linear-gradient(var(--sale-row), var(--sale-row)), var(--surface);
+        border-color: rgba(16,185,129,.45);
+      }
+      #tbl td { display: block; padding: 0; }
+      #tbl td:empty, #tbl td.idx { display: none; }
+      #tbl td[data-label]::before {
+        content: attr(data-label); display: block;
+        font-size: .62rem; font-weight: 600; letter-spacing: .05em;
+        text-transform: uppercase; color: var(--text-muted);
+      }
+      /* fixed order so user column reordering (desktop) doesn't scramble cards */
+      #tbl td.td-icon { order: 1; }
+      #tbl td.name { order: 2; flex: 1 1 calc(100% - 3.5rem); min-width: 0; font-size: .95rem; line-height: 1.3; }
+      #tbl td.cur {
+        order: 3; flex: 1 1 0; min-width: 6rem;
+        background: var(--bg); border-radius: 8px; padding: .45rem .6rem;
+      }
+      #tbl td.bb { order: 4; flex: 1 1 100%; }
+      #tbl td.bb br { display: none; }
+      #tbl td.last-sale .ls-days { display: inline; }
+      #tbl td.last-sale .ls-days::before { content: ' · '; color: var(--text-muted); font-weight: 400; }
+      #tbl td.bb .bb-conv { margin-right: .4rem; }
+      #tbl td.perf, #tbl td.rel-date, #tbl td.sale-end, #tbl td.last-sale { order: 5; font-size: .78rem; }
+      #tbl td.perf::before, #tbl td.rel-date::before, #tbl td.sale-end::before, #tbl td.last-sale::before {
+        display: inline; margin-right: .3rem;
+      }
+    }
     .ph-tip {
       display: flex; align-items: center; gap: 1rem;
       background: var(--surface); border: 1px solid var(--border);
@@ -387,6 +428,10 @@
       {% endfor %}
       <button class="filter-btn" data-filter="bb-{{ reference_locale }}"><span data-i18n="filter.bestBuy">Best Buy</span> {{ reference_locale.upper() }}</button>
     {% endif %}
+    <div class="sort-mobile">
+      <select class="lang-select" id="sortSelect" aria-label="Sort by"></select>
+      <button class="theme-btn" id="sortDir" type="button" aria-label="Toggle sort direction">&#8593;</button>
+    </div>
   </div>
   <div class="ph-tip" id="ph-tip" style="display:none;" role="status" aria-live="polite">
     <span>📈</span>
@@ -408,6 +453,7 @@
           {% if selected_locales|length > 1 %}
           <th data-type="price" data-best-buy-col="1" data-i18n="th.bestBuy">Best Buy</th>
           {% endif %}
+          <th data-type="date" data-i18n="th.lastSale">Last Sale</th>
           <th data-type="num" data-i18n="th.performance">FPS</th>
           <th data-type="date" data-i18n="th.releaseDate">Release Date</th>
           <th data-type="date" data-i18n="th.saleEnds">Sale Ends</th>
@@ -453,6 +499,10 @@ window.I18n = (function () {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
       var val = strings[el.dataset.i18nPlaceholder];
       if (val !== undefined) el.placeholder = val;
+    });
+    document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
+      var val = strings[el.dataset.i18nLabel];
+      if (val !== undefined) el.dataset.label = val;
     });
   }
 
@@ -547,6 +597,15 @@ window.I18n = (function () {
       { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
   }
 
+  // Whole days from an ISO date (YYYY-MM-DD) to the viewer's today.
+  function daysSince(val) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(val);
+    if (!m) return null;
+    var now = new Date();
+    var today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.max(0, Math.round((today - Date.UTC(+m[1], +m[2] - 1, +m[3])) / 86400000));
+  }
+
   function applyDates() {
     var locale = I18n.localeString();
     var metaUpdatedEl = document.getElementById('meta-updated');
@@ -567,9 +626,25 @@ window.I18n = (function () {
     document.querySelectorAll('td.rel-date[data-date]').forEach(function (td) {
       td.textContent = formatReleaseDate(td.dataset.date, locale);
     });
+    document.querySelectorAll('td.last-sale[data-date]').forEach(function (td) {
+      td.textContent = ''; // stays empty (hidden on cards) when there's no sale
+      var val = td.dataset.date;
+      if (!val) return;
+      td.appendChild(document.createTextNode(formatReleaseDate(val, locale)));
+      var days = daysSince(val);
+      if (days === null) return;
+      var span = document.createElement('span');
+      span.className = 'ls-days';
+      span.textContent = days === 0 ? I18n.t('lastSale.today')
+        : I18n.t(days === 1 ? 'lastSale.dayAgo' : 'lastSale.daysAgo', { n: days });
+      td.appendChild(span);
+    });
   }
 
-  I18n.init(document.getElementById('langSelect'), applyDates);
+  I18n.init(document.getElementById('langSelect'), function () {
+    applyDates();
+    syncSortControl();
+  });
 
   var tbl = document.getElementById('tbl');
   if (!tbl) return;
@@ -586,6 +661,7 @@ window.I18n = (function () {
     if (th.dataset.i18n === 'th.performance') return 'perf';
     if (th.dataset.i18n === 'th.releaseDate') return 'reldate';
     if (th.dataset.i18n === 'th.saleEnds') return 'saleends';
+    if (th.dataset.i18n === 'th.lastSale') return 'lastsale';
     return 'col' + i;
   }
   allThs.forEach(function (th, i) { th.dataset.colKey = colKeyFor(th, i); });
@@ -603,7 +679,14 @@ window.I18n = (function () {
     var ths = [...headRow.children];
     var curKeys = ths.map(function (t) { return t.dataset.colKey; });
     var finalKeys = orderKeys.filter(function (k) { return curKeys.indexOf(k) !== -1; });
-    curKeys.forEach(function (k) { if (finalKeys.indexOf(k) === -1) finalKeys.push(k); });
+    // Columns missing from the saved order (e.g. newly added) go in at their
+    // default spot: right before the next default column that is placed.
+    curKeys.forEach(function (k, i) {
+      if (finalKeys.indexOf(k) !== -1) return;
+      var at = -1;
+      for (var j = i + 1; j < curKeys.length && at === -1; j++) at = finalKeys.indexOf(curKeys[j]);
+      if (at === -1) finalKeys.push(k); else finalKeys.splice(at, 0, k);
+    });
     var perm = finalKeys.map(function (k) { return curKeys.indexOf(k); });
     if (perm.every(function (oldIdx, j) { return oldIdx === j; })) return; // no change
     perm.forEach(function (oldIdx) { headRow.appendChild(ths[oldIdx]); });
@@ -665,6 +748,33 @@ window.I18n = (function () {
       return (a.cells[gi] ? a.cells[gi].textContent : '').localeCompare(b.cells[gi] ? b.cells[gi].textContent : '');
     });
     rows.forEach(function (r) { tbody.appendChild(r); });
+    syncSortControl();
+  }
+
+  // Phones hide the header, so a <select> + direction button mirror its sorting.
+  var sortSelect = document.getElementById('sortSelect');
+  var sortDirBtn = document.getElementById('sortDir');
+  function syncSortControl() {
+    if (!sortSelect || !allThs) return;
+    sortSelect.innerHTML = '';
+    allThs.forEach(function (th) {
+      if (!th.dataset.type || th.dataset.type === 'none') return;
+      var opt = document.createElement('option');
+      opt.value = th.dataset.colKey;
+      opt.textContent = th.textContent.trim();
+      sortSelect.appendChild(opt);
+    });
+    if (allThs[sortIdx]) sortSelect.value = allThs[sortIdx].dataset.colKey;
+    sortDirBtn.textContent = sortDir === 1 ? '↑' : '↓';
+  }
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function () {
+      var i = allThs.findIndex(function (th) { return th.dataset.colKey === sortSelect.value; });
+      if (i >= 0) { doSort(i, sortDir); saveUiState(); }
+    });
+    sortDirBtn.addEventListener('click', function () {
+      doSort(sortIdx >= 0 ? sortIdx : defaultColIdx(), -sortDir); saveUiState();
+    });
   }
 
   var suppressClick = false;
@@ -1174,8 +1284,9 @@ window.DekuError = (function () {
     (root || document).querySelectorAll('[data-ph-slug]').forEach(function (el) {
       el.classList.add('ph-trigger');
       if (isTouchDevice) {
-        el.addEventListener('touchend', function (e) {
-          e.preventDefault();
+        // 'click' (not touchend) so scrolling past a price doesn't open the sheet
+        el.addEventListener('click', function (e) {
+          if (e.target.closest('a')) return;
           dismissTip();
           if (popup.style.display === 'block' && currentKey === el.dataset.phSlug + ':' + (el.dataset.phCurrency || 'br')) {
             hideBottomSheet();

@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
 from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache
-from app.parsing import parse_release_date, parse_sale_end
+from app.parsing import last_sale_start, parse_release_date, parse_sale_end
 from app.performance import fetch_performance_sheet
 
 log = logging.getLogger(__name__)
@@ -149,6 +149,7 @@ def merge_prices(games_by_locale: dict[str, list[dict]], reference_locale: str) 
                 "original": g["original"],
                 "current": g["current"],
                 "discount": g["discount"],
+                "last_sale": g.get("last_sale", ""),
             }
             if name not in meta_by_name:
                 meta_by_name[name] = {
@@ -293,6 +294,18 @@ def _parse_eshop_analytics(html: str) -> dict:
     return {}
 
 
+def _parse_price_history(html: str) -> dict:
+    """Extract the price_history_data JSON embedded in a DekuDeals item page, or {}."""
+    soup = BeautifulSoup(html, "html.parser")
+    script = soup.find("script", id="price_history_data")
+    if not script or not script.string:
+        return {}
+    try:
+        return json.loads(script.string)
+    except json.JSONDecodeError:
+        return {}
+
+
 def _parse_platforms(html: str) -> dict:
     """Extract Nintendo console availability from a DekuDeals item page.
 
@@ -358,7 +371,12 @@ def _fetch_eshop_prices(
                     timeout=30,
                 )
                 resp.raise_for_status()
-                results.append((slug, _parse_eshop_analytics(resp.text), _parse_platforms(resp.text)))
+                results.append((
+                    slug,
+                    _parse_eshop_analytics(resp.text),
+                    _parse_platforms(resp.text),
+                    _parse_price_history(resp.text),
+                ))
                 break
             except requests.exceptions.HTTPError as exc:
                 if exc.response is not None and exc.response.status_code == 429:
@@ -367,17 +385,17 @@ def _fetch_eshop_prices(
                     time.sleep(1.0)
                     continue
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}, {}))
+                results.append((slug, {}, {}, {}))
                 break
             except Exception as exc:
                 log.warning("_fetch_eshop_prices: %s failed: %s", slug, exc)
-                results.append((slug, {}, {}))
+                results.append((slug, {}, {}, {}))
                 break
         if on_progress:
             on_progress(i + 1, total)
 
     slug_to_game = {g["slug"]: g for g in games}
-    for slug, eshop, platforms in results:
+    for slug, eshop, platforms, history in results:
         game = slug_to_game.get(slug)
         if not game:
             continue
@@ -390,6 +408,7 @@ def _fetch_eshop_prices(
 
         value = eshop["value"]
         discount = eshop["discount"]
+        game["last_sale"] = last_sale_start(history, on_sale_now=discount > 0)
 
         if value == 0:
             game["current"] = "Unavailable"
@@ -410,6 +429,7 @@ def _fetch_eshop_prices(
 def _refresh_performance(db_path: str, user_agent: str = None) -> None:
     """Best-effort: fetch+parse the community FPS sheet and save it. Outage-safe.
 
+    Also refreshes handheld-performance.com data if stale (default: every 24h).
     Only overwrites performance_cache on a successful, non-empty fetch, so a
     transient sheet outage keeps the previous data instead of blanking it.
     """

@@ -162,3 +162,15 @@ def test_annotate_performance_sw2_flag_from_dekudeals(temp_db):
     games = [{"name": "G", "switch2": True}]  # DekuDeals says SW2 version exists
     _annotate_performance(games, temp_db)
     assert games[0]["perf_sw2"] is True
+
+
+def test_games_table_last_sale_column_uses_reference_locale(client):
+    set_config("WISHLIST_URL", "https://www.dekudeals.com/wishlist/test", config_module.DB_FILE)
+    set_config("SELECTED_CURRENCIES", json.dumps(["br"]), config_module.DB_FILE)
+    save_games_cache([
+        {"name": "Had Sale", "slug": "had", "prices": {"br": {"current": "R$ 30", "last_sale": "2026-06-25"}}},
+        {"name": "Never", "slug": "never", "prices": {"br": {"current": "R$ 30"}}},
+    ], config_module.DB_FILE)
+    html = client.get("/api/games-table").get_data(as_text=True)
+    assert 'class="last-sale"' in html
+    assert 'data-date="2026-06-25"' in html

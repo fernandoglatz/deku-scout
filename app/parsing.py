@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 
 def parse_release_date(raw: str) -> str:
@@ -56,3 +56,42 @@ def parse_sale_end(raw: str) -> str:
         except ValueError:
             continue
     return ""
+
+
+def last_sale_start(history: dict, on_sale_now: bool = False, max_sale_days: int = 60) -> str:
+    """Return the ISO date the most recent eShop sale started, or "" if none.
+
+    `history` is DekuDeals' price_history_data: {"headers": [store, ...],
+    "data": [[date, _, price_per_store...], ...]}. Only "Nintendo eShop" series
+    are used (cheapest one per day when there are several, e.g. Switch/Switch 2).
+
+    A sale starts when the price drops below the regular price and ends when it
+    returns. A drop lasting longer than `max_sale_days` is a permanent price cut,
+    not a sale. `on_sale_now` (from the item page) covers histories that begin
+    mid-sale, where the regular price never appears.
+    """
+    headers = history.get("headers") or []
+    cols = [i + 2 for i, h in enumerate(headers) if "eshop" in str(h).lower()]
+    if not cols:
+        return ""
+
+    regular = last_price = None
+    start = prev_start = run_start = ""
+    in_sale = False
+    for row in history.get("data") or []:
+        prices = [row[c] for c in cols if c < len(row) and row[c] is not None]
+        if not prices:
+            continue
+        day, price = row[0], min(prices)
+        if price != last_price:
+            run_start, last_price = day, price
+        if regular is None or price >= regular:
+            regular, in_sale = price, False
+        elif not in_sale:
+            in_sale, prev_start, start = True, start, day
+        elif (date.fromisoformat(day) - date.fromisoformat(start)).days > max_sale_days:
+            regular, in_sale, start = price, False, prev_start
+
+    if on_sale_now and not in_sale:
+        return run_start
+    return start
