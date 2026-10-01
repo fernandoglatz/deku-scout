@@ -1,5 +1,6 @@
 import re
 from datetime import date, datetime, timedelta, timezone
+from typing import Optional
 
 
 def parse_release_date(raw: str) -> str:
@@ -58,18 +59,22 @@ def parse_sale_end(raw: str) -> str:
     return ""
 
 
-def last_sale_end(history: dict, max_sale_days: int = 60) -> str:
-    """Return the last day (ISO date) of the most recent finished eShop sale, or "".
+def last_price_event(history: dict, on_sale_now: Optional[bool] = None, max_sale_days: int = 60) -> str:
+    """Return the ISO date of the most recent eShop price event, or "".
+
+    Events: a sale that ended (its last day on sale), a permanent price drop or
+    a price increase (the day the new price started). A sale still running at
+    the end of the history is not an event.
 
     `history` is DekuDeals' price_history_data: {"headers": [store, ...],
     "data": [[date, _, price_per_store...], ...]}. Only "Nintendo eShop" series
     are used (cheapest one per day when there are several, e.g. Switch/Switch 2).
 
-    A sale starts when the price drops below the regular price and ends when it
-    returns. A sale still running at the end of the history is ignored. A drop
-    lasting longer than `max_sale_days` is a permanent price cut, not a sale.
-    Histories can begin mid-sale (launch discounts): a short opening stretch
-    that later rises counts as a sale.
+    A drop below the regular price is a sale until it lasts longer than
+    `max_sale_days`, then it's a permanent price drop. `on_sale_now` (the item
+    page's discount flag) settles a recent drop early: False means the lower
+    price is the new regular price. Histories can begin mid-sale (launch
+    discounts): a short opening stretch that later rises counts as a sale.
     """
     headers = history.get("headers") or []
     cols = [i + 2 for i, h in enumerate(headers) if "eshop" in str(h).lower()]
@@ -91,24 +96,31 @@ def last_sale_end(history: dict, max_sale_days: int = 60) -> str:
     def days(a: str, b: str) -> int:
         return (date.fromisoformat(b) - date.fromisoformat(a)).days
 
-    last_end = ""
+    event = ""
     regular = None
     sale_start = sale_end = ""
     for i, (first, last, price) in enumerate(runs):
         if i == 0:
             nxt = runs[1] if len(runs) > 1 else None
             if nxt and nxt[2] > price and days(first, nxt[0]) <= max_sale_days:
-                last_end = last  # history began mid-sale; the next run seeds regular
+                event = last  # history began mid-sale; the next run seeds regular
             else:
                 regular = price
             continue
-        if regular is None or price >= regular:
+        if regular is None:
+            regular = price
+            continue
+        if price >= regular:
             if sale_start:
-                last_end = sale_end
+                event = sale_end
+            if price > regular:
+                event = first  # price increase
             regular, sale_start = price, ""
         else:
             sale_start = sale_start or first
             sale_end = last
-            if days(sale_start, last) > max_sale_days:  # permanent price cut
-                regular, sale_start = price, ""
-    return last_end
+            if days(sale_start, last) > max_sale_days:  # permanent price drop
+                event, regular, sale_start = first, price, ""
+    if sale_start and on_sale_now is False:
+        event = runs[-1][0]  # below regular with no discount: a price drop
+    return event

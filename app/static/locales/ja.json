@@ -27,7 +27,7 @@
   "th.bestBuy": "最安値",
   "th.releaseDate": "発売日",
   "th.saleEnds": "セール終了",
-  "th.lastSale": "前回のセール",
+  "th.lastPriceChange": "最終価格変更",
   "lastSale.today": "今日",
   "lastSale.dayAgo": "1日前",
   "lastSale.daysAgo": "{n}日前",

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from app.parsing import last_sale_end, parse_release_date, parse_sale_end
+from app.parsing import last_price_event, parse_release_date, parse_sale_end
 
 
 # ── parse_release_date ─────────────────────────────────────────────────────────
@@ -131,7 +131,7 @@ def test_parse_sale_end_result_is_iso_format():
     assert re.match(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", result)
 
 
-# ── last_sale_end ─────────────────────────────────────────────────────────────
+# ── last_price_event ──────────────────────────────────────────────────────────
 
 def _history(prices, headers=("Nintendo eShop",), start_day=1):
     """Build a DekuDeals-shaped price history: one row per day, one price per header."""
@@ -142,64 +142,75 @@ def _history(prices, headers=("Nintendo eShop",), start_day=1):
     return {"headers": list(headers), "data": rows}
 
 
-def test_last_sale_end_is_last_day_of_most_recent_finished_sale():
+def test_last_price_event_is_last_day_of_most_recent_finished_sale():
     h = _history([20, 20, 10, 10, 20, 20, 15, 15, 20])
-    assert last_sale_end(h) == "2026-01-08"
+    assert last_price_event(h) == "2026-01-08"
 
 
-def test_last_sale_end_ignores_current_sale():
+def test_last_price_event_ignores_current_sale():
     h = _history([20, 10, 10, 20, 20, 15, 15])
-    assert last_sale_end(h) == "2026-01-03"
+    assert last_price_event(h) == "2026-01-03"
 
 
-def test_last_sale_end_deeper_discount_is_one_sale():
+def test_last_price_event_deeper_discount_is_one_sale():
     h = _history([20, 15, 10, 10, 20])
-    assert last_sale_end(h) == "2026-01-04"
+    assert last_price_event(h) == "2026-01-04"
 
 
-def test_last_sale_end_never_on_sale():
-    assert last_sale_end(_history([20, 20, 20])) == ""
+def test_last_price_event_never_on_sale():
+    assert last_price_event(_history([20, 20, 20])) == ""
 
 
-def test_last_sale_end_price_increase_is_not_a_sale():
-    assert last_sale_end(_history([20, 20, 20, 25, 25]), max_sale_days=1) == ""
-    assert last_sale_end(_history([20, 10, 20, 20, 25, 25])) == "2026-01-02"
+def test_last_price_event_price_increase_shows_day_it_rose():
+    assert last_price_event(_history([20, 20, 20, 25, 25]), max_sale_days=1) == "2026-01-04"
+    # sale ended 01-02, then the price rose on 01-05: the later event wins
+    assert last_price_event(_history([20, 10, 20, 20, 25, 25])) == "2026-01-05"
 
 
-def test_last_sale_end_permanent_price_cut_is_not_a_sale():
-    # sale on day 2, then a permanent cut from day 5 lasting longer than max_sale_days
+def test_last_price_event_permanent_price_cut_shows_day_it_dropped():
+    # Donkey Kong Bananza on prod: R$ 439.90 -> R$ 389.90 for good
+    h = _history([439.9] * 3 + [389.9] * 10)
+    assert last_price_event(h, max_sale_days=5) == "2026-01-04"
+    # sale on day 2, then a permanent cut from day 5
     h = _history([20, 10, 20, 20] + [12] * 20)
-    assert last_sale_end(h, max_sale_days=10) == "2026-01-02"
+    assert last_price_event(h, max_sale_days=10) == "2026-01-05"
 
 
-def test_last_sale_end_history_begins_mid_sale_then_ends():
+def test_last_price_event_recent_drop_without_discount_is_a_price_cut():
+    h = _history([44, 44, 44, 39, 39])
+    assert last_price_event(h, on_sale_now=False) == "2026-01-04"
+    assert last_price_event(h, on_sale_now=True) == ""   # a sale still running
+    assert last_price_event(h) == ""                     # unknown: treated as a sale
+
+
+def test_last_price_event_history_begins_mid_sale_then_ends():
     # Woodo on prod: tracked from launch at R$ 89.60, R$ 112 a month later
     h = _history([(89.6, None), (89.6, 89.6), (89.6, 89.6), (112.0, 112.0), (112.0, 112.0)],
                  headers=("Nintendo eShop (Switch)", "Nintendo eShop (Switch 2)"))
-    assert last_sale_end(h) == "2026-01-03"
+    assert last_price_event(h) == "2026-01-03"
 
 
-def test_last_sale_end_long_first_stretch_then_rise_is_price_increase():
+def test_last_price_event_long_first_stretch_then_rise_is_price_increase():
     h = _history([15] * 20 + [20, 20])
-    assert last_sale_end(h, max_sale_days=10) == ""
+    assert last_price_event(h, max_sale_days=10) == "2026-01-21"
 
 
-def test_last_sale_end_history_begins_mid_sale_still_running():
-    assert last_sale_end(_history([15, 15, 15])) == ""
+def test_last_price_event_history_begins_mid_sale_still_running():
+    assert last_price_event(_history([15, 15, 15])) == ""
 
 
-def test_last_sale_end_uses_only_eshop_series():
+def test_last_price_event_uses_only_eshop_series():
     h = _history([(9, 20), (9, 20), (9, 10), (9, 20)],
                  headers=("Walmart (physical)", "Nintendo eShop (digital)"))
-    assert last_sale_end(h) == "2026-01-03"
+    assert last_price_event(h) == "2026-01-03"
 
 
-def test_last_sale_end_multiple_eshop_series_uses_cheapest():
+def test_last_price_event_multiple_eshop_series_uses_cheapest():
     h = _history([(20, None), (20, 20), (20, 10), (20, 20)],
                  headers=("Nintendo eShop (Switch)", "Nintendo eShop (Switch 2)"))
-    assert last_sale_end(h) == "2026-01-03"
+    assert last_price_event(h) == "2026-01-03"
 
 
-def test_last_sale_end_empty_or_malformed():
-    assert last_sale_end({}) == ""
-    assert last_sale_end({"headers": ["Amazon"], "data": [["2026-01-01", None, 5]]}) == ""
+def test_last_price_event_empty_or_malformed():
+    assert last_price_event({}) == ""
+    assert last_price_event({"headers": ["Amazon"], "data": [["2026-01-01", None, 5]]}) == ""

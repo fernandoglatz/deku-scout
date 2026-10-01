@@ -27,7 +27,7 @@
   "th.bestBuy": "Melhor compra",
   "th.releaseDate": "Lançamento",
   "th.saleEnds": "Promoção até",
-  "th.lastSale": "Última promoção",
+  "th.lastPriceChange": "Última mudança de preço",
   "lastSale.today": "hoje",
   "lastSale.dayAgo": "há 1 dia",
   "lastSale.daysAgo": "há {n} dias",
