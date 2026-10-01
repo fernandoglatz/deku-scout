@@ -453,7 +453,7 @@
           {% if selected_locales|length > 1 %}
           <th data-type="price" data-best-buy-col="1" data-i18n="th.bestBuy">Best Buy</th>
           {% endif %}
-          <th data-type="date" data-i18n="th.lastSale">Last Sale</th>
+          <th data-type="date" data-i18n="th.lastPriceChange">Last Price Change</th>
           <th data-type="num" data-i18n="th.performance">FPS</th>
           <th data-type="date" data-i18n="th.releaseDate">Release Date</th>
           <th data-type="date" data-i18n="th.saleEnds">Sale Ends</th>
@@ -651,7 +651,7 @@ window.I18n = (function () {
     if (th.dataset.i18n === 'th.performance') return 'perf';
     if (th.dataset.i18n === 'th.releaseDate') return 'reldate';
     if (th.dataset.i18n === 'th.saleEnds') return 'saleends';
-    if (th.dataset.i18n === 'th.lastSale') return 'lastsale';
+    if (th.dataset.i18n === 'th.lastPriceChange') return 'lastsale';
     return 'col' + i;
   }
   allThs.forEach(function (th, i) { th.dataset.colKey = colKeyFor(th, i); });

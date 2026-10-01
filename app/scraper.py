@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
 from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache
-from app.parsing import last_sale_end, parse_release_date, parse_sale_end
+from app.parsing import last_price_event, parse_release_date, parse_sale_end
 from app.performance import fetch_performance_sheet
 
 log = logging.getLogger(__name__)
@@ -408,7 +408,8 @@ def _fetch_eshop_prices(
 
         value = eshop["value"]
         discount = eshop["discount"]
-        game["last_sale_end"] = last_sale_end(history)
+        # key predates price changes; kept so existing caches stay valid
+        game["last_sale_end"] = last_price_event(history, on_sale_now=discount > 0)
 
         if value == 0:
             game["current"] = "Unavailable"
