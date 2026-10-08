@@ -56,6 +56,9 @@ HISTORY_CACHE_TTL = 6 * 60 * 60
 PERFORMANCE_SHEET_ID = os.environ.get("PERFORMANCE_SHEET_ID", "1sOYZRiOuD9Cnr-e_hlzhRuxuEq5X5Ptwq4yCfwxyfFk")
 PERFORMANCE_SHEET_GID = os.environ.get("PERFORMANCE_SHEET_GID", "0")
 
+# Switchplaza games API: per-mode (docked/handheld) resolution and fps.
+SWITCHPLAZA_API_URL = os.environ.get("SWITCHPLAZA_API_URL", "https://switchplaza.net/api/games")
+
 # Handheld-performance.com data refresh interval (seconds). Scraping all games
 # takes ~90s, so this defaults to 24 hours. Set to 0 to disable auto-refresh.
 HANDED_REFRESH_TTL = int(os.environ.get("HANDED_REFRESH_TTL", str(24 * 60 * 60)))

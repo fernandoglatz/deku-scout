@@ -9,9 +9,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from app.config import COUNTRIES, DB_FILE, HEADERS, ICONS_DIR, LOCALE_URL, NO_DECIMAL_ISOS, WISHLIST_URL
-from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache
+from app.db import load_cookies, save_cookies, save_games_cache, save_performance_cache, save_switchplaza_cache
 from app.parsing import last_price_event, parse_release_date, parse_sale_end
-from app.performance import fetch_performance_sheet
+from app.performance import fetch_performance_sheet, fetch_switchplaza
 
 log = logging.getLogger(__name__)
 
@@ -428,11 +428,11 @@ def _fetch_eshop_prices(
 
 
 def _refresh_performance(db_path: str, user_agent: str = None) -> None:
-    """Best-effort: fetch+parse the community FPS sheet and save it. Outage-safe.
+    """Best-effort: fetch+parse the community FPS sheet and Switchplaza and save them. Outage-safe.
 
     Also refreshes handheld-performance.com data if stale (default: every 24h).
-    Only overwrites performance_cache on a successful, non-empty fetch, so a
-    transient sheet outage keeps the previous data instead of blanking it.
+    Each cache is only overwritten on a successful, non-empty fetch of its own
+    source, so a transient outage keeps the previous data instead of blanking it.
     """
     try:
         rows = fetch_performance_sheet(user_agent=user_agent)
@@ -443,6 +443,16 @@ def _refresh_performance(db_path: str, user_agent: str = None) -> None:
             log.warning("_refresh_performance: sheet parsed to 0 rows, keeping previous cache")
     except Exception as exc:
         log.warning("_refresh_performance: failed, keeping previous cache: %s", exc)
+
+    try:
+        rows = fetch_switchplaza(user_agent=user_agent)
+        if rows:
+            save_switchplaza_cache(rows, db_path)
+            log.info("_refresh_performance: saved %d switchplaza entries", len(rows))
+        else:
+            log.warning("_refresh_performance: switchplaza parsed to 0 rows, keeping previous cache")
+    except Exception as exc:
+        log.warning("_refresh_performance: switchplaza failed, keeping previous cache: %s", exc)
 
     # Refresh handheld-performance.com data if stale
     from app.performance import _HANDED_DATA_PATH, refresh_handheld_performance

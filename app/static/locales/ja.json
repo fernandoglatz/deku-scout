@@ -32,6 +32,8 @@
   "lastSale.dayAgo": "1日前",
   "lastSale.daysAgo": "{n}日前",
   "cell.unavailable": "入手不可",
+  "perf.docked": "TVモード",
+  "perf.handheld": "携帯モード",
   "bb.samePrice": "≈ 同一価格",
   "bb.buyIn": "で購入",
   "sale.expired": "終了",
