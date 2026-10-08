@@ -32,6 +32,8 @@
   "lastSale.dayAgo": "há 1 dia",
   "lastSale.daysAgo": "há {n} dias",
   "cell.unavailable": "Indisponível",
+  "perf.docked": "Modo TV",
+  "perf.handheld": "Modo portátil",
   "bb.samePrice": "≈ mesmo preço",
   "bb.buyIn": "comprar em",
   "sale.expired": "Expirado",

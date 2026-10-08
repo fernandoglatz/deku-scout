@@ -42,8 +42,11 @@
   </td>
   {% endif %}
   <td class="last-sale" data-label="Last Price Change" data-i18n-label="th.lastPriceChange" data-date="{{ g.prices.get(reference_locale, {}).get('last_sale_end', '') }}"></td>
-  <td class="perf" data-label="FPS" data-i18n-label="th.performance" data-sort="{{ g.perf_sort }}">
-    {%- if g.perf_label -%}{{ g.perf_label }}{% if g.perf_sw2 %} <span class="perf-s2">S2</span>{% endif %}{%- endif -%}
+  <td class="perf" data-label="FPS" data-i18n-label="th.performance" data-sort="{{ g.perf_sort }}"
+      {%- if g.perf_docked %} data-perf-docked="{{ g.perf_docked }}"{% endif %}
+      {%- if g.perf_handheld %} data-perf-handheld="{{ g.perf_handheld }}"{% endif %}>
+    {%- if g.perf_label -%}{{ g.perf_label }}{% if g.perf_sw2 %} <span class="perf-s2">S2</span>{% endif %}
+    {%- if g.perf_res %}<span class="perf-res">{{ g.perf_res }}</span>{% endif %}{%- endif -%}
   </td>
   <td class="rel-date" data-label="Release Date" data-i18n-label="th.releaseDate" data-date="{{ g.release_date }}"></td>
   <td class="sale-end" data-label="Sale Ends" data-i18n-label="th.saleEnds" data-date="{{ g.sale_end }}"></td>

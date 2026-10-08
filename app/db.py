@@ -176,6 +176,38 @@ def load_performance_cache(db_path: str) -> dict:
         return {}
 
 
+_SWITCHPLAZA_COLS = ("fps", "label", "resolution", "patch_type", "docked", "handheld")
+
+
+def save_switchplaza_cache(rows: dict, db_path: str) -> None:
+    """Replace the Switchplaza cache with {norm_name: {fps,label,resolution,patch_type,docked,handheld}}."""
+    ts = time.time()
+    defaults = {"fps": 0}
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("DELETE FROM switchplaza_cache")
+        conn.executemany(
+            "INSERT OR REPLACE INTO switchplaza_cache"
+            f" (norm_name, {', '.join(_SWITCHPLAZA_COLS)}, fetched_at) VALUES (?,?,?,?,?,?,?,?)",
+            [
+                (k, *(v.get(c, defaults.get(c, "")) for c in _SWITCHPLAZA_COLS), ts)
+                for k, v in rows.items()
+            ],
+        )
+        conn.commit()
+
+
+def load_switchplaza_cache(db_path: str) -> dict:
+    """Return {norm_name: {fps,label,resolution,patch_type,docked,handheld}}. Empty dict if table absent."""
+    try:
+        with sqlite3.connect(db_path) as conn:
+            rows = conn.execute(
+                f"SELECT norm_name, {', '.join(_SWITCHPLAZA_COLS)} FROM switchplaza_cache"
+            ).fetchall()
+        return {r[0]: dict(zip(_SWITCHPLAZA_COLS, r[1:])) for r in rows}
+    except sqlite3.OperationalError:
+        return {}
+
+
 def get_config(key: str, db_path: Optional[str] = None) -> Optional[str]:
     """Retrieve a config value from the database."""
     with sqlite3.connect(db_path or DB_FILE) as conn:

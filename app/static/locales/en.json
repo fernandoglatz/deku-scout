@@ -32,6 +32,8 @@
   "lastSale.dayAgo": "1 day ago",
   "lastSale.daysAgo": "{n} days ago",
   "cell.unavailable": "Unavailable",
+  "perf.docked": "Docked",
+  "perf.handheld": "Handheld",
   "bb.samePrice": "≈ same price",
   "bb.buyIn": "buy in",
   "sale.expired": "Expired",

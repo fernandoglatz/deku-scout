@@ -204,6 +204,8 @@
     .perf-s2 { font-size: .62rem; font-weight: 700; color: var(--accent);
                border: 1px solid var(--accent); border-radius: 3px;
                padding: 0 .2rem; vertical-align: middle; }
+    .perf-res { display: block; font-size: .72rem; font-weight: 600; color: var(--text-sub); }
+    td.perf[title] { cursor: help; }
     .ph-trigger { cursor: help; }
     #ph-popup {
       background: var(--surface); border: 1px solid var(--border);
@@ -332,6 +334,8 @@
       #tbl td.bb br { display: none; }
       #tbl td.last-sale .ls-days { display: inline; }
       #tbl td.last-sale .ls-days::before { content: ' · '; color: var(--text-muted); font-weight: 400; }
+      #tbl td.perf .perf-res { display: inline; }
+      #tbl td.perf .perf-res::before { content: ' · '; color: var(--text-muted); font-weight: 400; }
       #tbl td.bb .bb-conv { margin-right: .4rem; }
       #tbl td.perf, #tbl td.rel-date, #tbl td.sale-end, #tbl td.last-sale { order: 5; font-size: .78rem; }
       #tbl td.perf::before, #tbl td.rel-date::before, #tbl td.sale-end::before, #tbl td.last-sale::before {
@@ -505,6 +509,12 @@ window.I18n = (function () {
     document.querySelectorAll('[data-i18n-label]').forEach(function (el) {
       var val = strings[el.dataset.i18nLabel];
       if (val !== undefined) el.dataset.label = val;
+    });
+    document.querySelectorAll('td.perf[data-perf-docked], td.perf[data-perf-handheld]').forEach(function (el) {
+      var lines = [];
+      if (el.dataset.perfDocked) lines.push(t('perf.docked') + ': ' + el.dataset.perfDocked);
+      if (el.dataset.perfHandheld) lines.push(t('perf.handheld') + ': ' + el.dataset.perfHandheld);
+      el.title = lines.join('\n');
     });
   }
 

@@ -19,7 +19,7 @@ Visit `/demo` on any running instance to auto-configure the demo wishlist and go
 - Converts regional prices to your reference currency using live exchange rates
 - Highlights the best-buy region and how much you save vs. the reference price
 - Shows sale badges, sale end dates, and release dates
-- Performance (FPS) column showing each game's framerate on Switch 2 hardware — sourced from a community [Switch 2 FPS/Resolution list](https://docs.google.com/spreadsheets/d/1sOYZRiOuD9Cnr-e_hlzhRuxuEq5X5Ptwq4yCfwxyfFk); games with no data show blank
+- Performance (FPS) column showing each game's framerate and resolution on Switch 2 hardware (hover for every docked/handheld mode) — sourced from [Switch Plaza](https://switchplaza.net/?view=all), with the community [Switch 2 FPS/Resolution list](https://docs.google.com/spreadsheets/d/1sOYZRiOuD9Cnr-e_hlzhRuxuEq5X5Ptwq4yCfwxyfFk) and handheld-performance.com as fallbacks; games with no data show blank
 - Caches game data locally (SQLite) with configurable TTL — no repeated scraping
 - Displays and caches game cover art locally
 - Price history chart per game (hover on desktop, tap on mobile)
@@ -86,6 +86,7 @@ Environment variables (used at startup / for Docker):
 | `APP_VERSION`  | git branch / `dev` | Version label shown in the UI header; baked into the Docker image from the release tag |
 | `PERFORMANCE_SHEET_ID` | community sheet | Google Sheet ID for the FPS/performance data source |
 | `PERFORMANCE_SHEET_GID` | `0` | Tab (gid) within the performance sheet to read |
+| `SWITCHPLAZA_API_URL` | `https://switchplaza.net/api/games` | Switch Plaza games API used for per-mode FPS and resolution |
 
 ## User Management
 

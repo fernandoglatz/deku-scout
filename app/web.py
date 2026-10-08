@@ -22,6 +22,7 @@ from app.db import (
     get_config,
     load_games_cache,
     load_performance_cache,
+    load_switchplaza_cache,
     save_price_history_cache,
     set_config,
 )
@@ -271,40 +272,50 @@ def _compute_best_buy(games: list[dict], selected_locales: list[str], reference_
         g["sale_end"] = sale_ends.get(effective, g.get("sale_end", ""))
 
 
-_SW2_PATCH_TYPES = {"Switch 2 Edition", "Free Update"}
+_SW2_PATCH_TYPES = {"Switch 2 Edition", "Free Update", "Switch 2", "Switch 2 Enhanced"}
 
 
 def _annotate_performance(games: list[dict], db_path: str) -> None:
-    """Set perf_label/perf_sort/perf_sw2 on each game from performance_cache.
+    """Set perf_label/perf_sort/perf_sw2/perf_res/perf_docked/perf_handheld on each game.
 
-    Smart column: show the sheet's fps; mark perf_sw2 when a genuine Switch 2
-    version exists (DekuDeals switch2 flag OR a Switch 2 patch type).
-    Falls back to fuzzy name matching for abbreviation/variant mismatches.
-    Second fallback: handheld-performance.com data (no patch_type info).
+    Sources, best first: Switchplaza (fps + resolution per mode), the community
+    sheet (fps + patch type), handheld-performance.com. Switchplaza is matched
+    by exact name, then ignoring generic edition suffixes ("Gold Edition",
+    "Nintendo Switch 2 Edition") -- ahead of the sheet, since its row may be the
+    Switch 2 Edition -- but never fuzzily: its catalogue is large enough that
+    fuzzy_match pairs unrelated titles ("Resident Evil 3" -> "Resident Evil Generation Pack").
+    The other sources fall back to fuzzy matching. perf_sw2 marks a genuine
+    Switch 2 version (DekuDeals switch2 flag OR a Switch 2 patch/console type).
     """
-    from app.performance import fuzzy_match, load_handheld_performance
+    from app.performance import build_edition_index, edition_match, fuzzy_match, load_handheld_performance
 
+    switchplaza = load_switchplaza_cache(db_path)
+    switchplaza_editions = build_edition_index(switchplaza)
     perf = load_performance_cache(db_path)
     handheld_perf = load_handheld_performance()
     for g in games:
         name = g.get("name", "")
         norm_name = normalize_name(name)
-        row = perf.get(norm_name)
-        if not row:
-            _, row = fuzzy_match(name, perf)
-        if not row:
-            # Try handheld-performance.com data as second fallback
-            row = handheld_perf.get(norm_name)
-            if not row:
-                _, row = fuzzy_match(name, handheld_perf)
+        row = (switchplaza.get(norm_name)
+               or edition_match(norm_name, switchplaza_editions)
+               or perf.get(norm_name)
+               or fuzzy_match(name, perf)[1]
+               or handheld_perf.get(norm_name)
+               or fuzzy_match(name, handheld_perf)[1])
         if not row:
             g["perf_label"] = ""
             g["perf_sort"] = 0
             g["perf_sw2"] = False
+            g["perf_res"] = ""
+            g["perf_docked"] = ""
+            g["perf_handheld"] = ""
             continue
         g["perf_label"] = row["label"]
         g["perf_sort"] = row["fps"]
         g["perf_sw2"] = bool(g.get("switch2")) or row.get("patch_type") in _SW2_PATCH_TYPES
+        g["perf_res"] = row.get("resolution", "")
+        g["perf_docked"] = row.get("docked", "")
+        g["perf_handheld"] = row.get("handheld", "")
 
 
 @web_bp.route("/")

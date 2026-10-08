@@ -620,3 +620,80 @@ def test_merge_prices_keeps_last_sale_end_per_locale():
     )
     assert result[0]["prices"]["br"]["last_sale_end"] == "2026-06-25"
     assert result[0]["prices"]["us"]["last_sale_end"] == "2026-05-01"
+
+
+# ---------------------------------------------------------------------------
+# _refresh_performance
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def no_handheld_refresh(monkeypatch):
+    import app.config as config_module
+    import app.performance as perf
+    monkeypatch.setattr(config_module, "HANDED_REFRESH_TTL", 0)
+    monkeypatch.setattr(perf, "refresh_handheld_performance", lambda: 0)
+
+
+_SP_ROW = {"fps": 60, "label": "60fps", "resolution": "1080p", "patch_type": "Switch 2",
+           "docked": "1080P 60 FPS", "handheld": ""}
+
+
+def test_refresh_performance_saves_sheet_and_switchplaza(temp_db, monkeypatch, no_handheld_refresh):
+    import app.scraper as scraper
+    from app.db import load_performance_cache, load_switchplaza_cache
+
+    monkeypatch.setattr(scraper, "fetch_performance_sheet",
+                        lambda user_agent=None: {"a": {"fps": 30, "label": "30fps", "patch_type": ""}})
+    captured = {}
+
+    def fake_sp(user_agent=None):
+        captured["ua"] = user_agent
+        return {"b": _SP_ROW}
+
+    monkeypatch.setattr(scraper, "fetch_switchplaza", fake_sp)
+    scraper._refresh_performance(temp_db, user_agent="UA/1")
+    assert set(load_performance_cache(temp_db)) == {"a"}
+    assert load_switchplaza_cache(temp_db) == {"b": _SP_ROW}
+    assert captured["ua"] == "UA/1"
+
+
+def test_refresh_performance_switchplaza_failure_keeps_previous_cache(temp_db, monkeypatch, no_handheld_refresh):
+    import app.scraper as scraper
+    from app.db import load_performance_cache, load_switchplaza_cache, save_switchplaza_cache
+
+    save_switchplaza_cache({"old": _SP_ROW}, temp_db)
+    monkeypatch.setattr(scraper, "fetch_performance_sheet",
+                        lambda user_agent=None: {"a": {"fps": 30, "label": "30fps", "patch_type": ""}})
+
+    def boom(user_agent=None):
+        raise RuntimeError("switchplaza down")
+
+    monkeypatch.setattr(scraper, "fetch_switchplaza", boom)
+    scraper._refresh_performance(temp_db)
+    assert set(load_switchplaza_cache(temp_db)) == {"old"}
+    # The sheet still refreshes when Switchplaza fails
+    assert set(load_performance_cache(temp_db)) == {"a"}
+
+
+def test_refresh_performance_empty_switchplaza_keeps_previous_cache(temp_db, monkeypatch, no_handheld_refresh):
+    import app.scraper as scraper
+    from app.db import load_switchplaza_cache, save_switchplaza_cache
+
+    save_switchplaza_cache({"old": _SP_ROW}, temp_db)
+    monkeypatch.setattr(scraper, "fetch_performance_sheet", lambda user_agent=None: {})
+    monkeypatch.setattr(scraper, "fetch_switchplaza", lambda user_agent=None: {})
+    scraper._refresh_performance(temp_db)
+    assert set(load_switchplaza_cache(temp_db)) == {"old"}
+
+
+def test_refresh_performance_sheet_failure_still_refreshes_switchplaza(temp_db, monkeypatch, no_handheld_refresh):
+    import app.scraper as scraper
+    from app.db import load_switchplaza_cache
+
+    def boom(user_agent=None):
+        raise RuntimeError("sheet down")
+
+    monkeypatch.setattr(scraper, "fetch_performance_sheet", boom)
+    monkeypatch.setattr(scraper, "fetch_switchplaza", lambda user_agent=None: {"b": _SP_ROW})
+    scraper._refresh_performance(temp_db)
+    assert set(load_switchplaza_cache(temp_db)) == {"b"}

@@ -6,7 +6,7 @@ import re
 
 import requests
 
-from app.config import HEADERS, PERFORMANCE_SHEET_GID, PERFORMANCE_SHEET_ID
+from app.config import HEADERS, PERFORMANCE_SHEET_GID, PERFORMANCE_SHEET_ID, SWITCHPLAZA_API_URL
 
 # Path to the pre-scraped handheld-performance.com data
 _HANDED_DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "handheld_performance.json")
@@ -15,7 +15,9 @@ _HANDED_DATA_PATH = os.path.join(os.path.dirname(__file__), "data", "handheld_pe
 def load_handheld_performance() -> dict:
     """Load pre-scraped performance data from handheld-performance.com.
 
-    Returns {norm_name: {'fps': int, 'label': str}} or empty dict on error.
+    Returns {norm_name: {'fps', 'label', 'resolution', 'docked', 'handheld'}}
+    or empty dict on error. 'docked'/'handheld' are human-readable per-mode
+    summaries ("720p 60 FPS"), empty when the mode has no data.
     """
     if not os.path.exists(_HANDED_DATA_PATH):
         return {}
@@ -43,8 +45,26 @@ def load_handheld_performance() -> dict:
         if not entry or entry.get("fps") is None:
             continue
         fps_val = entry["fps"]
-        result[norm] = {"fps": fps_val, "label": f"{fps_val}fps"}
+        result[norm] = {
+            "fps": fps_val,
+            "label": f"{fps_val}fps",
+            "resolution": normalize_resolution(entry.get("resolution")),
+            "docked": _handheld_mode_summary(perf, "Docked"),
+            "handheld": _handheld_mode_summary(perf, "Handheld"),
+        }
     return result
+
+
+def _handheld_mode_summary(perf: list, mode: str) -> str:
+    """Join one mode's rows as "<resolution> <framerate>" ("720p 60 FPS / ...")."""
+    parts = []
+    for p in perf:
+        if p.get("mode") != mode:
+            continue
+        text = f"{p.get('resolution') or ''} {p.get('framerate') or ''}".strip()
+        if text:
+            parts.append(text)
+    return " / ".join(parts)
 
 
 def refresh_handheld_performance() -> int:
@@ -295,3 +315,167 @@ def fetch_performance_sheet(sheet_id: str = None, gid: str = None,
     resp = requests.get(url, headers=_headers(user_agent), timeout=timeout)
     resp.raise_for_status()
     return parse_performance_csv(resp.text)
+
+
+_RESOLUTION_RE = re.compile(r"^\s*(<)?\s*(\d+)\s*([pk])", re.IGNORECASE)
+
+
+def normalize_resolution(text: str) -> str:
+    """Canonical short resolution: '1080P' -> '1080p', '4k' -> '4K', '<1080P' -> '<1080p'.
+
+    Trailing qualifiers are dropped ('720p (D)' -> '720p', '1080p-1200p' -> '1080p').
+    Returns '' for missing or unrecognised values ('Unknown', '60 FPS').
+    """
+    m = _RESOLUTION_RE.match(text or "")
+    if not m:
+        return ""
+    below, number, unit = m.groups()
+    return f"{below or ''}{number}{'K' if unit.lower() == 'k' else 'p'}"
+
+
+_PROFILE_RES_RE = re.compile(r"<?\s*\d+\s*[pk]", re.IGNORECASE)
+_PROFILE_FPS_RE = re.compile(r"\s*(\d+)\s*(?:fps)?\s*", re.IGNORECASE)
+
+
+def parse_perf_profiles(text: str) -> list[dict]:
+    """Parse a Switchplaza perf string into [{'resolution', 'fps', 'label'}].
+
+    '1080P 60 FPS (Performance) / 4K 30 FPS' -> two profiles; '4K60' and
+    '60 FPS' are accepted; a resolution-only profile gets fps=None.
+    'TBA', 'N/A' and empty values yield [].
+    """
+    profiles = []
+    for part in (text or "").split("/"):
+        label_match = re.search(r"\(([^)]*)\)", part)
+        label = label_match.group(1).strip() if label_match else ""
+        core = re.sub(r"\(.*?\)", "", part).strip()
+
+        res_match = _PROFILE_RES_RE.match(core)
+        resolution = normalize_resolution(res_match.group(0)) if res_match else ""
+        rest = core[res_match.end():] if res_match else core
+        fps_match = _PROFILE_FPS_RE.fullmatch(rest) if rest else None
+        if not resolution and not fps_match:
+            continue
+        profiles.append({
+            "resolution": resolution,
+            "fps": int(fps_match.group(1)) if fps_match else None,
+            "label": label,
+        })
+    return profiles
+
+
+def _perf_text(value) -> str:
+    """The raw perf string when it holds at least one profile, else ''."""
+    text = (value or "").strip()
+    return text if parse_perf_profiles(text) else ""
+
+
+def parse_switchplaza_games(games: list) -> dict:
+    """Build {norm_name: {fps, label, resolution, patch_type, docked, handheld}}.
+
+    The headline fps/resolution comes from the first docked profile with an
+    fps, falling back to handheld (matching the sheet's docked preference).
+    'docked'/'handheld' keep the full per-mode strings for the tooltip.
+    Games with no fps are skipped.
+    """
+    result: dict = {}
+    for game in games:
+        norm = normalize_name(game.get("title"))
+        if not norm:
+            continue
+        docked = _perf_text(game.get("docked_perf"))
+        handheld = _perf_text(game.get("handheld_perf"))
+        primary = next(
+            (p for text in (docked, handheld) for p in parse_perf_profiles(text) if p["fps"]),
+            None,
+        )
+        if primary is None:
+            continue
+        row = {
+            "fps": primary["fps"],
+            "label": f"{primary['fps']}fps",
+            "resolution": primary["resolution"],
+            "patch_type": (game.get("console_type") or "").strip(),
+            "docked": docked,
+            "handheld": handheld,
+        }
+        result[norm] = row
+    return result
+
+
+# Generic edition descriptors only: title-specific subtitles ("Tarnished
+# Edition", "Devil Hunter Edition") are part of the name and must still match exactly.
+_EDITION_SUFFIX = re.compile(
+    r"\s+(?:gold|deluxe|digital deluxe|complete|definitive|ultimate|special|standard"
+    r"|premium|limited|legendary|legacy|enhanced|collector s"
+    r"|(?:\d+(?:st|nd|rd|th) )?anniversary|game of the year|goty"
+    r"|nintendo switch 2)\s+edition$"
+)
+_SW2_EDITION_SUFFIX = re.compile(r"\s+nintendo switch 2 edition$")
+
+
+def edition_key(norm_name: str) -> str:
+    """Strip trailing generic edition suffixes from a normalized name.
+
+    'resident evil 4 gold edition' -> 'resident evil 4';
+    'braid anniversary edition nintendo switch 2 edition' -> 'braid'.
+    A bare descriptor ('deluxe edition') is left as is.
+    """
+    key = norm_name or ""
+    while True:
+        stripped = _EDITION_SUFFIX.sub("", key)
+        if stripped == key:
+            return key
+        key = stripped
+
+
+def build_edition_index(rows: dict) -> dict:
+    """Index {norm_name: row} by edition_key.
+
+    On a collision the shortest (base) title wins, then alphabetical order,
+    so the result does not depend on the order rows were loaded in.
+    """
+    index: dict = {}
+    for norm_name in sorted(rows, key=lambda k: (len(k), k)):
+        index.setdefault(edition_key(norm_name), rows[norm_name])
+    return index
+
+
+def edition_match(norm_name: str, index: dict):
+    """Row whose title differs from norm_name only by edition suffixes, or None.
+
+    A Switch 2 Edition title is never matched this way: the base entry it
+    would fall back to describes the Switch 1 version's performance.
+    """
+    if not norm_name or _SW2_EDITION_SUFFIX.search(norm_name):
+        return None
+    return index.get(edition_key(norm_name))
+
+
+_SWITCHPLAZA_MAX_PAGES = 20
+
+
+def fetch_switchplaza(user_agent: str = None, timeout: int = 30, page_size: int = 5000) -> dict:
+    """Fetch every game from the Switchplaza API and parse it. Raises on network/HTTP error.
+
+    One request normally covers the whole catalogue; further pages are
+    followed if the API reports more (capped as a runaway guard).
+    """
+    games: list = []
+    page = 1
+    while page <= _SWITCHPLAZA_MAX_PAGES:
+        resp = requests.get(
+            SWITCHPLAZA_API_URL,
+            params={"page": page, "limit": page_size},
+            headers=_headers(user_agent),
+            timeout=timeout,
+        )
+        resp.raise_for_status()
+        payload = resp.json()
+        batch = payload.get("data") or []
+        games.extend(batch)
+        pages = (payload.get("pagination") or {}).get("pages") or 1
+        if not batch or page >= pages:
+            break
+        page += 1
+    return parse_switchplaza_games(games)
